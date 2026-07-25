@@ -5,6 +5,41 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.3.9] — 2026-07-25
+
+### Added
+- **Telegram sample** — 21st sample agent (`telegram/agent.yaml` + `oe-config.json`); uses Telegram Bot API via the generic REST adapter; bot token embedded in `baseUrl`; agent reads `chat_id` automatically from `getUpdates` and sends a summary notification back to the chat
+- **`"telegram"` connector type** — registered in `registry.js` routing to `restApi`; no custom SDK required
+
+### Changed
+- **Config-driven adapters — all HTTP API endpoints moved to YAML** — vendor-specific endpoint paths and request bodies are now defined in `agent.yaml` step `content` and `baseUrl` in `oe-config.json`; the runtime binary contains zero hardcoded API endpoints
+- **`rest-api.js` enhanced** — added `PUT`, `PATCH`, `DELETE` HTTP methods; universal `arraybuffer` response handling with automatic binary detection (audio/video saved to temp files with correct extension); `b64_json` detection saves OpenAI image responses as temp PNG files and returns `local_path` instead of raw base64; flexible auth: `bearerToken`, `apiKey` + `headerName`, Basic Auth, custom `headers` object, `queryParamName` for query-string auth
+- **`registry.js` simplified** — removed 6 specialized HTTP adapters (`search`, `ocr`, `imageGen`, `speech`, `videoGen`, `musicGen`); all their connection types now route to `restApi`; added `"google-drive"`, `"gmail-rest"`, and `"telegram"` aliases pointing to `restApi`
+- **`cli/index.js` — `loadConfig()` tolerates literal newlines in SSH private keys** — state-machine JSON pre-parser escapes bare newlines inside string values before `JSON.parse`; private keys with raw line breaks now load without `SyntaxError`
+- **10 sample configs updated to config-driven pattern** — `cloud-drives`, `email`, `image-generation`, `music-generation`, `ocr-vision`, `rest-api`, `speech-audio`, `ssh`, `video-generation`, `web-search`; each now uses `baseUrl` + auth credential in `oe-config.json` and API endpoint paths in `agent.yaml` step content
+- **`cloud-drives` sample** — `connection_type: google-drive`; uses Google Drive REST API v3 (`bearerToken` + `baseUrl`); no googleapis SDK dependency
+- **`email` sample** — `connection_type: gmail-rest`; uses Gmail REST API (`bearerToken` + `baseUrl`); no SMTP/IMAP; inbox read via `GET /messages`, send via `POST /messages/send` with base64url RFC 2822 body
+- **`music-generation` sample** — switched from deprecated Suno Studio API to kie.ai (`https://api.kie.ai/api/v1`); uses `POST /generate` + polling `GET /generate/<taskId>`; model `V4_5`
+- **`image-generation` sample** — uses `gpt-image-1` via `POST /images/generations`; `b64_json` response auto-saved to temp PNG; agent reports `local_path`
+- **`ssh` sample** — `privateKey` now inline PEM string in `oe-config.json` instead of `privateKeyPath`
+- **`rest-api` sample** — `baseUrl` updated to `https://jsonplaceholder.typicode.com` (public, no auth required)
+- **Website hero updated** — h1 changed to "Enterprise AI Platform & Agent Runtime"; hero paragraph and FAQ JSON-LD updated to match
+- **README "What is Open Enterprise?" updated** — dual positioning as Enterprise AI Platform and AI Agent Runtime
+- **`document.title` set to custom branding name** — enterprise license `brandingName` now applied to browser tab title
+- **`Cache-Control: no-store`** added to `/api/instance` response
+
+### Fixed
+- **Login screen version** — `app/package.json` version kept in sync with `app/server/package.json` so the login screen displays the correct version number
+
+---
+
+## [v1.3.8] — 2026-07-24
+
+### Changed
+- CHANGELOG updated with v1.3.6 and v1.3.7 entries
+
+---
+
 ## [v1.3.7] — 2026-07-24
 
 ### Fixed
