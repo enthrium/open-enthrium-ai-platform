@@ -10,10 +10,19 @@ steps:
       Design a detailed image generation prompt for a professional product showcase photo.
       The subject: a sleek laptop on a minimalist desk with soft natural lighting.
       Enhance with: camera angle, lighting style, color palette, mood, and aspect ratio (16:9).
+
   - name: Generate Image
     content: |
-      Call the image generation tool with the crafted prompt.
-      Request high resolution. Wait for the generation to complete and retrieve the image URL.
+      Submit the prompt to the OpenAI Image connector.
+      POST /images/generations with body:
+      {
+        "model": "gpt-image-1",
+        "prompt": "<detailed prompt from previous step>",
+        "n": 1,
+        "size": "1024x1024"
+      }
+      The response will contain data[0].local_path with the saved image file path. Report that path.
+
   - name: Report
     content: |
       Summarize the result:

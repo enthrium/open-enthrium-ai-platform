@@ -13,9 +13,9 @@
     {
       "connection_name": "OpenAI Image",
       "connection_type": "openai-image",
-      "apiKey": "YOUR_OPENAI_API_KEY",
-      "model": "gpt-image-1",
-      "size": "1024x1024"
+      "bearerToken": "YOUR_OPENAI_API_KEY",
+      "baseUrl": "https://api.openai.com/v1",
+      "model": "gpt-image-1"
     }
   ]
 }

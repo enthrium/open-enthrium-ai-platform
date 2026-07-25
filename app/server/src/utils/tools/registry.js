@@ -26,12 +26,6 @@ const ldap           = require("./adapters/ldap");
 const graphql        = require("./adapters/graphql");
 const web3           = require("./adapters/web3");
 const mcpClient      = require("./adapters/mcp-client");
-const search         = require("./adapters/search");
-const ocr            = require("./adapters/ocr");
-const imageGen       = require("./adapters/image-gen");
-const speech         = require("./adapters/speech");
-const videoGen       = require("./adapters/video-gen");
-const musicGen       = require("./adapters/music-gen");
 
 const ADAPTERS = {
   // SQL databases
@@ -116,16 +110,20 @@ const ADAPTERS = {
   mcp:           mcpClient,
   "mcp-server":  mcpClient,
   // OAuth cloud storage
-  onedrive:      onedrive,
-  dropbox:       dropbox,
-  box:           box,
-  gdrive:        gdrive,
-  sharepoint:    onedrive,
+  onedrive:        onedrive,
+  dropbox:         dropbox,
+  box:             box,
+  gdrive:          gdrive,
+  "google-drive":  restApi,
+  sharepoint:      onedrive,
+  // Messaging bots — baseUrl includes token, endpoints in agent.yaml
+  "telegram":    restApi,
   // REST / HTTP (explicit + fallback)
   "rest-api":    restApi,
   "http":        restApi,
   // Specific SaaS adapters
   gmail:         gmail,
+  "gmail-rest":  restApi,
   slack:         slack,
   jira:          jira,
   confluence:    confluence,
@@ -136,32 +134,33 @@ const ADAPTERS = {
   github:        github,
   "zoho-mail":   zohoMail,
   ssh:           ssh,
-  // Search
-  "perplexity-search": search,
-  "google-search":     search,
-  "bing-search":       search,
-  // OCR
-  "azure-vision":   ocr,
-  "google-vision":  ocr,
-  "aws-textract":   ocr,
-  "tesseract-ocr":  ocr,
-  // Image generation
-  "openai-image":      imageGen,
-  "flux":              imageGen,
-  "stable-diffusion":  imageGen,
-  "ideogram":          imageGen,
-  // Speech & audio
-  "elevenlabs":    speech,
-  "openai-tts":    speech,
-  "azure-speech":  speech,
-  "google-tts":    speech,
-  // Video generation
-  "runway": videoGen,
-  "kling":  videoGen,
-  "pika":   videoGen,
-  // Music generation
-  "suno":  musicGen,
-  "udio":  musicGen,
+  // Search — baseUrl + bearerToken in oe-config.json, endpoints in agent.yaml
+  "perplexity-search": restApi,
+  "perplexity":        restApi,
+  "google-search":     restApi,
+  "bing-search":       restApi,
+  // OCR — baseUrl + apiKey/headerName in oe-config.json, endpoints in agent.yaml
+  "azure-vision":   restApi,
+  "google-vision":  restApi,
+  "aws-textract":   restApi,
+  "tesseract-ocr":  restApi,
+  // Image generation — baseUrl + bearerToken in oe-config.json, endpoints in agent.yaml
+  "openai-image":     restApi,
+  "flux":             restApi,
+  "stable-diffusion": restApi,
+  "ideogram":         restApi,
+  // Speech & audio — baseUrl + apiKey/headerName in oe-config.json, endpoints in agent.yaml
+  "elevenlabs":   restApi,
+  "openai-tts":   restApi,
+  "azure-speech": restApi,
+  "google-tts":   restApi,
+  // Video generation — baseUrl + bearerToken in oe-config.json, endpoints in agent.yaml
+  "runway": restApi,
+  "kling":  restApi,
+  "pika":   restApi,
+  // Music generation — baseUrl + bearerToken in oe-config.json, endpoints in agent.yaml
+  "suno": restApi,
+  "udio": restApi,
 };
 
 function getToolDefinitions(connectors) {

@@ -1,24 +1,33 @@
 name: Research Agent
 description: Search the web and summarize findings with citations
 instructions: |
-  You are a research agent. Use web search to find current, accurate information.
+  You are a research agent. Use the Perplexity connector to search the web for current, accurate information.
   Always cite your sources and provide concise, well-structured summaries.
   Complete all steps fully before writing your report.
 steps:
   - name: Search
     content: |
-      Run 3 separate web searches on the following topics:
-      1. Latest AI agent frameworks released in 2025
-      2. Enterprise AI automation adoption trends 2025
-      3. Top open-source LLM tools for business automation
+      Run 3 separate searches using the Perplexity connector. For each search,
+      POST /chat/completions with body:
+      {
+        "model": "sonar",
+        "messages": [{ "role": "user", "content": "<search query>" }]
+      }
 
-      For each search, note the top 3 results: title, source, URL, and a one-sentence summary.
+      Search queries:
+      1. "Latest AI agent frameworks released in 2025"
+      2. "Enterprise AI automation adoption trends 2025"
+      3. "Top open-source LLM tools for business automation"
+
+      For each result, extract: key findings, sources cited, and URLs.
+
   - name: Synthesize Findings
     content: |
-      From the 9 sources gathered:
-      - Identify the top 5 themes that appear across multiple sources
+      From the 3 search results gathered:
+      - Identify the top 5 themes that appear across multiple results
       - Note any conflicting information or differing perspectives
       - Select the 5 most credible and relevant sources to cite in the final report
+
   - name: Report
     content: |
       Produce a structured research summary:
@@ -36,4 +45,4 @@ steps:
       [2-3 actionable recommendations based on the research]
 connectors:
   - connection_name: Perplexity
-    connection_type: perplexity
+    connection_type: perplexity-search

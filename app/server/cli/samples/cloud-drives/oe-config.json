@@ -13,9 +13,8 @@
     {
       "connection_name": "My Google Drive",
       "connection_type": "google-drive",
-      "clientId": "YOUR_GOOGLE_CLIENT_ID",
-      "clientSecret": "YOUR_GOOGLE_CLIENT_SECRET",
-      "refreshToken": "YOUR_GOOGLE_REFRESH_TOKEN"
+      "bearerToken": "YOUR_GOOGLE_ACCESS_TOKEN",
+      "baseUrl": "https://www.googleapis.com/drive/v3"
     }
   ]
 }

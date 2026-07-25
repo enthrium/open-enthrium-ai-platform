@@ -12,8 +12,9 @@
   "connectors": [
     {
       "connection_name": "Perplexity",
-      "connection_type": "perplexity",
-      "apiKey": "YOUR_PERPLEXITY_API_KEY"
+      "connection_type": "perplexity-search",
+      "bearerToken": "YOUR_PERPLEXITY_API_KEY",
+      "baseUrl": "https://api.perplexity.ai"
     }
   ]
 }

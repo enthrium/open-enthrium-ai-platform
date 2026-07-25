@@ -7,14 +7,20 @@ instructions: |
 steps:
   - name: Read Inbox
     content: |
-      Fetch the 10 most recent unread emails from the inbox.
-      For each email note: sender, subject, date, and a one-sentence summary of the body.
+      Call the Gmail connector:
+      GET /messages with params: { "labelIds": "UNREAD", "maxResults": "10" }
+      Then for each message id returned, call:
+      GET /messages/<id> with params: { "format": "metadata", "metadataHeaders": "From,Subject,Date" }
+      Collect sender, subject, date, and snippet for each email.
+
   - name: Draft and Send Reply
     content: |
       From the unread emails, identify the one that most urgently needs a reply.
-      Draft a professional acknowledgement reply and send it via SMTP.
-      Subject: Re: [original subject]
-      Body: acknowledge receipt and state that a full response will follow within 24 hours.
+      Draft a professional acknowledgement reply. Then send it by calling:
+      POST /messages/send
+      with body: { "raw": "<base64url-encoded RFC 2822 message>" }
+      Construct the raw field as: base64url("From: me\r\nTo: <sender>\r\nSubject: Re: <subject>\r\n\r\n<body>")
+
   - name: Report
     content: |
       Summarize what was done:
@@ -24,4 +30,4 @@ steps:
       - Confirm the reply was sent successfully
 connectors:
   - connection_name: My Email
-    connection_type: smtp
+    connection_type: gmail-rest

@@ -13,8 +13,9 @@
     {
       "connection_name": "Azure Vision",
       "connection_type": "azure-vision",
-      "endpoint": "https://YOUR_RESOURCE.cognitiveservices.azure.com",
-      "apiKey": "YOUR_AZURE_VISION_KEY"
+      "apiKey": "YOUR_AZURE_VISION_KEY",
+      "headerName": "Ocp-Apim-Subscription-Key",
+      "baseUrl": "https://YOUR_RESOURCE.cognitiveservices.azure.com/vision/v3.2"
     }
   ]
 }

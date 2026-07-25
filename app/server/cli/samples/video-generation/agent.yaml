@@ -1,9 +1,8 @@
 name: Video Creator
-description: Generate short video clips from text or image prompts
+description: Generate short video clips from text prompts
 instructions: |
   You are a video generation agent. Create short video clips using Runway.
-  Describe motion, style, and scene clearly. Videos are generated asynchronously —
-  poll for completion before returning the URL.
+  Video generation is asynchronous — after submitting, poll for completion before returning the result.
   Complete all steps fully before writing your report.
 steps:
   - name: Design Video Prompt
@@ -13,11 +12,21 @@ steps:
       Motion: slow upward drift with a rotating reveal.
       Style: cinematic, high contrast, blue accent lighting.
       Camera: slow push-in, shallow depth of field.
+
   - name: Generate Video
     content: |
       Submit the prompt to the Runway connector.
-      Poll every 15 seconds until generation status is "SUCCEEDED".
-      Retrieve the video URL once complete.
+      POST /image_to_video with body:
+      {
+        "promptText": "<video prompt from previous step>",
+        "model": "gen3a_turbo",
+        "duration": 5,
+        "ratio": "1280:720"
+      }
+      Save the id from the response.
+      Poll GET /tasks/<id> every 15 seconds until status is "SUCCEEDED".
+      Once complete, extract and return the output video URL.
+
   - name: Report
     content: |
       Summarize the result:
@@ -25,7 +34,6 @@ steps:
       - Generation time taken
       - Output video URL
       - Duration and resolution
-      - Recommended use cases for this clip
 connectors:
   - connection_name: Runway
     connection_type: runway

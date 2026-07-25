@@ -12,12 +12,9 @@
   "connectors": [
     {
       "connection_name": "My Email",
-      "connection_type": "smtp",
-      "host": "smtp.gmail.com",
-      "port": 587,
-      "user": "you@gmail.com",
-      "password": "YOUR_APP_PASSWORD",
-      "from": "you@gmail.com"
+      "connection_type": "gmail-rest",
+      "bearerToken": "YOUR_GOOGLE_ACCESS_TOKEN",
+      "baseUrl": "https://gmail.googleapis.com/gmail/v1/users/me"
     }
   ]
 }

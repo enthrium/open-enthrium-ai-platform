@@ -36,6 +36,25 @@ Examples:
   process.exit(0);
 }
 
+// ── config loader — tolerates literal newlines in private keys ───────────────
+
+function loadConfig(filePath) {
+  const raw = fs.readFileSync(filePath, "utf8");
+  try { return JSON.parse(raw); } catch (_) {}
+  // Walk the string as a state machine, escaping bare newlines inside JSON strings
+  let out = ""; let inStr = false; let esc = false;
+  for (let i = 0; i < raw.length; i++) {
+    const c = raw[i];
+    if (esc)            { out += c; esc = false; continue; }
+    if (c === "\\" && inStr) { out += c; esc = true; continue; }
+    if (c === '"')      { out += c; inStr = !inStr; continue; }
+    if (inStr && c === "\r") continue;          // drop bare CR
+    if (inStr && c === "\n") { out += "\\n"; continue; } // escape bare LF
+    out += c;
+  }
+  return JSON.parse(out);
+}
+
 // ── detect config file early (needed to check server.enabled) ────────────────
 
 let _earlyCfgFile = "oe-config.json";
@@ -44,7 +63,7 @@ for (let i = 0; i < args.length; i++) {
 }
 let _serverEnabledViaCfg = false;
 if (fs.existsSync(_earlyCfgFile)) {
-  try { _serverEnabledViaCfg = JSON.parse(fs.readFileSync(_earlyCfgFile, "utf8"))?.server?.enabled === true; }
+  try { _serverEnabledViaCfg = loadConfig(_earlyCfgFile)?.server?.enabled === true; }
   catch (e) {}
 }
 
@@ -59,7 +78,7 @@ if (args.includes("--serve") || _serverEnabledViaCfg) {
     console.error(`Download a starter kit from the Sample Library: https://github.com/openenterprise-info/open-enterprise-community/releases/latest/download/oe-runtime-samples.zip\n`);
     process.exit(1);
   }
-  const serveCfg = JSON.parse(fs.readFileSync(cfgFile, "utf8"));
+  const serveCfg = loadConfig(cfgFile);
   if (!serveCfg.llm?.provider || !serveCfg.llm?.apiKey) {
     console.error("\nError: config must have { llm: { provider, apiKey, model } }\n");
     process.exit(1);
@@ -98,7 +117,7 @@ if (!fs.existsSync(configFile)) {
 }
 
 const agentYaml = yaml.load(fs.readFileSync(agentFile, "utf8"));
-const config    = JSON.parse(fs.readFileSync(configFile, "utf8"));
+const config    = loadConfig(configFile);
 
 // ── connector matching ───────────────────────────────────────────────────────
 // YAML lists connectors by name+type only (no secrets).

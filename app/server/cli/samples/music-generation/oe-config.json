@@ -13,8 +13,8 @@
     {
       "connection_name": "Suno",
       "connection_type": "suno",
-      "apiKey": "YOUR_SUNO_API_KEY",
-      "model": "chirp-v3-5"
+      "bearerToken": "YOUR_KIE_AI_API_KEY",
+      "baseUrl": "https://api.kie.ai/api/v1"
     }
   ]
 }
