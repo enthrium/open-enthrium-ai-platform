@@ -83,6 +83,7 @@ export default function Login() {
     fetch("/api/instance").then(r => r.json()).then(d => {
       if (d.licenseType === "enterprise" && d.brandingName) {
         setBranding({ name: d.brandingName, logo: d.brandingLogo || null, url: d.brandingUrl || null });
+        document.title = `${d.brandingName} - Your Enterprise AI`;
       }
     }).catch(() => {});
   }, []);

@@ -144,7 +144,10 @@ export default function AppLayout() {
       .then(d => {
         const lt = d.licenseType || "community";
         setLicenseType(lt);
-        if (lt === "enterprise" && d.brandingName) setBranding({ name: d.brandingName, url: d.brandingUrl || null, logo: d.brandingLogo || null });
+        if (lt === "enterprise" && d.brandingName) {
+          setBranding({ name: d.brandingName, url: d.brandingUrl || null, logo: d.brandingLogo || null });
+          document.title = `${d.brandingName} - Your Enterprise AI`;
+        }
       })
       .catch(() => {});
   }, []);
