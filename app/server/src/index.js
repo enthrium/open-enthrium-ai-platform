@@ -68,6 +68,7 @@ app.get("/api/instance", async (req, res) => {
       req.db.setting.findUnique({ where: { key: "branding_url"  } }),
       req.db.setting.findUnique({ where: { key: "branding_logo" } }),
     ]);
+    res.set("Cache-Control", "no-store");
     res.json({
       licenseType,
       edition,
@@ -77,6 +78,7 @@ app.get("/api/instance", async (req, res) => {
       brandingLogo: brandingLogo?.value || null,
     });
   } catch {
+    res.set("Cache-Control", "no-store");
     res.json({ licenseType, edition, price, brandingName: null, brandingUrl: null, brandingLogo: null });
   }
 });
