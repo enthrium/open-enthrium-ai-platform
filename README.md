@@ -22,7 +22,7 @@ No LangChain. No LangGraph. No code. Run agents anywhere with a single binary.
 
 ## What is Open Enterprise?
 
-Open Enterprise is an **open-source enterprise AI platform** and **self-hosted AI agent runtime** that lets you build and run autonomous AI agents without writing code. Define complex, multi-step agentic AI workflows in plain YAML. Connect 2,673 enterprise tools — databases, APIs, cloud storage, messaging, SSH, IoT — without custom integration code.
+Open Enterprise is a **self-hosted, open-source Enterprise AI Platform and AI Agent Runtime** for building and running autonomous AI agents without writing code. Define multi-step AI workflows in plain YAML and connect to 2,673+ enterprise systems—including databases, APIs, cloud storage, messaging, SSH, and IoT—without custom integration code.
 
 - **No LangChain. No LangGraph. No Python.** Agents are declarative YAML files.
 - **Run agents anywhere.** OE Runtime is a single binary for Windows, Linux, and macOS. No Node.js, no Docker, no install.
