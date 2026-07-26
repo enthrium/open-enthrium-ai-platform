@@ -9,6 +9,7 @@ COPY processor/package.json  ./processor/
 RUN yarn workspace @open-enterprise/frontend install --frozen-lockfile
 
 COPY frontend/ ./frontend/
+COPY server/src/data/ ./server/src/data/
 RUN yarn workspace @open-enterprise/frontend build
 
 # ── Stage 2: Production runtime ───────────────────────────────────────────────

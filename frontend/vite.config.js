@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
 const { version } = JSON.parse(readFileSync(resolve(__dirname, "../package.json"), "utf-8"));
@@ -18,12 +18,24 @@ function readEnvVar(key, fallback) {
 const FRONTEND_PORT = parseInt(readEnvVar("FRONTEND_PORT", "3000"));
 const SERVER_PORT   = parseInt(readEnvVar("SERVER_PORT", "3001"));
 
+const commercialFrontend = resolve(__dirname, "../commercial/frontend");
+const hasCommercial = existsSync(commercialFrontend);
+
 export default defineConfig({
   plugins: [react()],
   define: {
     __APP_VERSION__: JSON.stringify(version),
   },
+  resolve: {
+    alias: {
+      "@commercial": hasCommercial
+        ? commercialFrontend
+        : resolve(__dirname, "src/commercial-stub"),
+      "@core": resolve(__dirname, "src"),
+    },
+  },
   server: {
+    fs: { allow: [".."] },
     port: FRONTEND_PORT,
     proxy: {
       "/api": { target: `http://localhost:${SERVER_PORT}`, changeOrigin: true }

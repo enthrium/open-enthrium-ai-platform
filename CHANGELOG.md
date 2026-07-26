@@ -5,6 +5,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.4.0] — 2026-07-26
+
+### Added
+- **Commercial overlay architecture** — drop a `commercial/` folder next to the community repo to unlock commercial features; no env vars, no license keys; folder presence is detected at startup by both the server and Vite
+- **`@commercial` / `@core` Vite aliases** — commercial frontend pages import community utilities via `@core/context/`, `@core/components/`, etc.; community builds to a stub when the folder is absent
+- **`server/src/data/connectionTypes.json`** — 2,654 connector type entries as the single source of truth; replaces the hardcoded array in both the seed script and the connector screen JSX
+- **`generate:postman` script** — `yarn generate:postman` (or `node scripts/generate-postman.js`) auto-builds `cli/oe-runtime.postman_collection.json` from all `cli/samples/*/agent.yaml` files; 21 sample requests in a "Samples" folder, one per sample agent
+- **Postman collection auto-generated on release** — `runtime-release.yml` runs `generate:postman` before uploading to GitHub Releases so every release ships a fresh, complete collection
+
+### Changed
+- **Repo flattened** — `app/server/`, `app/frontend/`, `app/processor/` moved to root-level `server/`, `frontend/`, `processor/`; Yarn workspace root is now the repo root
+- **Commercial pages moved out of community** — Agent Builder, Users, Developer (APIs + Embed), SSO, Compliance, Violations, Activity Log, Tier Limits, Token Usage, Vectors pages now live in `commercial/frontend/pages/` and are injected via `commercialRoutes`; community ships without them
+- **Community sidebar cleaned** — Users, Developer (APIs, Embed), and Vectors nav links removed; those sections only appear when commercial is present
+- **Connector seed reads from JSON** — `seed-connection-masters.js` no longer has a hardcoded list; it reads `server/src/data/connectionTypes.json` at runtime
+- **Docker entrypoint seeds connection masters** — `entrypoint.sh` runs `seed-connection-masters.js` after `db push` so connector types are always populated on first boot
+
+### Fixed
+- **Connector screen showing all "Soon"** — `connectionMaster` table was empty on fresh installs; fixed by seeding from `connectionTypes.json` on startup
+- **Login broken after commercial folder added** — `isEnterpriseLicense` reference removed from `/api/instance` route; replaced with `isCommercial` boolean from `fs.existsSync` check
+- **`requireCommercial` middleware using stale env vars** — updated to use `fs.existsSync` folder detection, consistent with server startup logic
+
+---
+
 ## [v1.3.9] — 2026-07-25
 
 ### Added

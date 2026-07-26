@@ -45,30 +45,6 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "Users",
-    adminOnly: true,
-    items: [
-      {
-        id: "users", label: "Users", path: "/users",
-        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 20h5v-2a4 4 0 00-5-3.87M9 20H4v-2a4 4 0 015-3.87m6-4.13a4 4 0 11-8 0 4 4 0 018 0zm6 0a3 3 0 11-6 0 3 3 0 016 0zM3 17a3 3 0 016 0" />,
-      },
-    ],
-  },
-  {
-    label: "Developer",
-    adminOnly: true,
-    items: [
-      {
-        id: "api-keys", label: "APIs", path: "/developer",
-        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />,
-      },
-      {
-        id: "embed", label: "Embed", path: "/developer/embed",
-        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />,
-      },
-    ],
-  },
-  {
     label: "Security",
     adminOnly: true,
     enterpriseOnly: true,
@@ -109,10 +85,6 @@ const NAV_GROUPS = [
       {
         id: "maintenance", label: "Maintenance", path: "/settings/maintenance",
         icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />,
-      },
-      {
-        id: "vectors", label: "Vectors", path: "/settings/vectors", adminOnly: true,
-        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />,
       },
       {
         id: "sso", label: "SSO", path: "/settings/sso", adminOnly: true, enterpriseOnly: true,

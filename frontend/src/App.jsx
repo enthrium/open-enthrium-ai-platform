@@ -29,23 +29,13 @@ import DashboardPage   from "./pages/Dashboard/DashboardPage";
 import WorkspacesPage  from "./pages/Workspaces/WorkspacesPage";
 import ChatsPage       from "./pages/Chats/ChatsPage";
 import AgentRunsPage   from "./pages/Agents/AgentRunsPage";
-import UsersPage       from "./pages/Users/UsersPage";
-import ApiKeysPage     from "./pages/Developer/ApiKeysPage";
-import EmbedPage       from "./pages/Developer/EmbedPage";
 import SettingsPage    from "./pages/Settings/SettingsPage";
 import MaintenancePage from "./pages/Settings/MaintenancePage";
-import VectorsPage     from "./pages/Settings/VectorsPage";
-import CompliancePage  from "./pages/Settings/CompliancePage";
-import ViolationsPage  from "./pages/Settings/ViolationsPage";
-import TokenUsagePage  from "./pages/Settings/TokenUsagePage";
-import ActivityLogPage  from "./pages/Settings/ActivityLogPage";
-import SSOPage          from "./pages/Settings/SSOPage";
-import TierLimitsPage   from "./pages/Settings/TierLimitsPage";
 import ApprovalsPage    from "./pages/Agents/ApprovalsPage";
 import MarketplacePage        from "./pages/Marketplace/MarketplacePage";
-import AgentBuilderPage       from "./pages/AgentBuilder/AgentBuilderPage";
 import ConnectorsLibraryPage  from "./pages/Agents/ConnectorsLibraryPage";
 import RuntimePage             from "./pages/Runtime/RuntimePage";
+import commercialRoutes        from "@commercial/routes";
 
 function AppRoutes() {
   return (
@@ -72,21 +62,11 @@ function AppRoutes() {
         <Route path="/agent-runs"          element={<AgentRunsPage />} />
         <Route path="/approvals"           element={<ApprovalsPage />} />
         <Route path="/marketplace"           element={<MarketplacePage />} />
-        <Route path="/agent-builder"         element={<AgentBuilderPage />} />
         <Route path="/connectors-library"    element={<ConnectorsLibraryPage />} />
         <Route path="/runtime"               element={<RuntimePage />} />
-        <Route path="/users"               element={<UsersPage />} />
-        <Route path="/developer"           element={<ApiKeysPage />} />
-        <Route path="/developer/embed"     element={<EmbedPage />} />
         <Route path="/settings"            element={<SettingsPage />} />
         <Route path="/settings/maintenance"  element={<MaintenancePage />} />
-        <Route path="/settings/vectors"     element={<VectorsPage />} />
-        <Route path="/settings/compliance"  element={<CompliancePage />} />
-        <Route path="/settings/violations"  element={<ViolationsPage />} />
-        <Route path="/settings/token-usage" element={<TokenUsagePage />} />
-        <Route path="/settings/activity"    element={<ActivityLogPage />} />
-        <Route path="/settings/sso"         element={<SSOPage />} />
-        <Route path="/settings/tier-limits" element={<TierLimitsPage />} />
+        {commercialRoutes.map(r => <Route key={r.path} path={r.path} element={r.element} />)}
         <Route path="*"                    element={<HomeRedirect />} />
       </Route>
     </Routes>

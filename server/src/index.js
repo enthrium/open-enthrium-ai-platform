@@ -39,24 +39,19 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, _res, next) => { req.db = prisma; next(); });
 
-const isEnterpriseLicense =
-  process.env.LICENSE_TYPE    === "enterprise" &&
-  process.env.LICENSE_EDITION === "Open Enterprise Commercial" &&
-  process.env.LICENSE_PRICE   === "custom";
-
-// Auto-load commercial routes when license matches
-if (isEnterpriseLicense) {
+const commercialRoutesPath = path.resolve(__dirname, "../../commercial/routes");
+const isCommercial = fs.existsSync(commercialRoutesPath);
+if (isCommercial) {
   try {
-    const commercial = require("../../commercial/routes");
-    commercial.register(app);
-    console.log("[License] Commercial edition — enterprise routes loaded");
-  } catch (_) {
-    console.log("[License] Commercial routes not found — skipping");
+    require(commercialRoutesPath).register(app);
+    console.log("[Commercial] Routes loaded");
+  } catch (e) {
+    console.log("[Commercial] Failed to load routes:", e.message);
   }
 }
 
 app.get("/api/instance", async (req, res) => {
-  const isEnterprise = isEnterpriseLicense;
+  const isEnterprise = isCommercial;
 
   const licenseType = isEnterprise ? "enterprise"                : "community";
   const edition     = isEnterprise ? "Open Enterprise Commercial" : "Open Enterprise Community";

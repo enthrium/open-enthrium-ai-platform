@@ -1,5 +1,9 @@
 const jwt    = require("jsonwebtoken");
 const crypto = require("crypto");
+const fs     = require("fs");
+const path   = require("path");
+
+const _commercialExists = fs.existsSync(path.resolve(__dirname, "../../../commercial/routes"));
 
 function authenticate(req, res, next) {
   const header = req.headers.authorization;
@@ -50,11 +54,7 @@ function requireManagerOrAdminOrUser(req, res, next) {
 }
 
 function requireCommercial(req, res, next) {
-  if (
-    process.env.LICENSE_TYPE    !== "enterprise" ||
-    process.env.LICENSE_EDITION !== "Open Enterprise Commercial" ||
-    process.env.LICENSE_PRICE   !== "custom"
-  ) {
+  if (!_commercialExists) {
     return res.status(403).json({ error: "This feature requires a commercial license." });
   }
   next();
