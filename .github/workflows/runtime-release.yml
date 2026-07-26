@@ -19,18 +19,17 @@ jobs:
           node-version: "22"
 
       - name: Install dependencies
-        working-directory: app
         run: yarn install --frozen-lockfile --ignore-scripts
 
       - name: Build Windows runtime
-        working-directory: app/server
+        working-directory: server
         run: yarn build:win
 
       - name: Upload oe-runtime-win.exe
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          files: app/server/cli/oe-runtime-win.exe
+          files: server/cli/oe-runtime-win.exe
 
   build-linux:
     runs-on: ubuntu-latest
@@ -44,24 +43,23 @@ jobs:
           node-version: "22"
 
       - name: Install dependencies
-        working-directory: app
         run: yarn install --frozen-lockfile --ignore-scripts
 
       - name: Build Linux runtime
-        working-directory: app/server
+        working-directory: server
         run: yarn build:linux
 
       - name: Zip sample library
-        run: cd app/server/cli && zip -r oe-runtime-samples.zip samples/
+        run: cd server/cli && zip -r oe-runtime-samples.zip samples/
 
       - name: Upload oe-runtime-linux and starter files
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           files: |
-            app/server/cli/oe-runtime-linux
-            app/server/cli/oe-runtime.postman_collection.json
-            app/server/cli/oe-runtime-samples.zip
+            server/cli/oe-runtime-linux
+            server/cli/oe-runtime.postman_collection.json
+            server/cli/oe-runtime-samples.zip
 
   build-macos:
     runs-on: macos-latest
@@ -75,18 +73,17 @@ jobs:
           node-version: "22"
 
       - name: Install dependencies
-        working-directory: app
         run: yarn install --frozen-lockfile --ignore-scripts
 
       - name: Build macOS runtime
-        working-directory: app/server
+        working-directory: server
         run: yarn build:macos
 
       - name: Upload oe-runtime-macos
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          files: app/server/cli/oe-runtime-macos
+          files: server/cli/oe-runtime-macos
 
   update-website:
     if: github.repository == 'openenterprise-info/open-enterprise-community'

@@ -29,10 +29,10 @@ jobs:
       - name: Build image
         run: |
           docker build \
-            -f app/Dockerfile \
+            -f Dockerfile \
             -t "${{ secrets.DOCKER_USERNAME }}/${{ steps.image.outputs.IMAGE }}:${{ steps.version.outputs.VERSION }}" \
             -t "${{ secrets.DOCKER_USERNAME }}/${{ steps.image.outputs.IMAGE }}:latest" \
-            app/
+            .
 
       - name: Push to Docker Hub
         run: |
