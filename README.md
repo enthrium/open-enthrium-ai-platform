@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>Open Enterprise</h1>
+<h1>OpenEnterprise.info</h1>
 <h3>Enterprise AI Platform &amp; Agent Runtime · Apache-2.0 · Self-Hosted</h3>
 
 **A self-hosted AI agent runtime built on declarative YAML agents.**
@@ -20,9 +20,9 @@ No LangChain. No LangGraph. No code. Run agents anywhere with a single binary.
 
 ---
 
-## What is Open Enterprise?
+## What is OpenEnterprise.info?
 
-Open Enterprise is a **self-hosted, open-source Enterprise AI Platform and AI Agent Runtime** for building and running autonomous AI agents without writing code. Define multi-step AI workflows in plain YAML and connect to 2,673+ enterprise systems—including databases, APIs, cloud storage, messaging, SSH, and IoT—without custom integration code.
+OpenEnterprise.info is a **self-hosted, open-source Enterprise AI Platform and AI Agent Runtime** for building and running autonomous AI agents without writing code. Define multi-step AI workflows in plain YAML and connect to 2,673+ enterprise systems—including databases, APIs, cloud storage, messaging, SSH, and IoT—without custom integration code.
 
 - **No LangChain. No LangGraph. No Python.** Agents are declarative YAML files.
 - **Run agents anywhere.** OE Runtime is a single binary for Windows, Linux, and macOS. No Node.js, no Docker, no install.
@@ -38,7 +38,7 @@ Open Enterprise is a **self-hosted, open-source Enterprise AI Platform and AI Ag
 
 - [Architecture](#architecture)
 - [OE Runtime — Single Binary Agent Executor](#oe-runtime--single-binary-agent-executor)
-- [Open Enterprise Platform](#open-enterprise-platform)
+- [OpenEnterprise.info Platform](#openenterpriseinfo-platform)
 - [Quick Start](#quick-start)
 - [Writing Agents](#writing-agents)
 - [Agent Examples](#agent-examples)
@@ -56,11 +56,11 @@ Open Enterprise is a **self-hosted, open-source Enterprise AI Platform and AI Ag
 
 ## Architecture
 
-Open Enterprise has two deployment modes — the **Platform** (full web application) and the **Runtime** (standalone CLI binary). Both share the same underlying agent execution engine.
+OpenEnterprise.info has two deployment modes — the **Platform** (full web application) and the **Runtime** (standalone CLI binary). Both share the same underlying agent execution engine.
 
 ```mermaid
 graph TD
-    subgraph Platform["🖥️ Open Enterprise Platform (Web Application)"]
+    subgraph Platform["🖥️ OpenEnterprise.info Platform (Web Application)"]
         UI["React Frontend\n(Workspaces, Agents, Chat, RAG)"]
         API["Node.js API Server"]
         DB[("SQLite / PostgreSQL")]
@@ -269,7 +269,7 @@ curl -X POST http://localhost:3333/run \
 
 ---
 
-## Open Enterprise Platform
+## OpenEnterprise.info Platform
 
 The full web application — multi-workspace, multi-user, multi-LLM. Deploy once, use across your entire organization.
 
@@ -628,7 +628,7 @@ All connectors are browsable from the **Connectors** tab inside the Platform.
 
 ## Runtime vs Platform
 
-| | OE Runtime | Open Enterprise Platform |
+| | OE Runtime | OpenEnterprise.info Platform |
 |---|-----------|--------------------------|
 | **Best for** | Local execution, CI/CD, mobile/web backends, scripts | Teams, organizations, production SaaS |
 | **Install** | Single binary download — no install | Docker or source |
@@ -650,7 +650,7 @@ You can use both together: author and test agents with OE Runtime locally, then 
 
 Architectural comparison only — not a benchmark. Every tool has a different primary use case.
 
-| | Open Enterprise | LangGraph | CrewAI | AutoGen | Dify |
+| | OpenEnterprise.info | LangGraph | CrewAI | AutoGen | Dify |
 |---|:---:|:---:|:---:|:---:|:---:|
 | **Agent definition** | Declarative YAML | Python code | Python code | Python code | UI + YAML |
 | **No-code** | ✅ | ❌ | ❌ | ❌ | Partial |
@@ -695,7 +695,7 @@ All LLM, embedding, and vector database settings are configured from the admin p
 - [ ] Agent chaining via CLI (`--chain followup.yaml`)
 - [ ] WebAssembly target for browser / edge execution
 
-### Open Enterprise Platform
+### OpenEnterprise.info Platform
 
 - [ ] Event-driven agent triggers (webhook, queue, file watch)
 - [ ] Visual flow builder — drag-and-drop workflow designer
