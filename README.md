@@ -279,7 +279,7 @@ docker run -d \
   -e JWT_SECRET=your-secret \
   -e SUPER_ADMIN_EMAIL=admin@yourdomain.com \
   -e SUPER_ADMIN_PASSWORD=your-password \
-  -v ./data:/app/server/storage \
+  -v open-enterprise-data:/app/server/storage \
   openenterprise/open-enterprise-community:latest
 ```
 
@@ -335,7 +335,7 @@ docker run -d \
   -e JWT_SECRET=change-me \
   -e SUPER_ADMIN_EMAIL=admin@yourdomain.com \
   -e SUPER_ADMIN_PASSWORD=changeme \
-  -v ./data:/app/server/storage \
+  -v open-enterprise-data:/app/server/storage \
   openenterprise/open-enterprise-community:latest
 ```
 
