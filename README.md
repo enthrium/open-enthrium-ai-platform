@@ -732,7 +732,7 @@ Contributions are welcome. Before opening a PR:
 
 **Where contributions are most valuable:**
 
-- New connector adapters (see `app/server/src/utils/tools/adapters/`)
+- New connector adapters (see `server/src/utils/tools/adapters/`)
 - Agent YAML examples for the community marketplace
 - Bug fixes with clear reproduction steps
 - Documentation improvements and translations
