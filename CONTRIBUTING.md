@@ -8,6 +8,17 @@ Open an issue first before writing code. This lets us align on whether the chang
 
 ---
 
+## Open Enterprise Ecosystem
+
+This repo is the **core platform** (web application + Docker). Contributions to the standalone binaries belong in the dedicated repos:
+
+| | Repo |
+|---|---|
+| ⚡ **OE Runtime** (agent executor binary + samples) | [open-enterprise-ai-agent-runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime) |
+| 🔌 **OE MCP** (MCP server binary + samples) | [open-enterprise-ai-mcp-server](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server) |
+
+---
+
 ## Repo Structure
 
 ```
@@ -24,10 +35,6 @@ open-enterprise-community/
 │   │       ├── registry.js         # Maps connector type IDs → adapters
 │   │       └── adapters/           # 34 working adapter implementations
 │   ├── scripts/                    # Seed scripts and build utilities
-│   ├── cli/
-│   │   ├── index.js                # oe-runtime CLI entry point
-│   │   ├── server.js               # oe-runtime HTTP server mode
-│   │   └── samples/                # 21 sample agents (one per capability)
 │   └── prisma/                     # Database schema
 ├── frontend/                       # React + Vite + Tailwind
 │   └── src/
@@ -37,12 +44,10 @@ open-enterprise-community/
 │       └── commercial-stub/        # Empty stub — replaced by commercial overlay
 ├── processor/                      # Document ingestion microservice
 ├── Dockerfile
-├── entrypoint.sh
-└── commercial/                     # NOT in this repo (gitignored)
-                                    # Commercial edition overlay — private
+└── entrypoint.sh
 ```
 
-**Note:** The `commercial/` folder is gitignored. It is part of the private commercial edition and is never committed here. Do not attempt to add it.
+**Note:** The `commercial/` folder is gitignored. It is part of the private commercial edition and is never committed here.
 
 ---
 
@@ -73,6 +78,7 @@ There are three distinct layers — understanding them is essential before contr
 | `mqtt.js` | MQTT, AWS IoT, HiveMQ |
 | `ssh.js` | SSH command execution |
 | `sftp.js` | SFTP + FTP file operations |
+| `filesystem.js` | Local filesystem — list, read, write, search |
 | `s3.js` | AWS S3, GCS, Azure Blob, MinIO, R2, Wasabi, Backblaze |
 | `ldap.js` | LDAP, Active Directory, Azure AD, OpenLDAP |
 | `graphql.js` | GraphQL queries + mutations |
@@ -99,25 +105,12 @@ There are three distinct layers — understanding them is essential before contr
 | `music-gen.js` | Music generation (Udio, kie.ai) |
 | `search.js` | Web search (Perplexity, Google, Bing) |
 
-### What "tested" means
-
-Of the 2,654 catalog entries, **21 connector workflows have been tested end-to-end** via the sample agents in `server/cli/samples/`. Each sample is a real agent that was run against a live API:
-
-`sql-databases` · `nosql-cache` · `file-storage` · `email` · `cloud-drives` · `ssh` · `rest-api` · `graphql` · `web-search` · `blockchain-web3` · `directory-identity` · `iot-messaging` · `message-queues` · `image-generation` · `ocr-vision` · `speech-audio` · `video-generation` · `music-generation` · `productivity-crm` · `team-messaging` · `telegram`
-
-All remaining catalog entries either:
-- Fall back to `rest-api.js` (works for any standard HTTP API with correct `baseUrl` + auth in config)
-- Have a registered adapter but have not been run against a live service in CI
-
-There is no automated test suite for connectors. Contributions that add a sample agent for an untested type are highly valued.
-
 ---
 
 ## What Gets Accepted
 
 **Likely accepted:**
 - New adapter files for connector types currently falling back to `rest-api.js`
-- Sample agents (`server/cli/samples/<name>/agent.yaml` + `oe-config.json`) for real-world workflows
 - Registry entries that map catalog types to an existing adapter
 - Bug fixes with a clear reproduction case
 - Documentation corrections and clarity improvements
@@ -128,7 +121,7 @@ There is no automated test suite for connectors. Contributions that add a sample
 - New features that belong in the commercial edition
 - Dependencies that significantly increase bundle size
 - Opinionated refactors that don't fix a real problem
-- Changes to `server/src/data/connectionTypes.json` without a corresponding adapter or registry entry
+- Changes to `connectionTypes.json` without a corresponding adapter or registry entry
 
 ---
 
@@ -137,8 +130,7 @@ There is no automated test suite for connectors. Contributions that add a sample
 1. Create `server/src/utils/tools/adapters/<name>.js`
 2. Implement three exports: `getToolDefinitions(connector)`, `getAnthropicToolDefinitions(connector)`, `executeTool(action, args, connector, db)`
 3. Register the type IDs in `server/src/utils/tools/registry.js`
-4. Add a sample agent in `server/cli/samples/<name>/` with a working `agent.yaml` and a redacted `oe-config.json`
-5. Run `yarn workspace @open-enterprise/server generate:postman` to regenerate the Postman collection
+4. Add a sample agent in the [open-enterprise-ai-agent-runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime) repo under `server/cli/samples/<name>/`
 
 Look at `server/src/utils/tools/adapters/slack.js` for a simple SaaS adapter example, or `server/src/utils/tools/adapters/database.js` for a multi-dialect example.
 
@@ -147,7 +139,7 @@ Look at `server/src/utils/tools/adapters/slack.js` for a simple SaaS adapter exa
 ## How to Submit a PR
 
 1. Fork the repo and create a branch from `main`
-2. Name your branch descriptively: `fix/connector-timeout`, `feat/slack-connector`, `docs/docker-setup`
+2. Name your branch descriptively: `fix/connector-timeout`, `feat/slack-adapter`, `docs/docker-setup`
 3. Keep PRs focused — one fix or feature per PR
 4. Fill in the PR template completely
 5. All PRs require at least one approval from a maintainer before merging
