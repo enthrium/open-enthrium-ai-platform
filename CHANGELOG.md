@@ -5,6 +5,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.4.1] — 2026-07-28
+
+### Added
+- **OE MCP Server** — new standalone binary (`oe-mcp-win.exe`, `oe-mcp-linux`, `oe-mcp-macos`) that exposes enterprise connectors as MCP tools; AI apps (Claude Code, Cursor, Windsurf, Claude Desktop) connect via stdio or HTTP serve mode
+- **`--stdio` mode** — Claude Code VS Code extension launches `oe-mcp-win.exe` as a child process automatically; no manual server start required
+- **`--serve` mode** — `oe-mcp --serve --port 4040 oe-mcp.yaml` starts an HTTP MCP server; Cursor, Windsurf, and cloud deployments connect via URL
+- **Persistent memory tools** — `memory_set`, `memory_get`, `memory_delete`, `memory_list` tools available in every MCP session; state stored in `oe-mcp-memory.json` next to the config file and survives restarts
+- **Filesystem connector** — new `filesystem` adapter with 8 tools: `list_dir`, `read_file`, `write_file`, `append_file`, `delete_file`, `make_dir`, `file_info`, `search_files`; directory traversal blocked via `safePath()` security check; 50 KB read limit
+- **MCP sample configs** — ready-to-use `oe-mcp.yaml` starter files for: PostgreSQL, MySQL, MongoDB, GitHub, Slack, Google Drive, SSH, filesystem, Oracle, Salesforce (coming soon), ServiceNow (coming soon), and a multi-connector example
+- **`open-enterprise-ai-agent-runtime` repo** — dedicated public repo for the OE Runtime binary; own CI pipeline builds `oe-runtime-win.exe`, `oe-runtime-linux`, `oe-runtime-macos` on every version tag
+- **`open-enterprise-ai-mcp-server` repo** — dedicated public repo for the OE MCP binary; own CI pipeline builds all platform binaries + `oe-mcp-samples.zip` on every version tag
+
+### Changed
+- **Repo restructure** — `server/cli/` moved to `open-enterprise-ai-agent-runtime`; `server/mcp/` moved to `open-enterprise-ai-mcp-server`; community and commercial repos now contain only the core platform (`server/src/`, frontend, workflows)
+- **`runtime-release.yml` removed** from community CI — runtime binary builds are now owned by the `open-enterprise-ai-agent-runtime` repo
+- **`registry.js`** — added `filesystem`, `local-file`, `local-fs` aliases routing to the new filesystem adapter
+
+---
+
 ## [v1.4.0] — 2026-07-26
 
 ### Added
