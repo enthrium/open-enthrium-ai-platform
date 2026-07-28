@@ -1,0 +1,8 @@
+connectors:
+  - name: my-project
+    type: filesystem
+    basePath: /home/user/my-project
+
+memory:
+  - key: context
+    value: "Local project files. basePath is the root of the project."

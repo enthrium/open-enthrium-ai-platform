@@ -26,6 +26,7 @@ const ldap           = require("./adapters/ldap");
 const graphql        = require("./adapters/graphql");
 const web3           = require("./adapters/web3");
 const mcpClient      = require("./adapters/mcp-client");
+const filesystem     = require("./adapters/filesystem");
 
 const ADAPTERS = {
   // SQL databases
@@ -106,6 +107,10 @@ const ADAPTERS = {
   "infura":      web3,
   "alchemy":     web3,
   moralis:       web3,
+  // Local filesystem
+  filesystem:    filesystem,
+  "local-file":  filesystem,
+  "local-fs":    filesystem,
   // MCP protocol
   mcp:           mcpClient,
   "mcp-server":  mcpClient,

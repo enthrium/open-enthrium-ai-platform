@@ -25,11 +25,17 @@ jobs:
         working-directory: server
         run: yarn build:win
 
-      - name: Upload oe-runtime-win.exe
+      - name: Build Windows MCP
+        working-directory: server
+        run: yarn build:mcp-win
+
+      - name: Upload Windows binaries
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          files: server/cli/oe-runtime-win.exe
+          files: |
+            server/cli/oe-runtime-win.exe
+            server/mcp/dist/oe-mcp-win.exe
 
   build-linux:
     runs-on: ubuntu-latest
@@ -49,21 +55,30 @@ jobs:
         working-directory: server
         run: yarn build:linux
 
+      - name: Build Linux MCP
+        working-directory: server
+        run: yarn build:mcp-linux
+
       - name: Generate Postman collection from samples
         working-directory: server
         run: yarn generate:postman
 
-      - name: Zip sample library
+      - name: Zip runtime samples
         run: cd server/cli && zip -r oe-runtime-samples.zip samples/
 
-      - name: Upload oe-runtime-linux and starter files
+      - name: Zip MCP samples
+        run: cd server/mcp && zip -r oe-mcp-samples.zip samples/
+
+      - name: Upload Linux binaries and starter files
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           files: |
             server/cli/oe-runtime-linux
+            server/mcp/dist/oe-mcp-linux
             server/cli/oe-runtime.postman_collection.json
             server/cli/oe-runtime-samples.zip
+            server/mcp/oe-mcp-samples.zip
 
   build-macos:
     runs-on: macos-latest
@@ -83,11 +98,17 @@ jobs:
         working-directory: server
         run: yarn build:macos
 
-      - name: Upload oe-runtime-macos
+      - name: Build macOS MCP
+        working-directory: server
+        run: yarn build:mcp-macos
+
+      - name: Upload macOS binaries
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          files: server/cli/oe-runtime-macos
+          files: |
+            server/cli/oe-runtime-macos
+            server/mcp/dist/oe-mcp-macos
 
   update-website:
     if: github.repository == 'openenterprise-info/open-enterprise-community'

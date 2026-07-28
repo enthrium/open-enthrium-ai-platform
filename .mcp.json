@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "oe-mcp": {
+      "type": "http",
+      "url": "http://localhost:4040/mcp"
+    }
+  }
+}

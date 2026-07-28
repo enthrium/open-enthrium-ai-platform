@@ -10,11 +10,17 @@
     "db:push": "prisma db push",
     "db:seed-masters": "node scripts/seed-connection-masters.js",
     "generate:postman": "node scripts/generate-postman.js",
+    "mcp": "node mcp/index.js",
+    "mcp:dev": "node mcp/index.js mcp/samples/multi-connector/oe-mcp.yaml",
     "build:bundle": "ncc build cli/index.js --out cli/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql",
-    "build:win":   "ncc build cli/index.js --out cli/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql && node --experimental-sea-config sea-config.json && node scripts/inject-sea.js",
+    "build:win": "ncc build cli/index.js --out cli/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql && node --experimental-sea-config sea-config.json && node scripts/inject-sea.js",
     "build:linux": "ncc build cli/index.js --out cli/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql && node --experimental-sea-config sea-config.json && node scripts/inject-sea.js",
     "build:macos": "ncc build cli/index.js --out cli/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql && node --experimental-sea-config sea-config.json && node scripts/inject-sea.js",
-    "build:all":   "ncc build cli/index.js --out cli/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql && node --experimental-sea-config sea-config.json && node scripts/inject-sea.js"
+    "build:all": "ncc build cli/index.js --out cli/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql && node --experimental-sea-config sea-config.json && node scripts/inject-sea.js",
+    "build:mcp-bundle": "ncc build mcp/index.js --out mcp/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql",
+    "build:mcp-win": "ncc build mcp/index.js --out mcp/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql && node --experimental-sea-config mcp/sea-config.json && node scripts/inject-sea.js --mcp",
+    "build:mcp-linux": "ncc build mcp/index.js --out mcp/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql && node --experimental-sea-config mcp/sea-config.json && node scripts/inject-sea.js --mcp",
+    "build:mcp-macos": "ncc build mcp/index.js --out mcp/bundle --external oracledb --external better-sqlite3 --external snowflake-sdk --external mssql && node --experimental-sea-config mcp/sea-config.json && node scripts/inject-sea.js --mcp"
   },
   "pkg": {
     "scripts": [
@@ -35,6 +41,7 @@
     "@elastic/elasticsearch": "^9.4.2",
     "@google-cloud/bigquery": "^8.3.1",
     "@lancedb/lancedb": "0.14.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@modelcontextprotocol/server-github": "^2025.4.8",
     "@modelcontextprotocol/server-postgres": "^0.6.2",
     "@pinecone-database/pinecone": "^3.0.0",
