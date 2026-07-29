@@ -10,6 +10,7 @@ No LangChain. No LangGraph. No Python. Define workflows in plain YAML and connec
 [![Docker Pulls](https://img.shields.io/docker/pulls/openenterprise/open-enterprise-community?color=2496ED&logo=docker&logoColor=white)](https://hub.docker.com/r/openenterprise/open-enterprise-community)
 [![GitHub Release](https://img.shields.io/github/v/release/openenterprise-info/open-enterprise-community?color=4f46e5&label=latest)](https://github.com/openenterprise-info/open-enterprise-community/releases)
 [![Website](https://img.shields.io/badge/Website-openenterprise.info-4f46e5)](https://www.openenterprise.info)
+[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-openenterprise-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/openenterprise/open-enterprise-community)
 
 </div>
@@ -36,7 +37,7 @@ OpenEnterprise.info is a **self-hosted, open-source Enterprise AI Platform** for
 - **Human approval gates.** Build human-in-the-loop agentic workflows without writing code.
 - **Enterprise-ready.** Multi-workspace, RAG, MCP, DLP governance, and 2,673 connectors out of the box.
 
-🌐 **[openenterprise.info](https://www.openenterprise.info)** &nbsp;·&nbsp; ⚡ **[OE Runtime docs](https://www.openenterprise.info/runtime.html)**
+🌐 **[openenterprise.info](https://www.openenterprise.info)** &nbsp;·&nbsp; ⚡ **[OE Runtime docs](https://www.openenterprise.info/runtime.html)** &nbsp;·&nbsp; 💬 **[Discord](https://discord.com/invite/vWsZ24Msn)**
 
 ---
 
