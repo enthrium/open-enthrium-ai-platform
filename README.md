@@ -1,10 +1,11 @@
 <div align="center">
 
 <h1>OpenEnterprise.info</h1>
-<h3>Enterprise AI Platform · Apache-2.0 · Self-Hosted</h3>
+<h3>OE Platform · OE Runtime · OE MCP &nbsp;|&nbsp; Apache-2.0 · Self-Hosted</h3>
 
-**A self-hosted enterprise AI platform for building and running autonomous AI agents without writing code.**
-No LangChain. No LangGraph. No Python. Define workflows in plain YAML and connect to 2,673+ enterprise systems.
+**An open-source Enterprise AI Ecosystem — 3 products, one platform.**
+OE Platform (Enterprise AI) · OE Runtime (Agent Executor) · OE MCP (MCP Server).
+No code. No LangChain. No Python. 2,673+ enterprise connectors.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](LICENSE)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openenterprise/open-enterprise-community?color=2496ED&logo=docker&logoColor=white)](https://hub.docker.com/r/openenterprise/open-enterprise-community)
