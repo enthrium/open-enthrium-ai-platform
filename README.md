@@ -8,7 +8,7 @@ No code. No LangChain. No Python. 2,673+ enterprise connectors.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](LICENSE)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openenterprise/open-enterprise-community?color=2496ED&logo=docker&logoColor=white)](https://hub.docker.com/r/openenterprise/open-enterprise-community)
-[![GitHub Release](https://img.shields.io/github/v/release/openenterprise-info/open-enterprise-community?color=4f46e5&label=latest)](https://github.com/openenterprise-info/open-enterprise-community/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/openenterprise-info/open-enterprise-ai-platform?color=4f46e5&label=latest)](https://github.com/openenterprise-info/open-enterprise-ai-platform/releases)
 [![Website](https://img.shields.io/badge/Website-openenterprise.info-4f46e5)](https://www.openenterprise.info)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-openenterprise-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/openenterprise/open-enterprise-community)
@@ -154,7 +154,7 @@ Contributions are welcome. Before opening a PR:
 | 🐳 Docker Hub | [hub.docker.com/r/openenterprise/open-enterprise-community](https://hub.docker.com/r/openenterprise/open-enterprise-community) |
 | ⚡ OE Runtime | [open-enterprise-ai-agent-runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime) |
 | 🔌 OE MCP | [open-enterprise-ai-mcp-server](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server) |
-| 🐛 Issues | [github.com/openenterprise-info/open-enterprise-community/issues](https://github.com/openenterprise-info/open-enterprise-community/issues) |
+| 🐛 Issues | [github.com/openenterprise-info/open-enterprise-ai-platform/issues](https://github.com/openenterprise-info/open-enterprise-ai-platform/issues) |
 
 ---
 
@@ -167,6 +167,6 @@ No usage limits. No telemetry. No call-home.
 
 <div align="center">
 
-**[⭐ Star this repo](https://github.com/openenterprise-info/open-enterprise-community)** &nbsp;·&nbsp; **[🐳 Docker Hub](https://hub.docker.com/r/openenterprise/open-enterprise-community)** &nbsp;·&nbsp; **[🌐 Website](https://www.openenterprise.info)**
+**[⭐ Star this repo](https://github.com/openenterprise-info/open-enterprise-ai-platform)** &nbsp;·&nbsp; **[🐳 Docker Hub](https://hub.docker.com/r/openenterprise/open-enterprise-community)** &nbsp;·&nbsp; **[🌐 Website](https://www.openenterprise.info)**
 
 </div>
