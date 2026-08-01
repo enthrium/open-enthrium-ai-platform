@@ -1,0 +1,1 @@
+connectors:   - name: my-server     type: ssh     host: 192.168.1.100     port: 22     username: ubuntu     privateKey: /path/to/key.pem     # OR use password instead of privateKey:     # password: your-password  memory:   - key: context     value: "Remote server connected via SSH. Can run commands, read logs, check disk/CPU."

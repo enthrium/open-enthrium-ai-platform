@@ -1,0 +1,1 @@
+connectors:   - name: my-postgres     type: postgresql     host: localhost     port: 5432     database: mydb     user: admin     password: secret  memory:   - key: project_context     value: "This is a PostgreSQL database for our application."
