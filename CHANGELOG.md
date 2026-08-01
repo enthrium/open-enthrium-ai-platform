@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.4.8] — 2026-08-01
+
+### Changed
+- GitHub Release notes for MCP and Runtime now populated automatically from their own focused CHANGELOGs on every release
+- MCP and Runtime CHANGELOGs split into dedicated files managed from the monorepo
+- `release.yml` workflows for MCP and Runtime now managed from monorepo (`server/mcp/.github/workflows/` and `server/cli/.github/workflows/`)
+
+---
+
 ## [v1.4.7] — 2026-08-01
 
 ### Added

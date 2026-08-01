@@ -34,6 +34,8 @@ jobs:
           cp server/mcp/LICENSE /tmp/mcp-repo/LICENSE
           cp server/mcp/SECURITY.md /tmp/mcp-repo/SECURITY.md
           cp server/mcp/CHANGELOG.md /tmp/mcp-repo/CHANGELOG.md
+          mkdir -p /tmp/mcp-repo/.github/workflows
+          cp server/mcp/.github/workflows/release.yml /tmp/mcp-repo/.github/workflows/release.yml
 
       - name: Commit, push and tag
         env:
