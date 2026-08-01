@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { version } from "../../../package.json";
 
 const VERSION = `v${version}`;
-const REPO = "https://github.com/openenterprise-info/open-enterprise-community";
+const REPO = "https://github.com/enthrium/open-enterprise-community";
 const BASE_URL = `${REPO}/releases/latest/download`;
 
 const DOWNLOADS = [

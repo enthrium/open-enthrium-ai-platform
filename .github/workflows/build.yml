@@ -8,8 +8,8 @@ on:
 jobs:
   build:
     if: |
-      github.repository == 'openenterprise-info/open-enterprise-commercial' ||
-      github.repository == 'openenterprise-info/open-enterprise-ai-platform'
+      github.repository == 'enthrium/enthrium-commercial' ||
+      github.repository == 'enthrium/open-enthrium-ai-platform'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

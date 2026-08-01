@@ -5,10 +5,10 @@
     "homepage":  "https://www.openenterprise.info/mcp.html",
     "repository":  {
                        "type":  "git",
-                       "url":  "git+https://github.com/openenterprise-info/open-enterprise-ai-mcp-server.git"
+                       "url":  "git+https://github.com/enthrium/open-enthrium-ai-mcp-server.git"
                    },
     "license":  "Apache-2.0",
-    "mcpName":  "io.github.openenterprise-info/oe-mcp",
+    "mcpName":  "io.github.enthrium/oe-mcp",
     "bin":  {
                 "oe-mcp":  "bin.js"
             },

@@ -18,7 +18,7 @@ if (!BINARY) {
   process.exit(1);
 }
 
-const URL  = `https://github.com/openenterprise-info/open-enterprise-ai-mcp-server/releases/download/v${VERSION}/${BINARY}`;
+const URL  = `https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/download/v${VERSION}/${BINARY}`;
 const DEST = path.join(__dirname, "bin", BINARY);
 
 function download(url, dest, redirects) {

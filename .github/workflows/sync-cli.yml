@@ -7,7 +7,7 @@ on:
 
 jobs:
   sync:
-    if: github.repository == 'openenterprise-info/open-enterprise-commercial'
+    if: github.repository == 'enthrium/enthrium-commercial'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,7 +16,7 @@ jobs:
         env:
           PAT: ${{ secrets.WEBSITE_PAT }}
         run: |
-          git clone https://x-access-token:${PAT}@github.com/openenterprise-info/open-enterprise-ai-agent-runtime.git /tmp/cli-repo
+          git clone https://x-access-token:${PAT}@github.com/enthrium/open-enthrium-ai-agent-runtime.git /tmp/cli-repo
 
       - name: Sync server/ (excl. mcp/) and root files
         run: |
@@ -43,7 +43,7 @@ jobs:
           cd /tmp/cli-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${PAT}@github.com/openenterprise-info/open-enterprise-ai-agent-runtime.git
+          git remote set-url origin https://x-access-token:${PAT}@github.com/enthrium/open-enthrium-ai-agent-runtime.git
           git add -A
           git diff --cached --quiet || git commit -m "sync: ${TAG}"
           git push origin main

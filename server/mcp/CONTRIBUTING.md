@@ -14,11 +14,11 @@ This repo contains the **standalone MCP server binary** — the MCP protocol imp
 
 | Contribution | Where it goes |
 |---|---|
-| New connector adapter (e.g. Salesforce, SAP) | [open-enterprise-ai-platform](https://github.com/openenterprise-info/open-enterprise-ai-platform) → `server/src/utils/tools/adapters/` |
+| New connector adapter (e.g. Salesforce, SAP) | [open-enterprise-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) → `server/src/utils/tools/adapters/` |
 | New sample `oe-mcp.yaml` config | **This repo** → `server/mcp/samples/<name>/` |
 | Bug in MCP server, stdio/serve transport, memory tools | **This repo** → `server/mcp/index.js` |
-| Bug in agent execution engine or adapters | [open-enterprise-ai-platform](https://github.com/openenterprise-info/open-enterprise-ai-platform) |
-| Runtime binary or agent samples | [open-enterprise-ai-agent-runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime) |
+| Bug in agent execution engine or adapters | [open-enterprise-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) |
+| Runtime binary or agent samples | [open-enterprise-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) |
 
 ---
 

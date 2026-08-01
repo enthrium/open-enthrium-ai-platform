@@ -8,7 +8,7 @@ No code. No LangChain. No Python. 2,673+ enterprise connectors.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](LICENSE)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openenterprise/open-enterprise-community?color=2496ED&logo=docker&logoColor=white)](https://hub.docker.com/r/openenterprise/open-enterprise-community)
-[![GitHub Release](https://img.shields.io/github/v/release/openenterprise-info/open-enterprise-ai-platform?color=4f46e5&label=latest)](https://github.com/openenterprise-info/open-enterprise-ai-platform/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/enthrium/open-enthrium-ai-platform?color=4f46e5&label=latest)](https://github.com/enthrium/open-enthrium-ai-platform/releases)
 [![Website](https://img.shields.io/badge/Website-openenterprise.info-4f46e5)](https://www.openenterprise.info)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-openenterprise-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/openenterprise/open-enterprise-community)
@@ -23,8 +23,8 @@ This repo is the **core platform** (web application + Docker). For standalone bi
 
 | | Repo | What it does |
 |---|---|---|
-| ⚡ **OE Runtime** | [open-enterprise-ai-agent-runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime) | Standalone binary — run YAML agents locally or as an HTTP server on Windows, Linux, macOS |
-| 🔌 **OE MCP** | [open-enterprise-ai-mcp-server](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server) | MCP server binary — connect Claude Code, Cursor, Windsurf to enterprise data |
+| ⚡ **OE Runtime** | [open-enterprise-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) | Standalone binary — run YAML agents locally or as an HTTP server on Windows, Linux, macOS |
+| 🔌 **OE MCP** | [open-enterprise-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) | MCP server binary — connect Claude Code, Cursor, Windsurf to enterprise data |
 
 ---
 
@@ -152,9 +152,9 @@ Contributions are welcome. Before opening a PR:
 |---|---|
 | 🌐 Website | [openenterprise.info](https://www.openenterprise.info) |
 | 🐳 Docker Hub | [hub.docker.com/r/openenterprise/open-enterprise-community](https://hub.docker.com/r/openenterprise/open-enterprise-community) |
-| ⚡ OE Runtime | [open-enterprise-ai-agent-runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime) |
-| 🔌 OE MCP | [open-enterprise-ai-mcp-server](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server) |
-| 🐛 Issues | [github.com/openenterprise-info/open-enterprise-ai-platform/issues](https://github.com/openenterprise-info/open-enterprise-ai-platform/issues) |
+| ⚡ OE Runtime | [open-enterprise-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) |
+| 🔌 OE MCP | [open-enterprise-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) |
+| 🐛 Issues | [github.com/enthrium/open-enthrium-ai-platform/issues](https://github.com/enthrium/open-enthrium-ai-platform/issues) |
 
 ---
 
@@ -167,6 +167,6 @@ No usage limits. No telemetry. No call-home.
 
 <div align="center">
 
-**[⭐ Star this repo](https://github.com/openenterprise-info/open-enterprise-ai-platform)** &nbsp;·&nbsp; **[🐳 Docker Hub](https://hub.docker.com/r/openenterprise/open-enterprise-community)** &nbsp;·&nbsp; **[🌐 Website](https://www.openenterprise.info)**
+**[⭐ Star this repo](https://github.com/enthrium/open-enthrium-ai-platform)** &nbsp;·&nbsp; **[🐳 Docker Hub](https://hub.docker.com/r/openenterprise/open-enterprise-community)** &nbsp;·&nbsp; **[🌐 Website](https://www.openenterprise.info)**
 
 </div>

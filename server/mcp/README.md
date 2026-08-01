@@ -6,10 +6,10 @@
 **Connect any AI coding assistant to your enterprise data — databases, files, APIs, and more — via a single binary.**
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](LICENSE)
-[![GitHub Release](https://img.shields.io/github/v/release/openenterprise-info/open-enterprise-ai-mcp-server?color=4f46e5&label=latest)](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server/releases)
-[![Windows](https://img.shields.io/badge/Windows-Download-0078D4?logo=windows&logoColor=white)](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server/releases/latest/download/oe-mcp-win.exe)
-[![Linux](https://img.shields.io/badge/Linux-Download-E95420?logo=linux&logoColor=white)](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server/releases/latest/download/oe-mcp-linux)
-[![macOS](https://img.shields.io/badge/macOS-Download-000000?logo=apple&logoColor=white)](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server/releases/latest/download/oe-mcp-macos)
+[![GitHub Release](https://img.shields.io/github/v/release/enthrium/open-enthrium-ai-mcp-server?color=4f46e5&label=latest)](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases)
+[![Windows](https://img.shields.io/badge/Windows-Download-0078D4?logo=windows&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-win.exe)
+[![Linux](https://img.shields.io/badge/Linux-Download-E95420?logo=linux&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-linux)
+[![macOS](https://img.shields.io/badge/macOS-Download-000000?logo=apple&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-macos)
 [![npm](https://img.shields.io/npm/v/@openenterprise/oe-mcp?color=0284c7&label=npm)](https://www.npmjs.com/package/@openenterprise/oe-mcp)
 [![Website](https://img.shields.io/badge/Website-openenterprise.info-4f46e5)](https://www.openenterprise.info)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
@@ -70,10 +70,10 @@ Prefer a standalone binary? Download for your platform:
 
 | Platform | Binary |
 |---|---|
-| **Windows** | [oe-mcp-win.exe](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server/releases/latest/download/oe-mcp-win.exe) |
-| **Linux** | [oe-mcp-linux](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server/releases/latest/download/oe-mcp-linux) |
-| **macOS** | [oe-mcp-macos](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server/releases/latest/download/oe-mcp-macos) |
-| **Sample configs** | [oe-mcp-samples.zip](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server/releases/latest/download/oe-mcp-samples.zip) — ready-to-use `oe-mcp.yaml` for common connectors |
+| **Windows** | [oe-mcp-win.exe](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-win.exe) |
+| **Linux** | [oe-mcp-linux](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-linux) |
+| **macOS** | [oe-mcp-macos](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-macos) |
+| **Sample configs** | [oe-mcp-samples.zip](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-samples.zip) — ready-to-use `oe-mcp.yaml` for common connectors |
 
 ---
 
@@ -406,7 +406,7 @@ Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.yaml` and survives
 >
 > If you need any of these four, run with Node.js instead:
 > ```bash
-> git clone https://github.com/openenterprise-info/open-enterprise-ai-mcp-server.git
+> git clone https://github.com/enthrium/open-enthrium-ai-mcp-server.git
 > cd open-enterprise-ai-mcp-server/server
 > yarn install
 > # stdio mode (Claude Code)
@@ -420,7 +420,7 @@ Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.yaml` and survives
 
 ## Sample Configs
 
-Download [oe-mcp-samples.zip](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server/releases/latest/download/oe-mcp-samples.zip) for ready-to-use configs:
+Download [oe-mcp-samples.zip](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-samples.zip) for ready-to-use configs:
 
 `postgres` · `mysql` · `mongodb` · `github` · `slack` · `gdrive` · `ssh` · `filesystem` · `oracle` · `multi-connector`
 
@@ -445,8 +445,8 @@ OE MCP Server is part of the [Open Enterprise](https://openenterprise.info) plat
 
 | | |
 |---|---|
-| ⚡ **Agent Runtime** | [open-enterprise-ai-agent-runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime) — run YAML agents as CLI or HTTP server |
-| 🖥️ **Platform (Docker)** | [open-enterprise-ai-platform](https://github.com/openenterprise-info/open-enterprise-ai-platform) — full web app with workspaces, RAG, Agent Builder, DLP |
+| ⚡ **Agent Runtime** | [open-enterprise-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) — run YAML agents as CLI or HTTP server |
+| 🖥️ **Platform (Docker)** | [open-enterprise-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) — full web app with workspaces, RAG, Agent Builder, DLP |
 | 🌐 **Website** | [openenterprise.info](https://openenterprise.info) |
 
 ---
@@ -460,6 +460,6 @@ No usage limits. No telemetry. No call-home.
 
 <div align="center">
 
-**[⭐ Star this repo](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server)** &nbsp;·&nbsp; **[🌐 Website](https://www.openenterprise.info)** &nbsp;·&nbsp; **[⚡ Agent Runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime)**
+**[⭐ Star this repo](https://github.com/enthrium/open-enthrium-ai-mcp-server)** &nbsp;·&nbsp; **[🌐 Website](https://www.openenterprise.info)** &nbsp;·&nbsp; **[⚡ Agent Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime)**
 
 </div>
