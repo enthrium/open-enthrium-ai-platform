@@ -44,5 +44,5 @@ jobs:
           git add -A
           git diff --cached --quiet || git commit -m "sync: ${TAG}"
           git push origin main
-          git tag ${TAG}
-          git push origin ${TAG}
+          git tag -f ${TAG}
+          git push origin ${TAG} --force
