@@ -7,7 +7,9 @@ on:
 
 jobs:
   build:
-    if: github.repository == 'openenterprise-info/open-enterprise-commercial'
+    if: |
+      github.repository == 'openenterprise-info/open-enterprise-commercial' ||
+      github.repository == 'openenterprise-info/open-enterprise-ai-platform'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
