@@ -17,14 +17,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [v1.4.7] — 2026-08-01
 
 ### Added
-- **Community Docker image** — `open-enterprise-ai-platform` repo now builds and pushes `openenterprise/open-enterprise-community` to Docker Hub independently on every release tag; commercial and community images are fully separate
-- **OE MCP multi-platform binaries** — `oe-mcp-win.exe`, `oe-mcp-linux`, `oe-mcp-macos` built and attached to every GitHub release in `open-enterprise-ai-mcp-server`; samples zip (`oe-mcp-samples.zip`) included
+- **Community Docker image** — `open-enthrium-ai-platform` repo now builds and pushes `openenterprise/open-enterprise-community` to Docker Hub independently on every release tag; commercial and community images are fully separate
+- **OE MCP multi-platform binaries** — `oe-mcp-win.exe`, `oe-mcp-linux`, `oe-mcp-macos` built and attached to every GitHub release in `open-enthrium-ai-mcp-server`; samples zip (`oe-mcp-samples.zip`) included
 - **`@openenterprise/oe-mcp` npm package** — published to npm automatically on every release; `npx @openenterprise/oe-mcp` works on any machine without a manual binary download
-- **OE Runtime multi-platform binaries** — `oe-runtime-win.exe`, `oe-runtime-linux`, `oe-runtime-macos` + Postman collection built and attached to every GitHub release in `open-enterprise-ai-agent-runtime`
+- **OE Runtime multi-platform binaries** — `oe-runtime-win.exe`, `oe-runtime-linux`, `oe-runtime-macos` + Postman collection built and attached to every GitHub release in `open-enthrium-ai-agent-runtime`
 - **Automated website version bumps** — `mcp.html` and `runtime.html` download link versions update automatically when a release tag is pushed; no manual edits needed
 
 ### Changed
-- **Monorepo** — `open-enterprise-commercial` is now the single source of truth; one tag push fans out to all four repos (`open-enterprise-ai-platform`, `open-enterprise-ai-mcp-server`, `open-enterprise-ai-agent-runtime`) via GitHub Actions sync workflows
+- **Monorepo** — `enthrium-commercial` is now the single source of truth; one tag push fans out to all four repos (`open-enthrium-ai-platform`, `open-enthrium-ai-mcp-server`, `open-enthrium-ai-agent-runtime`) via GitHub Actions sync workflows
 - **Root docs managed from monorepo** — `README.md`, `CONTRIBUTING.md`, `LICENSE`, and `SECURITY.md` for the MCP and runtime public repos are now authored inside `server/mcp/` and `server/cli/` and synced on every release
 - **Sync workflows use force-push for tags** — stale tags in target repos are overwritten cleanly; no more manual tag cleanup between retags
 
@@ -39,12 +39,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Persistent memory tools** — `memory_set`, `memory_get`, `memory_delete`, `memory_list` tools available in every MCP session; state stored in `oe-mcp-memory.json` next to the config file and survives restarts
 - **Filesystem connector** — new `filesystem` adapter with 8 tools: `list_dir`, `read_file`, `write_file`, `append_file`, `delete_file`, `make_dir`, `file_info`, `search_files`; directory traversal blocked via `safePath()` security check; 50 KB read limit
 - **MCP sample configs** — ready-to-use `oe-mcp.yaml` starter files for: PostgreSQL, MySQL, MongoDB, GitHub, Slack, Google Drive, SSH, filesystem, Oracle, Salesforce (coming soon), ServiceNow (coming soon), and a multi-connector example
-- **`open-enterprise-ai-agent-runtime` repo** — dedicated public repo for the OE Runtime binary; own CI pipeline builds `oe-runtime-win.exe`, `oe-runtime-linux`, `oe-runtime-macos` on every version tag
-- **`open-enterprise-ai-mcp-server` repo** — dedicated public repo for the OE MCP binary; own CI pipeline builds all platform binaries + `oe-mcp-samples.zip` on every version tag
+- **`open-enthrium-ai-agent-runtime` repo** — dedicated public repo for the OE Runtime binary; own CI pipeline builds `oe-runtime-win.exe`, `oe-runtime-linux`, `oe-runtime-macos` on every version tag
+- **`open-enthrium-ai-mcp-server` repo** — dedicated public repo for the OE MCP binary; own CI pipeline builds all platform binaries + `oe-mcp-samples.zip` on every version tag
 
 ### Changed
-- **Repo restructure** — `server/cli/` moved to `open-enterprise-ai-agent-runtime`; `server/mcp/` moved to `open-enterprise-ai-mcp-server`; community and commercial repos now contain only the core platform (`server/src/`, frontend, workflows)
-- **`runtime-release.yml` removed** from community CI — runtime binary builds are now owned by the `open-enterprise-ai-agent-runtime` repo
+- **Repo restructure** — `server/cli/` moved to `open-enthrium-ai-agent-runtime`; `server/mcp/` moved to `open-enthrium-ai-mcp-server`; community and commercial repos now contain only the core platform (`server/src/`, frontend, workflows)
+- **`runtime-release.yml` removed** from community CI — runtime binary builds are now owned by the `open-enthrium-ai-agent-runtime` repo
 - **`registry.js`** — added `filesystem`, `local-file`, `local-fs` aliases routing to the new filesystem adapter
 
 ---
