@@ -1,0 +1,44 @@
+name: Sync → oe-ai-agent-runtime
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  sync:
+    if: github.repository == 'openenterprise-info/open-enterprise-commercial'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone oe-ai-agent-runtime
+        env:
+          PAT: ${{ secrets.WEBSITE_PAT }}
+        run: |
+          git clone https://x-access-token:${PAT}@github.com/openenterprise-info/open-enterprise-ai-agent-runtime.git /tmp/cli-repo
+
+      - name: Sync server/ (excl. mcp/)
+        run: |
+          rsync -av --delete \
+            --exclude='mcp/' \
+            --exclude='node_modules/' \
+            --exclude='storage/' \
+            --exclude='.env' \
+            --exclude='.env.example' \
+            server/ /tmp/cli-repo/server/
+
+      - name: Commit, push and tag
+        env:
+          PAT: ${{ secrets.WEBSITE_PAT }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          cd /tmp/cli-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${PAT}@github.com/openenterprise-info/open-enterprise-ai-agent-runtime.git
+          git add -A
+          git diff --cached --quiet || git commit -m "sync: ${TAG}"
+          git push origin main
+          git tag ${TAG}
+          git push origin ${TAG}
