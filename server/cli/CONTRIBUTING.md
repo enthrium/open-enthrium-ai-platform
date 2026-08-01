@@ -1,4 +1,4 @@
-# Contributing to Open Enterprise AI Agent Runtime
+# Contributing to Open Enthrium AI Agent Runtime
 
 Thank you for your interest in contributing. This document covers the repo structure, what belongs here vs the platform repo, and how to submit a contribution.
 

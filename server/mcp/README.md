@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>Open Enterprise AI MCP Server</h1>
+<h1>Open Enthrium AI MCP Server</h1>
 <h3>aka OE MCP · Enterprise MCP Server · Apache-2.0 · Claude Code · Cursor · Windsurf · Claude Desktop</h3>
 
 **Connect any AI coding assistant to your enterprise data — databases, files, APIs, and more — via a single binary.**
@@ -11,7 +11,7 @@
 [![Linux](https://img.shields.io/badge/Linux-Download-E95420?logo=linux&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-linux)
 [![macOS](https://img.shields.io/badge/macOS-Download-000000?logo=apple&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-macos)
 [![npm](https://img.shields.io/npm/v/@openenterprise/oe-mcp?color=0284c7&label=npm)](https://www.npmjs.com/package/@openenterprise/oe-mcp)
-[![Website](https://img.shields.io/badge/Website-openenterprise.info-4f46e5)](https://www.openenterprise.info)
+[![Website](https://img.shields.io/badge/Website-openenthrium.com-4f46e5)](https://www.openenthrium.com)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 
 </div>
@@ -439,15 +439,15 @@ Both modes are supported in the same binary — just pass the appropriate flag.
 
 ---
 
-## Part of Open Enterprise
+## Part of Open Enthrium
 
-OE MCP Server is part of the [Open Enterprise](https://openenterprise.info) platform.
+OE MCP Server is part of the [Open Enthrium](https://openenthrium.com) platform.
 
 | | |
 |---|---|
 | ⚡ **Agent Runtime** | [open-enterprise-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) — run YAML agents as CLI or HTTP server |
 | 🖥️ **Platform (Docker)** | [open-enterprise-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) — full web app with workspaces, RAG, Agent Builder, DLP |
-| 🌐 **Website** | [openenterprise.info](https://openenterprise.info) |
+| 🌐 **Website** | [openenthrium.com](https://openenthrium.com) |
 
 ---
 
@@ -460,6 +460,6 @@ No usage limits. No telemetry. No call-home.
 
 <div align="center">
 
-**[⭐ Star this repo](https://github.com/enthrium/open-enthrium-ai-mcp-server)** &nbsp;·&nbsp; **[🌐 Website](https://www.openenterprise.info)** &nbsp;·&nbsp; **[⚡ Agent Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime)**
+**[⭐ Star this repo](https://github.com/enthrium/open-enthrium-ai-mcp-server)** &nbsp;·&nbsp; **[🌐 Website](https://www.openenthrium.com)** &nbsp;·&nbsp; **[⚡ Agent Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime)**
 
 </div>

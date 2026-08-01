@@ -1,4 +1,4 @@
-# Contributing to Open Enterprise AI MCP Server
+# Contributing to Open Enthrium AI MCP Server
 
 Thank you for your interest in contributing. This document covers the repo structure, what belongs here vs the platform repo, and how to submit a contribution.
 

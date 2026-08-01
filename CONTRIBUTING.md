@@ -1,4 +1,4 @@
-# Contributing to Open Enterprise
+# Contributing to Open Enthrium
 
 Thank you for your interest in contributing. This document explains the codebase structure, connector architecture, what is actually tested, and what kinds of contributions get accepted.
 
@@ -8,7 +8,7 @@ Open an issue first before writing code. This lets us align on whether the chang
 
 ---
 
-## Open Enterprise Ecosystem
+## Open Enthrium Ecosystem
 
 This repo is the **core platform** (web application + Docker). Contributions to the standalone binaries belong in the dedicated repos:
 

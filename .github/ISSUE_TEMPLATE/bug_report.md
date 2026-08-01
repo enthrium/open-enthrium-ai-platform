@@ -22,7 +22,7 @@ assignees: ''
 
 ## Environment
 
-- Open Enterprise version / Docker tag:
+- Open Enthrium version / Docker tag:
 - OS:
 - Docker version:
 - LLM provider:

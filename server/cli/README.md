@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>Open Enterprise AI Agent Runtime</h1>
+<h1>Open Enthrium AI Agent Runtime</h1>
 <h3>aka OE Runtime · Standalone AI Agent Executor · Apache-2.0 · Windows · Linux · macOS</h3>
 
 **Run AI agents against any enterprise data source — no cloud, no platform, just a single binary.**
@@ -10,7 +10,7 @@
 [![Windows](https://img.shields.io/badge/Windows-Download-0078D4?logo=windows&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-agent-runtime/releases/latest/download/oe-runtime-win.exe)
 [![Linux](https://img.shields.io/badge/Linux-Download-E95420?logo=linux&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-agent-runtime/releases/latest/download/oe-runtime-linux)
 [![macOS](https://img.shields.io/badge/macOS-Download-000000?logo=apple&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-agent-runtime/releases/latest/download/oe-runtime-macos)
-[![Website](https://img.shields.io/badge/Website-openenterprise.info-4f46e5)](https://www.openenterprise.info)
+[![Website](https://img.shields.io/badge/Website-openenthrium.com-4f46e5)](https://www.openenthrium.com)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 
 </div>
@@ -253,15 +253,15 @@ Download [oe-runtime-samples.zip](https://github.com/enthrium/open-enthrium-ai-a
 
 ---
 
-## Part of Open Enterprise
+## Part of Open Enthrium
 
-OE Agent Runtime is the open-source standalone execution layer of the [Open Enterprise](https://openenterprise.info) platform.
+OE Agent Runtime is the open-source standalone execution layer of the [Open Enthrium](https://openenthrium.com) platform.
 
 | | |
 |---|---|
 | 🖥️ **Platform (Docker)** | [open-enterprise-community](https://github.com/enthrium/open-enthrium-ai-platform) — full web app with workspaces, RAG, Agent Builder, DLP |
 | 🔌 **MCP Server** | [open-enterprise-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) — connect Claude Code, Cursor, Windsurf to enterprise data |
-| 🌐 **Website** | [openenterprise.info](https://openenterprise.info) |
+| 🌐 **Website** | [openenthrium.com](https://openenthrium.com) |
 
 ---
 
@@ -274,6 +274,6 @@ No usage limits. No telemetry. No call-home.
 
 <div align="center">
 
-**[⭐ Star this repo](https://github.com/enthrium/open-enthrium-ai-agent-runtime)** &nbsp;·&nbsp; **[🌐 Website](https://www.openenterprise.info)** &nbsp;·&nbsp; **[🔌 MCP Server](https://github.com/enthrium/open-enthrium-ai-mcp-server)**
+**[⭐ Star this repo](https://github.com/enthrium/open-enthrium-ai-agent-runtime)** &nbsp;·&nbsp; **[🌐 Website](https://www.openenthrium.com)** &nbsp;·&nbsp; **[🔌 MCP Server](https://github.com/enthrium/open-enthrium-ai-mcp-server)**
 
 </div>

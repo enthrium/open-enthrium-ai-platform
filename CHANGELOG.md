@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Open Enterprise are documented here.
+All notable changes to Open Enthrium are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
@@ -91,7 +91,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **`ssh` sample** — `privateKey` now inline PEM string in `oe-config.json` instead of `privateKeyPath`
 - **`rest-api` sample** — `baseUrl` updated to `https://jsonplaceholder.typicode.com` (public, no auth required)
 - **Website hero updated** — h1 changed to "Enterprise AI Platform & Agent Runtime"; hero paragraph and FAQ JSON-LD updated to match
-- **README "What is Open Enterprise?" updated** — dual positioning as Enterprise AI Platform and AI Agent Runtime
+- **README "What is Open Enthrium?" updated** — dual positioning as Enterprise AI Platform and AI Agent Runtime
 - **`document.title` set to custom branding name** — enterprise license `brandingName` now applied to browser tab title
 - **`Cache-Control: no-store`** added to `/api/instance` response
 
@@ -124,7 +124,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **"How-To Guides" section in `runtime.html`** — card grid linking all 20 blog posts directly from the runtime page
 - **All 20 blog posts in `blog/index.html`** — agent blog cards added to the blog index
 - **All 20 blog URLs in `sitemap.xml`** — with `lastmod 2026-07-24`
-- **Website + Runtime links in `README.md`** — added `openenterprise.info` and `runtime.html` links to the "What is Open Enterprise?" bullet list
+- **Website + Runtime links in `README.md`** — added `openenthrium.com` and `runtime.html` links to the "What is Open Enthrium?" bullet list
 
 ### Changed
 - `index.html` — `#commercial` section replaced with a compact teaser pointing to `commercial.html`; nav, mobile nav, and footer updated to link to `commercial.html`
@@ -272,7 +272,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 - Version badge moved to sidebar
-- Footer updated to `www.openenterprise.info`
+- Footer updated to `www.openenthrium.com`
 
 ---
 
@@ -319,7 +319,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [v1.0.0] — 2026-07-08
 
 ### Added
-- Initial release of Open Enterprise Community Edition
+- Initial release of Open Enthrium Community Edition
 - Multi-LLM support: 17+ providers (OpenAI, Anthropic, Azure OpenAI, Groq, Gemini, Ollama, Mistral, and more)
 - RAG pipeline: ingestion queue, chunking, embedding, vector upsert, similarity search, cited responses
 - 8 vector database adapters: LanceDB (default), Pinecone, Qdrant, Chroma, Weaviate, PgVector, Milvus, Zilliz
