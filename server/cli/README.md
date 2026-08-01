@@ -229,7 +229,7 @@ curl -X POST http://localhost:3333/run \
 > If you need any of these four, run with Node.js instead:
 > ```bash
 > git clone https://github.com/enthrium/open-enthrium-ai-agent-runtime.git
-> cd open-enterprise-ai-agent-runtime/server
+> cd open-enthrium-ai-agent-runtime/server
 > yarn install
 > node cli/index.js agent.yaml --config oe-config.json
 > # or serve mode
@@ -259,8 +259,8 @@ OE Agent Runtime is the open-source standalone execution layer of the [Open Enth
 
 | | |
 |---|---|
-| 🖥️ **Platform (Docker)** | [open-enterprise-community](https://github.com/enthrium/open-enthrium-ai-platform) — full web app with workspaces, RAG, Agent Builder, DLP |
-| 🔌 **MCP Server** | [open-enterprise-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) — connect Claude Code, Cursor, Windsurf to enterprise data |
+| 🖥️ **Platform (Docker)** | [open-enthrium-community](https://github.com/enthrium/open-enthrium-ai-platform) — full web app with workspaces, RAG, Agent Builder, DLP |
+| 🔌 **MCP Server** | [open-enthrium-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) — connect Claude Code, Cursor, Windsurf to enterprise data |
 | 🌐 **Website** | [openenthrium.com](https://openenthrium.com) |
 
 ---

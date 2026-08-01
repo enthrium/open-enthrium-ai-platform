@@ -407,7 +407,7 @@ Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.yaml` and survives
 > If you need any of these four, run with Node.js instead:
 > ```bash
 > git clone https://github.com/enthrium/open-enthrium-ai-mcp-server.git
-> cd open-enterprise-ai-mcp-server/server
+> cd open-enthrium-ai-mcp-server/server
 > yarn install
 > # stdio mode (Claude Code)
 > node mcp/index.js --stdio /path/to/oe-mcp.yaml
@@ -445,8 +445,8 @@ OE MCP Server is part of the [Open Enthrium](https://openenthrium.com) platform.
 
 | | |
 |---|---|
-| ⚡ **Agent Runtime** | [open-enterprise-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) — run YAML agents as CLI or HTTP server |
-| 🖥️ **Platform (Docker)** | [open-enterprise-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) — full web app with workspaces, RAG, Agent Builder, DLP |
+| ⚡ **Agent Runtime** | [open-enthrium-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) — run YAML agents as CLI or HTTP server |
+| 🖥️ **Platform (Docker)** | [open-enthrium-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) — full web app with workspaces, RAG, Agent Builder, DLP |
 | 🌐 **Website** | [openenthrium.com](https://openenthrium.com) |
 
 ---

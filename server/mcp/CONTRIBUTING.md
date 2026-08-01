@@ -14,18 +14,18 @@ This repo contains the **standalone MCP server binary** — the MCP protocol imp
 
 | Contribution | Where it goes |
 |---|---|
-| New connector adapter (e.g. Salesforce, SAP) | [open-enterprise-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) → `server/src/utils/tools/adapters/` |
+| New connector adapter (e.g. Salesforce, SAP) | [open-enthrium-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) → `server/src/utils/tools/adapters/` |
 | New sample `oe-mcp.yaml` config | **This repo** → `server/mcp/samples/<name>/` |
 | Bug in MCP server, stdio/serve transport, memory tools | **This repo** → `server/mcp/index.js` |
-| Bug in agent execution engine or adapters | [open-enterprise-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) |
-| Runtime binary or agent samples | [open-enterprise-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) |
+| Bug in agent execution engine or adapters | [open-enthrium-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) |
+| Runtime binary or agent samples | [open-enthrium-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) |
 
 ---
 
 ## Repo Structure
 
 ```
-open-enterprise-ai-mcp-server/
+open-enthrium-ai-mcp-server/
 ├── server/
 │   ├── mcp/
 │   │   ├── index.js          # MCP server — stdio + HTTP serve modes, memory tools

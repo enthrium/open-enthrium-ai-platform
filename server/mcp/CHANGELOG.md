@@ -21,7 +21,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Automated website version bumps** — `mcp.html` download link versions update automatically on release tag
 
 ### Changed
-- Source of truth moved to monorepo (`open-enterprise-commercial`); one tag fans out to all repos
+- Source of truth moved to monorepo (`enthrium-commercial`); one tag fans out to all repos
 - `README.md`, `CONTRIBUTING.md`, `LICENSE`, `SECURITY.md`, `CHANGELOG.md` managed from monorepo
 
 ---
@@ -38,4 +38,4 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Sample configs** — ready-to-use `oe-mcp.yaml` starters for PostgreSQL, MySQL, MongoDB, GitHub, Slack, Google Drive, SSH, filesystem, and a multi-connector example
 
 ### Changed
-- Dedicated public repo `open-enterprise-ai-mcp-server` established with own CI pipeline
+- Dedicated public repo `open-enthrium-ai-mcp-server` established with own CI pipeline
