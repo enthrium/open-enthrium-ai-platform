@@ -18,7 +18,7 @@ jobs:
         run: |
           git clone https://x-access-token:${PAT}@github.com/openenterprise-info/open-enterprise-ai-agent-runtime.git /tmp/cli-repo
 
-      - name: Sync server/ (excl. mcp/)
+      - name: Sync server/ (excl. mcp/) and root files
         run: |
           rsync -av --delete \
             --exclude='mcp/' \
@@ -27,6 +27,10 @@ jobs:
             --exclude='.env' \
             --exclude='.env.example' \
             server/ /tmp/cli-repo/server/
+          cp server/cli/README.md /tmp/cli-repo/README.md
+          cp server/cli/CONTRIBUTING.md /tmp/cli-repo/CONTRIBUTING.md
+          cp server/cli/LICENSE /tmp/cli-repo/LICENSE
+          cp server/cli/SECURITY.md /tmp/cli-repo/SECURITY.md
 
       - name: Commit, push and tag
         env:
