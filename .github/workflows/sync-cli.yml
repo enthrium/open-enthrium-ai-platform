@@ -31,6 +31,7 @@ jobs:
           cp server/cli/CONTRIBUTING.md /tmp/cli-repo/CONTRIBUTING.md
           cp server/cli/LICENSE /tmp/cli-repo/LICENSE
           cp server/cli/SECURITY.md /tmp/cli-repo/SECURITY.md
+          cp server/cli/CHANGELOG.md /tmp/cli-repo/CHANGELOG.md
 
       - name: Commit, push and tag
         env:

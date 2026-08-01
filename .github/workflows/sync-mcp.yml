@@ -33,6 +33,7 @@ jobs:
           cp server/mcp/CONTRIBUTING.md /tmp/mcp-repo/CONTRIBUTING.md
           cp server/mcp/LICENSE /tmp/mcp-repo/LICENSE
           cp server/mcp/SECURITY.md /tmp/mcp-repo/SECURITY.md
+          cp server/mcp/CHANGELOG.md /tmp/mcp-repo/CHANGELOG.md
 
       - name: Commit, push and tag
         env:
