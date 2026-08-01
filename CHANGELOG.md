@@ -5,6 +5,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.4.7] — 2026-08-01
+
+### Added
+- **Community Docker image** — `open-enterprise-ai-platform` repo now builds and pushes `openenterprise/open-enterprise-community` to Docker Hub independently on every release tag; commercial and community images are fully separate
+- **OE MCP multi-platform binaries** — `oe-mcp-win.exe`, `oe-mcp-linux`, `oe-mcp-macos` built and attached to every GitHub release in `open-enterprise-ai-mcp-server`; samples zip (`oe-mcp-samples.zip`) included
+- **`@openenterprise/oe-mcp` npm package** — published to npm automatically on every release; `npx @openenterprise/oe-mcp` works on any machine without a manual binary download
+- **OE Runtime multi-platform binaries** — `oe-runtime-win.exe`, `oe-runtime-linux`, `oe-runtime-macos` + Postman collection built and attached to every GitHub release in `open-enterprise-ai-agent-runtime`
+- **Automated website version bumps** — `mcp.html` and `runtime.html` download link versions update automatically when a release tag is pushed; no manual edits needed
+
+### Changed
+- **Monorepo** — `open-enterprise-commercial` is now the single source of truth; one tag push fans out to all four repos (`open-enterprise-ai-platform`, `open-enterprise-ai-mcp-server`, `open-enterprise-ai-agent-runtime`) via GitHub Actions sync workflows
+- **Root docs managed from monorepo** — `README.md`, `CONTRIBUTING.md`, `LICENSE`, and `SECURITY.md` for the MCP and runtime public repos are now authored inside `server/mcp/` and `server/cli/` and synced on every release
+- **Sync workflows use force-push for tags** — stale tags in target repos are overwritten cleanly; no more manual tag cleanup between retags
+
+---
+
 ## [v1.4.1] — 2026-07-28
 
 ### Added
