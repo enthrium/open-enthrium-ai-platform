@@ -20,7 +20,7 @@ jobs:
 
       - name: Sync server/ (excl. cli/) and npm wrapper and root files
         run: |
-          rsync -av --delete \
+          rsync -avc --delete \
             --exclude='cli/' \
             --exclude='mcp/npm/' \
             --exclude='node_modules/' \
@@ -28,7 +28,7 @@ jobs:
             --exclude='.env' \
             --exclude='.env.example' \
             server/ /tmp/mcp-repo/server/
-          rsync -av --delete server/mcp/npm/ /tmp/mcp-repo/npm/
+          rsync -avc --delete server/mcp/npm/ /tmp/mcp-repo/npm/
           cp server/mcp/README.md /tmp/mcp-repo/README.md
           cp server/mcp/CONTRIBUTING.md /tmp/mcp-repo/CONTRIBUTING.md
           cp server/mcp/LICENSE /tmp/mcp-repo/LICENSE

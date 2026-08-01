@@ -20,7 +20,7 @@ jobs:
 
       - name: Sync server/ (excl. mcp/) and root files
         run: |
-          rsync -av --delete \
+          rsync -avc --delete \
             --exclude='mcp/' \
             --exclude='node_modules/' \
             --exclude='storage/' \
