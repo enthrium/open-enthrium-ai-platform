@@ -1,5 +1,5 @@
-
-    "name":  "open-enterprise",
+{
+    "name": "open-enterprise",
     "version":  "1.4.6",
     "private":  true,
     "workspaces":  [

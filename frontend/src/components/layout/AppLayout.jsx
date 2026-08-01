@@ -161,7 +161,7 @@ export default function AppLayout() {
                 : <span className="text-white font-black text-sm">{branding?.name?.[0]?.toUpperCase() || "O"}</span>
               }
             </div>
-            <span className="text-white font-semibold text-base tracking-tight">{branding?.name || "Open Enterprise"}</span>
+            <span className="text-white font-semibold text-base tracking-tight">{branding?.name || "OpenEnterprise.info"}</span>
           </button>
         </div>
         <UserMenu user={user} logout={logout} licenseType={licenseType} />

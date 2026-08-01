@@ -171,7 +171,7 @@ export default function Onboarding() {
           <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo rounded-2xl mb-4">
             <span className="text-white font-black text-2xl">E</span>
           </div>
-          <h1 className="text-white text-2xl font-bold">Welcome to Open Enterprise</h1>
+          <h1 className="text-white text-2xl font-bold">Welcome to OpenEnterprise.info</h1>
           <p className="text-slate-400 text-sm mt-1">Set up your Knowledge Hub</p>
         </div>
 
@@ -259,7 +259,7 @@ export default function Onboarding() {
               <div className="flex gap-3 mt-5">
                 <button type="button" onClick={() => setStep(1)} className="btn-secondary flex-1 py-2.5">&larr; Back</button>
                 <button type="submit" className="btn-primary flex-1 py-2.5" disabled={loading}>
-                  {loading ? "Launching…" : "Launch Open Enterprise"}
+                  {loading ? "Launching…" : "Launch OpenEnterprise.info"}
                 </button>
               </div>
             </form>

@@ -225,7 +225,7 @@ export default function Login() {
                   : <span className="text-white font-black text-xl">{branding ? branding.name[0].toUpperCase() : "E"}</span>
                 }
               </div>
-              <span className="text-white font-bold text-xl tracking-tight">{branding?.name || "Open Enterprise"}</span>
+              <span className="text-white font-bold text-xl tracking-tight">{branding?.name || "OpenEnterprise.info"}</span>
             </div>
 
             <h2 className="text-shimmer text-4xl font-black leading-tight mb-4" style={{ letterSpacing: "-0.02em" }}>
@@ -270,7 +270,7 @@ export default function Login() {
                 : <span className="text-white font-black text-lg">{branding ? branding.name[0].toUpperCase() : "E"}</span>
               }
             </div>
-            <span className="text-navy font-bold text-lg">{branding?.name || "Open Enterprise"}</span>
+            <span className="text-navy font-bold text-lg">{branding?.name || "OpenEnterprise.info"}</span>
           </div>
 
           <div className="w-full max-w-[380px]">
@@ -377,7 +377,7 @@ export default function Login() {
             </div>
 
             <p className="text-center text-slate-400 text-xs mt-8">
-              {branding?.name || "Open Enterprise"} v{__APP_VERSION__} &mdash; Your Enterprise AI Platform
+              {branding?.name || "OpenEnterprise.info"} v{__APP_VERSION__} &mdash; Your Enterprise AI Platform
             </p>
           </div>
         </div>
