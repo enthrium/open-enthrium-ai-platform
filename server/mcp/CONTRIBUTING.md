@@ -14,10 +14,10 @@ This repo contains the **standalone MCP server binary** — the MCP protocol imp
 
 | Contribution | Where it goes |
 |---|---|
-| New connector adapter (e.g. Salesforce, SAP) | [open-enterprise-community](https://github.com/openenterprise-info/open-enterprise-community) → `server/src/utils/tools/adapters/` |
+| New connector adapter (e.g. Salesforce, SAP) | [open-enterprise-ai-platform](https://github.com/openenterprise-info/open-enterprise-ai-platform) → `server/src/utils/tools/adapters/` |
 | New sample `oe-mcp.yaml` config | **This repo** → `server/mcp/samples/<name>/` |
 | Bug in MCP server, stdio/serve transport, memory tools | **This repo** → `server/mcp/index.js` |
-| Bug in agent execution engine or adapters | [open-enterprise-community](https://github.com/openenterprise-info/open-enterprise-community) |
+| Bug in agent execution engine or adapters | [open-enterprise-ai-platform](https://github.com/openenterprise-info/open-enterprise-ai-platform) |
 | Runtime binary or agent samples | [open-enterprise-ai-agent-runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime) |
 
 ---
@@ -33,7 +33,7 @@ open-enterprise-ai-mcp-server/
 │   │   └── samples/          # Ready-to-use oe-mcp.yaml configs
 │   │       └── <name>/
 │   │           └── oe-mcp.yaml
-│   ├── src/                  # Shared adapter source (synced from community)
+│   ├── src/                  # Shared adapter source (synced from platform repo)
 │   │   └── utils/tools/
 │   │       ├── registry.js
 │   │       └── adapters/

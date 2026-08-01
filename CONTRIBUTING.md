@@ -22,7 +22,7 @@ This repo is the **core platform** (web application + Docker). Contributions to 
 ## Repo Structure
 
 ```
-open-enterprise-community/
+open-enterprise-ai-platform/
 ├── server/                         # Express API, Prisma, agent engine, connectors
 │   ├── src/
 │   │   ├── index.js                # Server entry point

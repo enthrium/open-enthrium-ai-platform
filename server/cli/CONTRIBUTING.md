@@ -14,10 +14,10 @@ This repo contains the **standalone runtime binary** — the CLI entry point, HT
 
 | Contribution | Where it goes |
 |---|---|
-| New connector adapter (e.g. Salesforce, SAP) | [open-enterprise-community](https://github.com/openenterprise-info/open-enterprise-community) → `server/src/utils/tools/adapters/` |
+| New connector adapter (e.g. Salesforce, SAP) | [open-enterprise-ai-platform](https://github.com/openenterprise-info/open-enterprise-ai-platform) → `server/src/utils/tools/adapters/` |
 | New sample agent (`agent.yaml` + `oe-config.json`) | **This repo** → `server/cli/samples/<name>/` |
 | Bug in CLI entry point or HTTP server mode | **This repo** → `server/cli/` |
-| Bug in agent execution engine | [open-enterprise-community](https://github.com/openenterprise-info/open-enterprise-community) → `server/src/engine/` |
+| Bug in agent execution engine | [open-enterprise-ai-platform](https://github.com/openenterprise-info/open-enterprise-ai-platform) → `server/src/engine/` |
 | MCP server binary or MCP samples | [open-enterprise-ai-mcp-server](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server) |
 
 ---
@@ -34,7 +34,7 @@ open-enterprise-ai-agent-runtime/
 │   │       └── <name>/
 │   │           ├── agent.yaml
 │   │           └── oe-config.json
-│   ├── src/                  # Shared adapter source (synced from community)
+│   ├── src/                  # Shared adapter source (synced from platform repo)
 │   │   └── utils/tools/
 │   │       ├── registry.js
 │   │       └── adapters/
