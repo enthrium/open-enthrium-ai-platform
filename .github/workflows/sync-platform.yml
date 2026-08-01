@@ -1,0 +1,48 @@
+name: Sync → open-enterprise-ai-platform
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  sync:
+    if: github.repository == 'openenterprise-info/open-enterprise-commercial'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone open-enterprise-ai-platform
+        env:
+          PAT: ${{ secrets.WEBSITE_PAT }}
+        run: |
+          git clone https://x-access-token:${PAT}@github.com/openenterprise-info/open-enterprise-ai-platform.git /tmp/platform-repo
+
+      - name: Sync (excl. commercial/ and server adapters)
+        run: |
+          rsync -av --delete \
+            --exclude='.git/' \
+            --exclude='commercial/' \
+            --exclude='server/cli/' \
+            --exclude='server/mcp/' \
+            --exclude='server/node_modules/' \
+            --exclude='server/storage/' \
+            --exclude='server/.env' \
+            --exclude='server/.env.example' \
+            --exclude='node_modules/' \
+            . /tmp/platform-repo/
+
+      - name: Commit, push and tag
+        env:
+          PAT: ${{ secrets.WEBSITE_PAT }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          cd /tmp/platform-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${PAT}@github.com/openenterprise-info/open-enterprise-ai-platform.git
+          git add -A
+          git diff --cached --quiet || git commit -m "sync: ${TAG}"
+          git push origin main
+          git tag ${TAG}
+          git push origin ${TAG}

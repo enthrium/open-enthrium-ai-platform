@@ -1,0 +1,46 @@
+name: Sync → oe-ai-mcp-server
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  sync:
+    if: github.repository == 'openenterprise-info/open-enterprise-commercial'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone oe-ai-mcp-server
+        env:
+          PAT: ${{ secrets.WEBSITE_PAT }}
+        run: |
+          git clone https://x-access-token:${PAT}@github.com/openenterprise-info/open-enterprise-ai-mcp-server.git /tmp/mcp-repo
+
+      - name: Sync server/ (excl. cli/) and npm wrapper
+        run: |
+          rsync -av --delete \
+            --exclude='cli/' \
+            --exclude='mcp/npm/' \
+            --exclude='node_modules/' \
+            --exclude='storage/' \
+            --exclude='.env' \
+            --exclude='.env.example' \
+            server/ /tmp/mcp-repo/server/
+          rsync -av --delete server/mcp/npm/ /tmp/mcp-repo/npm/
+
+      - name: Commit, push and tag
+        env:
+          PAT: ${{ secrets.WEBSITE_PAT }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          cd /tmp/mcp-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${PAT}@github.com/openenterprise-info/open-enterprise-ai-mcp-server.git
+          git add -A
+          git diff --cached --quiet || git commit -m "sync: ${TAG}"
+          git push origin main
+          git tag ${TAG}
+          git push origin ${TAG}
