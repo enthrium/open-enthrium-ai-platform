@@ -1,4 +1,4 @@
-# Contributing to Open Enterprise
+# Contributing to Open Enthrium
 
 Thank you for your interest in contributing. This document explains the codebase structure, connector architecture, what is actually tested, and what kinds of contributions get accepted.
 
@@ -8,21 +8,21 @@ Open an issue first before writing code. This lets us align on whether the chang
 
 ---
 
-## Open Enterprise Ecosystem
+## Open Enthrium Ecosystem
 
 This repo is the **core platform** (web application + Docker). Contributions to the standalone binaries belong in the dedicated repos:
 
 | | Repo |
 |---|---|
-| ⚡ **OE Runtime** (agent executor binary + samples) | [open-enterprise-ai-agent-runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime) |
-| 🔌 **OE MCP** (MCP server binary + samples) | [open-enterprise-ai-mcp-server](https://github.com/openenterprise-info/open-enterprise-ai-mcp-server) |
+| ⚡ **OE Runtime** (agent executor binary + samples) | [open-enthrium-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) |
+| 🔌 **OE MCP** (MCP server binary + samples) | [open-enthrium-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) |
 
 ---
 
 ## Repo Structure
 
 ```
-open-enterprise-community/
+open-enthrium-ai-platform/
 ├── server/                         # Express API, Prisma, agent engine, connectors
 │   ├── src/
 │   │   ├── index.js                # Server entry point
@@ -130,7 +130,7 @@ There are three distinct layers — understanding them is essential before contr
 1. Create `server/src/utils/tools/adapters/<name>.js`
 2. Implement three exports: `getToolDefinitions(connector)`, `getAnthropicToolDefinitions(connector)`, `executeTool(action, args, connector, db)`
 3. Register the type IDs in `server/src/utils/tools/registry.js`
-4. Add a sample agent in the [open-enterprise-ai-agent-runtime](https://github.com/openenterprise-info/open-enterprise-ai-agent-runtime) repo under `server/cli/samples/<name>/`
+4. Add a sample agent in the [open-enthrium-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) repo under `server/cli/samples/<name>/`
 
 Look at `server/src/utils/tools/adapters/slack.js` for a simple SaaS adapter example, or `server/src/utils/tools/adapters/database.js` for a multi-dialect example.
 
