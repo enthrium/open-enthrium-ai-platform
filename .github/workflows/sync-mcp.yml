@@ -18,7 +18,7 @@ jobs:
         run: |
           git clone https://x-access-token:${PAT}@github.com/openenterprise-info/open-enterprise-ai-mcp-server.git /tmp/mcp-repo
 
-      - name: Sync server/ (excl. cli/) and npm wrapper
+      - name: Sync server/ (excl. cli/) and npm wrapper and root files
         run: |
           rsync -av --delete \
             --exclude='cli/' \
@@ -29,6 +29,10 @@ jobs:
             --exclude='.env.example' \
             server/ /tmp/mcp-repo/server/
           rsync -av --delete server/mcp/npm/ /tmp/mcp-repo/npm/
+          cp server/mcp/README.md /tmp/mcp-repo/README.md
+          cp server/mcp/CONTRIBUTING.md /tmp/mcp-repo/CONTRIBUTING.md
+          cp server/mcp/LICENSE /tmp/mcp-repo/LICENSE
+          cp server/mcp/SECURITY.md /tmp/mcp-repo/SECURITY.md
 
       - name: Commit, push and tag
         env:
