@@ -1,7 +1,7 @@
 <div align="center">
 
-<h1>openenthrium.com</h1>
-<h3>Open-Source Enterprise AI Ecosystem · Apache-2.0 · Self-Hosted</h3>
+<h1>Open Enthrium</h1>
+<h3>Open-Source AI Ecosystem · Apache-2.0 · Self-Hosted</h3>
 
 **Build, deploy, and govern AI Agents, Assistants, RAG, MCP, Workspaces, and Enterprise Automation.**
 No code. No LangChain. No Python. 2,673+ enterprise connectors.
@@ -9,7 +9,7 @@ No code. No LangChain. No Python. 2,673+ enterprise connectors.
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](LICENSE)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openenterprise/open-enterprise-community?color=2496ED&logo=docker&logoColor=white)](https://hub.docker.com/r/openenterprise/open-enterprise-community)
 [![GitHub Release](https://img.shields.io/github/v/release/enthrium/open-enthrium-ai-platform?color=4f46e5&label=latest)](https://github.com/enthrium/open-enthrium-ai-platform/releases)
-[![Website](https://img.shields.io/badge/Website-openenthrium.com-4f46e5)](https://www.openenthrium.com)
+[![Website](https://img.shields.io/badge/Website-Open_Enthrium-4f46e5)](https://www.openenthrium.com)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-openenterprise-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/openenterprise/open-enterprise-community)
 
@@ -28,16 +28,16 @@ This repo is the **core platform** (web application + Docker). For standalone bi
 
 ---
 
-## What is openenthrium.com?
+## What is Open Enthrium?
 
-openenthrium.com is a **self-hosted, open-source Enterprise AI Platform** for building and running autonomous AI agents without writing code. Deploy it on your own infrastructure and connect to 2,673+ enterprise systems — databases, APIs, cloud storage, messaging, SSH, and IoT — without custom integration code.
+Open Enthrium is a **Self-Hosted, Open-Source AI Platform** for building and running autonomous AI agents without writing code. Deploy it on your own infrastructure and connect to 2,673+ enterprise systems — databases, APIs, cloud storage, messaging, SSH, and IoT — without custom integration code.
 
 - **No code.** Agents are declarative YAML files.
 - **Self-hosted.** Deploy on your own infrastructure. Own your data completely. No call-home.
 - **Human approval gates.** Build human-in-the-loop agentic workflows without writing code.
 - **Enterprise-ready.** Multi-workspace, RAG, MCP, DLP governance, and 2,673 connectors out of the box.
 
-🌐 **[openenthrium.com](https://www.openenthrium.com)** &nbsp;·&nbsp; ⚡ **[OE Runtime docs](https://www.openenthrium.com/runtime.html)** &nbsp;·&nbsp; 💬 **[Discord](https://discord.com/invite/vWsZ24Msn)**
+🌐 **[Open Enthrium](https://www.openenthrium.com)** &nbsp;·&nbsp; ⚡ **[OE Runtime docs](https://www.openenthrium.com/runtime.html)** &nbsp;·&nbsp; 💬 **[Discord](https://discord.com/invite/vWsZ24Msn)**
 
 ---
 
@@ -150,7 +150,7 @@ Contributions are welcome. Before opening a PR:
 
 | | |
 |---|---|
-| 🌐 Website | [openenthrium.com](https://www.openenthrium.com) |
+| 🌐 Website | [Open Enthrium](https://www.openenthrium.com) |
 | 🐳 Docker Hub | [hub.docker.com/r/openenterprise/open-enterprise-community](https://hub.docker.com/r/openenterprise/open-enterprise-community) |
 | ⚡ OE Runtime | [open-enthrium-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) |
 | 🔌 OE MCP | [open-enthrium-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) |
