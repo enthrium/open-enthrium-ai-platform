@@ -67,13 +67,6 @@ yarn workspace @open-enthrium/server db:seed-masters
 yarn dev
 ```
 
-For a production build:
-
-```bash
-yarn build
-yarn workspace @open-enthrium/server start
-```
-
 ---
 
 ## Platform Capabilities
