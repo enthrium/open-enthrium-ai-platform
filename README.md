@@ -19,7 +19,7 @@ No code. No LangChain. No Python. 2,673+ enterprise connectors.
 
 ## What is Open Enthrium AI Platform?
 
-A **Self-Hosted, Open-Source AI Platform** for building and running autonomous AI agents without writing code. Deploy it on your own infrastructure and connect to 2,673+ enterprise systems — databases, APIs, cloud storage, messaging, SSH, and IoT — without custom integration code.
+A self-hosted, web-based open-source AI platform for building and running autonomous AI agents without writing code. Deploy it on your own infrastructure and connect to 2,673+ enterprise systems — databases, APIs, cloud storage, messaging, SSH, and IoT — without custom integration code.
 
 - **No code.** Agents are declarative YAML files.
 - **Self-hosted.** Deploy on your own infrastructure. Own your data completely. No call-home.
