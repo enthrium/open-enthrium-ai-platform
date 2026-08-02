@@ -5,6 +5,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.5.0] — 2026-08-02
+
+### Changed
+- **Full rebrand — Open Enterprise → Open Enthrium** — all occurrences of `Open Enterprise`, `openenterprise.info`, and `OpenEnterprise.info` replaced with `Open Enthrium` / `openenthrium.com` across the entire codebase: console logs, API docs, Swagger UI title, license edition strings, UI fallback names, login page, onboarding, embed widget, settings descriptions, browser tab title, footer links, bug report email, admin user filter, Postman collection, MCP/runtime usage text, and sample YAML files
+- **Yarn workspace packages renamed** — `@open-enterprise/server`, `@open-enterprise/frontend`, `@open-enterprise/processor` → `@open-enthrium/server`, `@open-enthrium/frontend`, `@open-enthrium/processor`; `Dockerfile` and `package.json` scripts updated accordingly
+- **`commercial/` folder tracked in `enthrium-commercial`** — removed from `.gitignore`; `sync-platform.yml` already excludes it from the public platform repo via rsync rules
+- **Support email** — `support@openenterprise.info` → `team@openenthrium.com` across all repos and in-app bug report link
+- **Login page copy** — tagline updated to "Your AI Intelligence Platform"; description updated to "AI Assistants to AI Ecosystem"
+- **Browser tab title** — `OpenEnterprise.info - Your Enterprise AI` → `Open Enthrium - AI Intelligence Platform`
+- **Website refresh** — hero, sub-hero product cards, and footer copy updated across `index.html`, `platform.html`, `runtime.html`, `mcp.html`; Docker Hub buttons removed; old GitHub org links fixed
+
+### Added
+- **Platform README from-source setup** — detailed steps including Prisma `db:push` + `db:seed-masters`, Discord community link
+- **Runtime README — Binary vs Node.js Mode** — promoted from blockquote to a proper `##` section above the Connector Catalog (both agent-runtime and MCP repos)
+- **Runtime README — HTTP Server Mode** — restructured as Step 1 (enable in `oe-config.json`) + Step 2 (start command with output)
+- **Runtime README — Quick Start table** — all three platforms (Windows, Linux, macOS) + sample kit + Postman collection in one table
+
+### Fixed
+- **CONTRIBUTING.md aligned across all repos** — expanded Before You Start, descriptive branch naming, Fill in PR template step, dependency justification in Code Standards, structured Reporting Bugs, Questions section added (platform, runtime, MCP)
+- **SECURITY.md email** — `support@openenthrium.com` → `team@openenthrium.com` across all three public repos
+
+---
+
 ## [v1.4.8] — 2026-08-01
 
 ### Changed

@@ -388,7 +388,7 @@ oe-runtime market-report.yaml \\
       {/* Footer link */}
       <div className="pb-4">
         <a
-          href="https://www.openenterprise.info/runtime.html"
+          href="https://www.openenthrium.com/runtime.html"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-sm text-indigo hover:underline"

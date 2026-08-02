@@ -41,4 +41,4 @@ app.post("/process/url", async (req, res) => {
 
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
-app.listen(PORT, () => console.log(`Open Enterprise processor running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Open Enthrium processor running on port ${PORT}`));

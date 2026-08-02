@@ -458,7 +458,7 @@ function BrandingTab({ settings, set }) {
   return (
     <div className="space-y-6 max-w-lg">
       <p className="text-xs text-gray-500">
-        White-label the app name, logo, and footer. Leave blank to keep the OpenEnterprise.info defaults.
+        White-label the app name, logo, and footer. Leave blank to keep the Open Enthrium defaults.
       </p>
 
       {/* Logo */}
@@ -494,7 +494,7 @@ function BrandingTab({ settings, set }) {
         <label className="block text-sm font-medium text-slate-700 mb-1">Brand Name</label>
         <input className="input" type="text" value={settings.branding_name || ""}
           onChange={e => set("branding_name", e.target.value)} placeholder="e.g. Acme Corp" />
-        <p className="text-xs text-gray-400 mt-1">Replaces "OpenEnterprise.info" in the top navbar and footer.</p>
+        <p className="text-xs text-gray-400 mt-1">Replaces "Open Enthrium" in the top navbar and footer.</p>
       </div>
 
       {/* Brand URL */}

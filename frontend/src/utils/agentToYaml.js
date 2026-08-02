@@ -17,7 +17,7 @@ export function agentToRuntimeYaml(a) {
   return dump(obj, { lineWidth: -1, noRefs: true });
 }
 
-// Workspace format — for importing into the Open Enterprise platform
+// Workspace format — for importing into the Open Enthrium platform
 export function agentToYaml(a) {
   const lines = [
     `name: "${a.name || "Untitled Agent"}"`,

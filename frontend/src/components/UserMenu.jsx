@@ -177,7 +177,7 @@ export default function UserMenu({ user, logout, licenseType }) {
 
               {/* Report bug */}
               <a
-                href="mailto:support@openenterprise.info?subject=Bug Report"
+                href="mailto:team@openenthrium.com?subject=Bug Report"
                 onClick={() => setOpen(false)}
                 className="flex items-start gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-colors hover:bg-white/10"
               >
@@ -186,7 +186,7 @@ export default function UserMenu({ user, logout, licenseType }) {
                 </svg>
                 <div>
                   <p className="text-sm font-medium text-white">Report a Bug</p>
-                  <p className="text-xs mt-0.5" style={{ color: "rgba(148,163,184,0.7)" }}>Send an email to support@openenterprise.info</p>
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(148,163,184,0.7)" }}>Send an email to team@openenthrium.com</p>
                 </div>
               </a>
 

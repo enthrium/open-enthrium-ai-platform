@@ -156,7 +156,7 @@ export default function EmbedChat() {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-white font-semibold text-sm truncate">{configLoaded ? wsName : ""}</p>
-          <p className="text-indigo-200 text-[10px]">Powered by OpenEnterprise.info</p>
+          <p className="text-indigo-200 text-[10px]">Powered by Open Enthrium</p>
         </div>
         <span className="flex items-center gap-1.5">
           <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />

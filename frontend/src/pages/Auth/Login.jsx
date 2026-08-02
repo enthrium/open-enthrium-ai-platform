@@ -225,14 +225,14 @@ export default function Login() {
                   : <span className="text-white font-black text-xl">{branding ? branding.name[0].toUpperCase() : "E"}</span>
                 }
               </div>
-              <span className="text-white font-bold text-xl tracking-tight">{branding?.name || "OpenEnterprise.info"}</span>
+              <span className="text-white font-bold text-xl tracking-tight">{branding?.name || "Open Enthrium"}</span>
             </div>
 
             <h2 className="text-shimmer text-4xl font-black leading-tight mb-4" style={{ letterSpacing: "-0.02em" }}>
-              Your Enterprise AI Platform
+              Your AI Intelligence Platform
             </h2>
             <p className="text-indigo-200 text-base leading-relaxed mb-8" style={{ color: "rgba(199,210,254,0.8)" }}>
-              From AI assistants to a full enterprise AI Platform — deploy, automate, and govern AI across your entire organisation.
+              AI Assistants to AI Ecosystem — deploy, automate, and govern AI across your entire organisation.
             </p>
 
             <div className="space-y-3.5">
@@ -270,7 +270,7 @@ export default function Login() {
                 : <span className="text-white font-black text-lg">{branding ? branding.name[0].toUpperCase() : "E"}</span>
               }
             </div>
-            <span className="text-navy font-bold text-lg">{branding?.name || "OpenEnterprise.info"}</span>
+            <span className="text-navy font-bold text-lg">{branding?.name || "Open Enthrium"}</span>
           </div>
 
           <div className="w-full max-w-[380px]">
@@ -377,7 +377,7 @@ export default function Login() {
             </div>
 
             <p className="text-center text-slate-400 text-xs mt-8">
-              {branding?.name || "OpenEnterprise.info"} v{__APP_VERSION__} &mdash; Your Enterprise AI Platform
+              {branding?.name || "Open Enthrium"} v{__APP_VERSION__} &mdash; Your AI Intelligence Platform
             </p>
           </div>
         </div>

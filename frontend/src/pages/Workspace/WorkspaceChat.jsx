@@ -1072,7 +1072,7 @@ export default function WorkspaceChat() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">{workspace?.name || "OpenEnterprise.info"}</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">{workspace?.name || "Open Enthrium"}</h2>
                 <p className="text-gray-500 text-[15px] max-w-sm leading-relaxed mb-6">
                   Select a thread from the sidebar or create a new one to start chatting.
                 </p>
@@ -1363,7 +1363,7 @@ export default function WorkspaceChat() {
             </form>
 
             <p className="text-xs text-center text-gray-400 mt-2">
-              OpenEnterprise.info can make mistakes. Check important info.
+              Open Enthrium can make mistakes. Check important info.
             </p>
           </div>
         </div>

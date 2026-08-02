@@ -1,5 +1,5 @@
-# ── Commercial edition (never committed to community repo) ────────────────────
-commercial/
+# ── Commercial edition (excluded from platform sync via sync-platform.yml) ────
+# commercial/ is committed here but excluded from open-enthrium-ai-platform sync
 
 # ── Dependencies ──────────────────────────────────────────────────────────────
 node_modules/

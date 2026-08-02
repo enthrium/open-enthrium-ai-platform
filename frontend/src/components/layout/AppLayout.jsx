@@ -161,7 +161,7 @@ export default function AppLayout() {
                 : <span className="text-white font-black text-sm">{branding?.name?.[0]?.toUpperCase() || "O"}</span>
               }
             </div>
-            <span className="text-white font-semibold text-base tracking-tight">{branding?.name || "OpenEnterprise.info"}</span>
+            <span className="text-white font-semibold text-base tracking-tight">{branding?.name || "Open Enthrium"}</span>
           </button>
         </div>
         <UserMenu user={user} logout={logout} licenseType={licenseType} />
@@ -248,8 +248,8 @@ export default function AppLayout() {
                   <span className="text-xs text-gray-400">Powered by <span className="font-semibold">{branding.name}</span></span>
                 )
               ) : (
-                <a href="https://www.openenterprise.info" target="_blank" rel="noreferrer" className="text-xs text-gray-400 hover:text-indigo transition-colors">
-                  Powered by <span className="font-semibold">www.openenterprise.info</span>
+                <a href="https://www.openenthrium.com" target="_blank" rel="noreferrer" className="text-xs text-gray-400 hover:text-indigo transition-colors">
+                  Powered by <span className="font-semibold">www.openenthrium.com</span>
                 </a>
               )}
             </footer>

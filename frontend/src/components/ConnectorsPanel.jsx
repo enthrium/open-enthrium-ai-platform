@@ -269,7 +269,7 @@ export default function ConnectorsPanel({ workspaceSlug, onDocumentAdded, refres
 
           {activeTab === "folder" && (
             <div className="space-y-2">
-              <p className="text-[11px] text-gray-400">Path must be accessible on the <span className="font-medium text-gray-500">server</span> running OpenEnterprise.info — not your local machine. For local files, use File Upload or Google Drive.</p>
+              <p className="text-[11px] text-gray-400">Path must be accessible on the <span className="font-medium text-gray-500">server</span> running Open Enthrium — not your local machine. For local files, use File Upload or Google Drive.</p>
               <input className="input text-sm w-full py-2 font-mono" value={folderPath}
                 onChange={e => { setFolderPath(e.target.value); setSuccess(""); }}
                 placeholder="e.g. /data/cvs  or  /mnt/s3-bucket/docs  or  \\fileserver\shared" />
