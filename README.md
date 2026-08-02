@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>Open Enthrium</h1>
+<h1>Open Enthrium AI Platform</h1>
 <h3>Open-Source AI Ecosystem · Apache-2.0 · Self-Hosted</h3>
 
 **Build, deploy, and govern AI Agents, Assistants, RAG, MCP, Workspaces, and Enterprise Automation.**
