@@ -6,11 +6,11 @@ COPY package.json yarn.lock ./
 COPY frontend/package.json   ./frontend/
 COPY server/package.json     ./server/
 COPY processor/package.json  ./processor/
-RUN yarn workspace @open-enterprise/frontend install --frozen-lockfile
+RUN yarn workspace @open-enthrium/frontend install --frozen-lockfile
 
 COPY frontend/ ./frontend/
 COPY server/src/data/ ./server/src/data/
-RUN yarn workspace @open-enterprise/frontend build
+RUN yarn workspace @open-enthrium/frontend build
 
 # ── Stage 2: Production runtime ───────────────────────────────────────────────
 FROM node:22-alpine
@@ -22,8 +22,8 @@ RUN npm install -g pm2 && apk add --no-cache openssl
 COPY package.json yarn.lock ./
 COPY server/package.json    ./server/
 COPY processor/package.json ./processor/
-RUN yarn workspace @open-enterprise/server    install --frozen-lockfile
-RUN yarn workspace @open-enterprise/processor install --frozen-lockfile
+RUN yarn workspace @open-enthrium/server    install --frozen-lockfile
+RUN yarn workspace @open-enthrium/processor install --frozen-lockfile
 
 # Copy source code (server/storage is excluded via .dockerignore — no dev data)
 COPY server/    ./server/

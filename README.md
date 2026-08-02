@@ -60,8 +60,8 @@ cp server/.env.example server/.env
 # Edit server/.env — set JWT_SECRET, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD
 
 # 4. Set up the database (Prisma)
-yarn workspace @open-enterprise/server db:push
-yarn workspace @open-enterprise/server db:seed-masters
+yarn workspace @open-enthrium/server db:push
+yarn workspace @open-enthrium/server db:seed-masters
 
 # 5. Start in development mode (server + processor + frontend)
 yarn dev
@@ -71,7 +71,7 @@ For a production build:
 
 ```bash
 yarn build
-yarn workspace @open-enterprise/server start
+yarn workspace @open-enthrium/server start
 ```
 
 ---

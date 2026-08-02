@@ -1,5 +1,5 @@
 {
-  "name": "@open-enterprise/frontend",
+  "name": "@open-enthrium/frontend",
   "version": "1.4.0",
   "scripts": {
     "dev": "vite",
