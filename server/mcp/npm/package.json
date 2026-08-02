@@ -1,4 +1,4 @@
-﻿{
+{
     "name": "@openenterprise/oe-mcp",
     "version":  "1.5.2",
     "description":  "OE MCP Server - connect Claude Code, Cursor \u0026 Windsurf to 2,600+ enterprise data sources. One binary, one YAML config.",
