@@ -5,6 +5,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.5.3] — 2026-08-02
+
+### Fixed
+- **Windows SEA binary silent exit** — GitHub Actions Windows runner's `node.exe` produced a broken SEA binary that exited silently with no output; CI now downloads the canonical `node.exe` directly from `nodejs.org` matching the exact runner version and uses that as the base binary (`CANONICAL_NODE_EXE`); fixes `npx @openenterprise/oe-mcp` on Windows
+
+---
+
+## [v1.5.2] — 2026-08-02
+
+### Changed
+- **Root package renamed** — `open-enterprise` → `open-enthrium` in root `package.json`
+- **Node.js 24 for binary builds** — MCP and Runtime release workflows updated from Node.js 22 to Node.js 24 to match local runtime environment; fixes binary size and compatibility
+- **Platform sync fix** — removed `--delete-excluded` flag from rsync in `sync-platform.yml`; previously caused `.git/` directory to be deleted in destination repo; `server/cli/` and `server/mcp/` now sync correctly
+
+### Fixed
+- **BOM in package.json breaking ncc build** — PowerShell `Set-Content -Encoding UTF8` writes UTF-8 with BOM in PS 5.1; switched to `[System.IO.File]::WriteAllText` with `UTF8Encoding($false)` to write BOM-free JSON
+
+---
+
+## [v1.5.1] — 2026-08-02
+
+### Added
+- **HTTP Server Mode section in runtime.html** — documents all three endpoints (`GET /health`, `POST /run`, `POST /run-file`) with curl examples including `x-api-key` header and YAML file example
+- **Folder structure diagram in runtime.html** — shows recommended layout for config, binary, and samples in one place
+
+### Changed
+- **Website copy cleanup** — removed copy buttons from all code blocks in `mcp.html` and `runtime.html`; removed CLI section, old HTTP Server Mode section, and Capabilities section from `runtime.html`
+- **`--serve` command corrected** — all examples now show `oe-runtime-win.exe --serve --config oe-config.json` (was missing `--config` flag)
+- **`/health` curl corrected** — all examples now include `-H "x-api-key: your-secret"` (header is required by server auth middleware)
+
+---
+
 ## [v1.5.0] — 2026-08-02
 
 ### Changed
