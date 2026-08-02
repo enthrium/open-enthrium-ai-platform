@@ -23,8 +23,6 @@ jobs:
           rsync -av --delete \
             --exclude='.git/' \
             --exclude='commercial/' \
-            --exclude='server/cli/' \
-            --exclude='server/mcp/' \
             --exclude='server/node_modules/' \
             --exclude='server/storage/' \
             --exclude='server/.env' \

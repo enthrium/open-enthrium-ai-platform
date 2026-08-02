@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.5.1] — 2026-08-02
+
+### Fixed
+- **Binary crash on startup** — `mcp/index.js` shebang and code were on a single line; ncc treated the entire file as a comment, producing an empty bundle that exited immediately with code 0 in all modes. Fixed by separating the shebang onto its own line.
+- **CI build reliability** — removed `--frozen-lockfile` from CI yarn install and copy root `yarn.lock` into server directory during sync so dependencies resolve correctly on the build runner.
+
+---
+
 ## [v1.4.8] — 2026-08-01
 
 ### Changed

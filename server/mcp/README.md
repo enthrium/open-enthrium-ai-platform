@@ -372,6 +372,26 @@ Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.yaml` and survives
 
 ---
 
+## Binary vs Node.js Mode
+
+The standalone binary works for all connector categories **except** Oracle, MSSQL, SQLite, and Snowflake — these use native C++ addons that cannot be bundled into a single executable.
+
+If you need any of these four, run with Node.js instead:
+
+```bash
+git clone https://github.com/enthrium/open-enthrium-ai-mcp-server.git
+cd open-enthrium-ai-mcp-server/server
+yarn install
+# stdio mode (Claude Code)
+node mcp/index.js --stdio /path/to/oe-mcp.yaml
+# serve mode (Cursor, Windsurf, cloud)
+node mcp/index.js --serve --port 4040 /path/to/oe-mcp.yaml
+```
+
+All other connectors (PostgreSQL, MySQL, MongoDB, Redis, S3, Slack, GitHub, REST API, SSH, filesystem, etc.) work directly with the binary — no Node.js required.
+
+---
+
 ## Connector Catalog
 
 **2,600+ connectors across 45+ categories:**
@@ -399,22 +419,6 @@ Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.yaml` and survives
 | **Web3 / Blockchain** | Ethereum, Polygon, Solana |
 | **Helpdesk** | Zendesk, Freshdesk, ServiceNow |
 | **+ more** | Healthcare (FHIR), ERP (SAP), Marketing, Analytics, ... |
-
-> **Binary vs Node.js mode**
->
-> The standalone binary works for all connector categories **except** Oracle, MSSQL, SQLite, and Snowflake — these use native C++ addons that cannot be bundled into a single executable.
->
-> If you need any of these four, run with Node.js instead:
-> ```bash
-> git clone https://github.com/enthrium/open-enthrium-ai-mcp-server.git
-> cd open-enthrium-ai-mcp-server/server
-> yarn install
-> # stdio mode (Claude Code)
-> node mcp/index.js --stdio /path/to/oe-mcp.yaml
-> # serve mode (Cursor, Windsurf, cloud)
-> node mcp/index.js --serve --port 4040 /path/to/oe-mcp.yaml
-> ```
-> All other connectors (PostgreSQL, MySQL, MongoDB, Redis, S3, Slack, GitHub, REST API, SSH, filesystem, etc.) work directly with the binary — no Node.js required.
 
 ---
 
@@ -446,7 +450,7 @@ OE MCP Server is part of the [Open Enthrium](https://openenthrium.com) platform.
 | | |
 |---|---|
 | ⚡ **Agent Runtime** | [open-enthrium-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) — run YAML agents as CLI or HTTP server |
-| 🖥️ **Platform (Docker)** | [open-enthrium-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) — full web app with workspaces, RAG, Agent Builder, DLP |
+| 🖥️ **Platform** | [open-enthrium-ai-platform](https://github.com/enthrium/open-enthrium-ai-platform) — full web app with workspaces, RAG, Agent Builder, DLP |
 | 🌐 **Website** | [openenthrium.com](https://openenthrium.com) |
 
 ---

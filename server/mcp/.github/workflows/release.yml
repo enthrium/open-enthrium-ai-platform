@@ -41,7 +41,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: server
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --ignore-scripts
 
       - name: Build Windows MCP
         working-directory: server
@@ -67,7 +67,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: server
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --ignore-scripts
 
       - name: Build Linux MCP
         working-directory: server
@@ -98,7 +98,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: server
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --ignore-scripts
 
       - name: Build macOS MCP
         working-directory: server

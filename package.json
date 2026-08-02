@@ -1,6 +1,6 @@
-{
-    "name": "open-enterprise",
-    "version":  "1.5.0",
+﻿{
+    "name": "open-enthrium",
+    "version":  "1.5.2",
     "private":  true,
     "workspaces":  [
                        "server",

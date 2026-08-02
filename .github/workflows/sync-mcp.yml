@@ -29,6 +29,7 @@ jobs:
             --exclude='.env.example' \
             server/ /tmp/mcp-repo/server/
           rsync -avc --delete server/mcp/npm/ /tmp/mcp-repo/npm/
+          cp yarn.lock /tmp/mcp-repo/server/yarn.lock
           cp server/mcp/README.md /tmp/mcp-repo/README.md
           cp server/mcp/CONTRIBUTING.md /tmp/mcp-repo/CONTRIBUTING.md
           cp server/mcp/LICENSE /tmp/mcp-repo/LICENSE

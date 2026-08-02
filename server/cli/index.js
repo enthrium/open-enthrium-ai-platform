@@ -13,7 +13,7 @@ const args = process.argv.slice(2);
 
 function usage() {
   console.log(`
-oe-runtime — Open Enterprise Agent Runner
+oe-runtime — Open Enthrium Agent Runner
 
 Usage:
   oe-runtime <agent.yaml> [options]   Run an agent once
