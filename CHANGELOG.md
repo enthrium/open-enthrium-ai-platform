@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.5.3.1] — 2026-08-02
+
+### Fixed
+- **MCP binary silent exit** — the MCP SDK's `StdioServerTransport` does not survive ncc bundling into a Node.js SEA; replaced with a hand-rolled JSON-RPC stdio transport (no SDK dependency); fixes `oe-mcp-win.exe --stdio` producing no output and `-32000: Connection closed`
+
+---
+
 ## [v1.5.3] — 2026-08-02
 
 ### Fixed
