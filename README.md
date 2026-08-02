@@ -45,9 +45,33 @@ Open [http://localhost:3001](http://localhost:3001) and log in with your super a
 
 **Or run from source:**
 
+> **Prerequisites:** Node.js v18+, Yarn v1.x
+
 ```bash
+# 1. Clone the repo
+git clone https://github.com/enthrium/open-enthrium-ai-platform.git
+cd open-enthrium-ai-platform
+
+# 2. Install dependencies
 yarn install
-yarn start
+
+# 3. Configure environment
+cp server/.env.example server/.env
+# Edit server/.env — set JWT_SECRET, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD
+
+# 4. Set up the database (Prisma)
+yarn workspace @open-enterprise/server db:push
+yarn workspace @open-enterprise/server db:seed-masters
+
+# 5. Start in development mode (server + processor + frontend)
+yarn dev
+```
+
+For a production build:
+
+```bash
+yarn build
+yarn workspace @open-enterprise/server start
 ```
 
 ---
