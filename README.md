@@ -26,7 +26,6 @@ Open Enthrium is a **Self-Hosted, Open-Source AI Platform** for building and run
 - **Human approval gates.** Build human-in-the-loop agentic workflows without writing code.
 - **Enterprise-ready.** Multi-workspace, RAG, MCP, DLP governance, and 2,673 connectors out of the box.
 
-🌐 **[Open Enthrium](https://www.openenthrium.com)** &nbsp;·&nbsp; ⚡ **[OE Runtime docs](https://www.openenthrium.com/runtime.html)** &nbsp;·&nbsp; 💬 **[Discord](https://discord.com/invite/vWsZ24Msn)**
 
 ---
 
@@ -43,6 +42,13 @@ docker run -d \
 ```
 
 Open [http://localhost:3001](http://localhost:3001) and log in with your super admin credentials. Configure your LLM provider, embedding model, and vector database from the admin panel — no `.env` changes needed.
+
+**Or run from source:**
+
+```bash
+yarn install
+yarn start
+```
 
 ---
 
@@ -144,6 +150,7 @@ Contributions are welcome. Before opening a PR:
 | ⚡ OE Runtime | [open-enthrium-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) |
 | 🔌 OE MCP | [open-enthrium-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) |
 | 🐛 Issues | [github.com/enthrium/open-enthrium-ai-platform/issues](https://github.com/enthrium/open-enthrium-ai-platform/issues) |
+| 💬 Discord | [discord.com/invite/vWsZ24Msn](https://discord.com/invite/vWsZ24Msn) |
 
 ---
 
