@@ -8,17 +8,6 @@ Open an issue first before writing code. This lets us align on whether the chang
 
 ---
 
-## Open Enthrium Ecosystem
-
-This repo is the **core platform** (web application + Docker). Contributions to the standalone binaries belong in the dedicated repos:
-
-| | Repo |
-|---|---|
-| ⚡ **OE Runtime** (agent executor binary + samples) | [open-enthrium-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) |
-| 🔌 **OE MCP** (MCP server binary + samples) | [open-enthrium-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) |
-
----
-
 ## Repo Structure
 
 ```
@@ -65,7 +54,7 @@ There are three distinct layers — understanding them is essential before contr
 
 ### Layer 3 — Adapters (`server/src/utils/tools/adapters/`)
 
-**34 adapter files.** Each adapter implements `getToolDefinitions()`, `getAnthropicToolDefinitions()`, and `executeTool()`. These are the actual working implementations.
+**35 adapter files.** Each adapter implements `getToolDefinitions()`, `getAnthropicToolDefinitions()`, and `executeTool()`. These are the actual working implementations.
 
 | Adapter file | Covers |
 |---|---|
