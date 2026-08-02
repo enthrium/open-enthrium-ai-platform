@@ -17,17 +17,6 @@ No code. No LangChain. No Python. 2,673+ enterprise connectors.
 
 ---
 
-## Open Enthrium Ecosystem
-
-This repo is the **core platform** (web application + Docker). For standalone binaries, see the dedicated repos:
-
-| | Repo | What it does |
-|---|---|---|
-| ⚡ **OE Runtime** | [open-enthrium-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) | Standalone binary — run YAML agents locally or as an HTTP server on Windows, Linux, macOS |
-| 🔌 **OE MCP** | [open-enthrium-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) | MCP server binary — connect Claude Code, Cursor, Windsurf to enterprise data |
-
----
-
 ## What is Open Enthrium?
 
 Open Enthrium is a **Self-Hosted, Open-Source AI Platform** for building and running autonomous AI agents without writing code. Deploy it on your own infrastructure and connect to 2,673+ enterprise systems — databases, APIs, cloud storage, messaging, SSH, and IoT — without custom integration code.
