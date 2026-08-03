@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.5.9] — 2026-08-03
+
+### Fixed
+- **npx cwd on Windows** — `bin.js` in both `@openenthrium/oe-runtime` and `@openenthrium/oe-mcp` now uses `process.env.INIT_CWD || process.cwd()` as the working directory for the spawned binary; fixes "agent file not found" error when running via npx on Windows where `npx.cmd` uses `pushd`/`popd` and changes the process cwd
+
+---
+
 ## [v1.5.8] — 2026-08-03
 
 ### Fixed
