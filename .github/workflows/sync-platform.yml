@@ -1,4 +1,4 @@
-name: Sync → open-enterprise-ai-platform
+name: Sync → open-enthrium-ai-platform
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clone open-enterprise-ai-platform
+      - name: Clone open-enthrium-ai-platform
         env:
           PAT: ${{ secrets.WEBSITE_PAT }}
         run: |

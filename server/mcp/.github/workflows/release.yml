@@ -140,7 +140,7 @@ jobs:
     needs: [build-windows, build-linux, build-macos]
     steps:
       - name: Clone website repo
-        run: git clone https://x-access-token:${{ secrets.WEBSITE_PAT }}@github.com/enthrium/open-enterprise-website.git website
+        run: git clone https://x-access-token:${{ secrets.WEBSITE_PAT }}@github.com/enthrium/open-enthrium-website.git website
 
       - name: Update version in mcp.html
         run: |

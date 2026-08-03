@@ -5,6 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.5.7] — 2026-08-03
+
+### Added
+- **`@openenthrium/oe-runtime` npm package** — `npx -y @openenthrium/oe-runtime run agent.yaml --config oe-config.json` works on any machine with Node.js; no binary download needed; postinstall downloads the correct platform binary from GitHub releases automatically
+- **OE Runtime CLI release workflow** — added `publish-npm` job to publish `@openenthrium/oe-runtime` on every release tag
+
+### Changed
+- **All `openenterprise`/`open-enterprise` references removed** — User-Agent strings, client IDs, Kafka clientId, Pinecone default index, telemetry token, workflow names, website repo URLs in release workflows all updated to `openenthrium`/`open-enthrium`
+- **Website runtime.html** — added npx pill to hero section
+
+---
+
 ## [v1.5.6] — 2026-08-03
 
 ### Changed

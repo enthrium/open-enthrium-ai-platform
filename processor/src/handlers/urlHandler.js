@@ -4,7 +4,7 @@ const cheerio = require("cheerio");
 async function processUrl(url) {
   const { data } = await axios.get(url, {
     timeout: 15000,
-    headers: { "User-Agent": "Mozilla/5.0 (compatible; OpenEnterprise/1.0)" }
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; OpenEnthrium/1.0)" }
   });
 
   const $ = cheerio.load(data);
