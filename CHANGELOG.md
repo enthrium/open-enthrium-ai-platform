@@ -5,10 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.5.8] — 2026-08-03
+
+### Fixed
+- **`@openenthrium/oe-runtime` npm publish** — corrected `working-directory` in CI from `npm` to `server/cli/npm` (path was wrong after sync to public repo, causing "No such file or directory" error)
+- **npx command syntax** — removed incorrect `run` subcommand; correct syntax is `npx -y @openenthrium/oe-runtime agent.yaml --config oe-config.json`
+
+---
+
 ## [v1.5.7] — 2026-08-03
 
 ### Added
-- **`@openenthrium/oe-runtime` npm package** — `npx -y @openenthrium/oe-runtime run agent.yaml --config oe-config.json` works on any machine with Node.js; no binary download needed; postinstall downloads the correct platform binary from GitHub releases automatically
+- **`@openenthrium/oe-runtime` npm package** — `npx -y @openenthrium/oe-runtime agent.yaml --config oe-config.json` works on any machine with Node.js; no binary download needed; postinstall downloads the correct platform binary from GitHub releases automatically
 - **OE Runtime CLI release workflow** — added `publish-npm` job to publish `@openenthrium/oe-runtime` on every release tag
 
 ### Changed
