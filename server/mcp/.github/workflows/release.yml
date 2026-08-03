@@ -129,7 +129,7 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
-      - name: Publish @openenterprise/oe-mcp to npm
+      - name: Publish @openenthrium/oe-mcp to npm
         working-directory: npm
         run: npm publish --access public
         env:

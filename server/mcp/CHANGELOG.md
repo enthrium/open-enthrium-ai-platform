@@ -25,7 +25,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **Multi-platform binaries** — `oe-mcp-win.exe`, `oe-mcp-linux`, `oe-mcp-macos` built and attached to every GitHub Release; `oe-mcp-samples.zip` included
-- **npm package** — `@openenterprise/oe-mcp` published to npm automatically on release; install with `npx @openenterprise/oe-mcp`
+- **npm package** — `@openenthrium/oe-mcp` published to npm automatically on release; install with `npx @openenthrium/oe-mcp`
 - **Automated website version bumps** — `mcp.html` download link versions update automatically on release tag
 
 ### Changed

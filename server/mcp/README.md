@@ -10,7 +10,7 @@
 [![Windows](https://img.shields.io/badge/Windows-Download-0078D4?logo=windows&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-win.exe)
 [![Linux](https://img.shields.io/badge/Linux-Download-E95420?logo=linux&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-linux)
 [![macOS](https://img.shields.io/badge/macOS-Download-000000?logo=apple&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-macos)
-[![npm](https://img.shields.io/npm/v/@openenterprise/oe-mcp?color=0284c7&label=npm)](https://www.npmjs.com/package/@openenterprise/oe-mcp)
+[![npm](https://img.shields.io/npm/v/@openenthrium/oe-mcp?color=0284c7&label=npm)](https://www.npmjs.com/package/@openenthrium/oe-mcp)
 [![Website](https://img.shields.io/badge/Website-openenthrium.com-4f46e5)](https://www.openenthrium.com)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 
@@ -42,7 +42,7 @@ No binary download needed — `npx` handles everything automatically:
   "mcpServers": {
     "oe-mcp": {
       "command": "npx",
-      "args": ["@openenterprise/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
+      "args": ["@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
     }
   }
 }
@@ -54,7 +54,7 @@ No binary download needed — `npx` handles everything automatically:
   "mcpServers": {
     "oe-mcp": {
       "command": "npx.cmd",
-      "args": ["@openenterprise/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
+      "args": ["@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
     }
   }
 }
@@ -121,7 +121,7 @@ macOS / Linux:
   "mcpServers": {
     "oe-mcp": {
       "command": "npx",
-      "args": ["@openenterprise/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
+      "args": ["@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
     }
   }
 }
@@ -133,7 +133,7 @@ Windows:
   "mcpServers": {
     "oe-mcp": {
       "command": "npx.cmd",
-      "args": ["@openenterprise/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
+      "args": ["@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
     }
   }
 }

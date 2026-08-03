@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.5.5] — 2026-08-02
+
+### Changed
+- **npm package renamed** — `@openenterprise/oe-mcp` → `@openenthrium/oe-mcp`; install with `npx @openenthrium/oe-mcp`
+- **Runtime CLI error message** — fixed download URL in config-not-found error pointing to old `open-enterprise-community` repo; now correctly points to `open-enthrium-ai-agent-runtime`
+
+---
+
 ## [v1.5.4] — 2026-08-02
 
 ### Fixed

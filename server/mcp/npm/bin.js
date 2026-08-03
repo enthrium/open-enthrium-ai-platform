@@ -19,7 +19,7 @@ if (!BINARY) {
 const BIN_PATH = path.join(__dirname, "bin", BINARY);
 
 if (!fs.existsSync(BIN_PATH)) {
-  console.error("OE MCP: binary not found. Try reinstalling: npm install -g @openenterprise/oe-mcp");
+  console.error("OE MCP: binary not found. Try reinstalling: npm install -g @openenthrium/oe-mcp");
   process.exit(1);
 }
 

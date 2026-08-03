@@ -1,8 +1,8 @@
-# OE MCP Server · `@openenterprise/oe-mcp`
+# OE MCP Server · `@openenthrium/oe-mcp`
 
 **Connect Claude Code, Cursor & Windsurf to 2,600+ enterprise data sources — databases, APIs, files, SSH, messaging, and more. One binary. One YAML config.**
 
-[![npm](https://img.shields.io/npm/v/@openenterprise/oe-mcp?color=0284c7)](https://www.npmjs.com/package/@openenterprise/oe-mcp)
+[![npm](https://img.shields.io/npm/v/@openenthrium/oe-mcp?color=0284c7)](https://www.npmjs.com/package/@openenthrium/oe-mcp)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](https://github.com/enthrium/open-enthrium-ai-mcp-server/blob/main/LICENSE)
 [![Website](https://img.shields.io/badge/Website-openenthrium.com-4f46e5)](https://www.openenthrium.com/mcp.html)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
@@ -151,7 +151,7 @@ memory:
   "mcpServers": {
     "oe-mcp": {
       "command": "npx",
-      "args": ["@openenterprise/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
+      "args": ["@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
     }
   }
 }
