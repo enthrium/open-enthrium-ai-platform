@@ -41,8 +41,9 @@ No binary download needed — `npx` handles everything automatically:
 {
   "mcpServers": {
     "oe-mcp": {
+      "type": "stdio",
       "command": "npx",
-      "args": ["@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
     }
   }
 }
@@ -53,12 +54,15 @@ No binary download needed — `npx` handles everything automatically:
 {
   "mcpServers": {
     "oe-mcp": {
+      "type": "stdio",
       "command": "npx.cmd",
-      "args": ["@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
     }
   }
 }
 ```
+
+> **Note:** `-y` tells npx to skip the install confirmation prompt. Without it, npx waits for keyboard input and the MCP connection never opens.
 
 Add this to `~/.mcp.json` (Claude Code) and reload VS Code. Done.
 
@@ -120,8 +124,9 @@ macOS / Linux:
 {
   "mcpServers": {
     "oe-mcp": {
+      "type": "stdio",
       "command": "npx",
-      "args": ["@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
     }
   }
 }
@@ -132,12 +137,15 @@ Windows:
 {
   "mcpServers": {
     "oe-mcp": {
+      "type": "stdio",
       "command": "npx.cmd",
-      "args": ["@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
     }
   }
 }
 ```
+
+> **Note:** `-y` skips npx's install confirmation prompt — without it, npx blocks waiting for keyboard input and the MCP connection never opens.
 
 **Option B — via downloaded binary:**
 

@@ -146,16 +146,33 @@ memory:
 
 **2. Add to Claude Code** (`~/.mcp.json`)
 
+macOS / Linux:
 ```json
 {
   "mcpServers": {
     "oe-mcp": {
+      "type": "stdio",
       "command": "npx",
-      "args": ["@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
     }
   }
 }
 ```
+
+Windows:
+```json
+{
+  "mcpServers": {
+    "oe-mcp": {
+      "type": "stdio",
+      "command": "npx.cmd",
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
+    }
+  }
+}
+```
+
+> **Note:** `-y` skips npx's install confirmation prompt — without it, npx blocks waiting for keyboard input and the MCP connection never opens.
 
 **3. Reload Claude Code** — your connectors appear as tools automatically.
 

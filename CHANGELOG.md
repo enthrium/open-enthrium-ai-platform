@@ -5,6 +5,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.5.6] — 2026-08-03
+
+### Changed
+- **Docker Hub migration** — platform image moved from `openenterprise/open-enterprise-community` to `jumbocoder/open-enthrium-ai-platform`; CI now auto-selects image name per repo (`enthrium-commercial` → private, `open-enthrium-ai-platform` → public)
+- **npx config** — added `-y` flag and `"type": "stdio"` to all MCP npx config snippets in README and website; fixes MCP connection never opening due to npx install confirmation prompt
+- **Contact form** — updated email from `info@openenterprise.info` to `team@openenthrium.com`; updated subject and autoresponse branding to Open Enthrium
+- **Website Docker buttons** — added "View on Docker Hub" button to `index.html` and `platform.html` hero sections
+
+---
+
 ## [v1.5.5] — 2026-08-02
 
 ### Changed

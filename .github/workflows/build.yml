@@ -21,18 +21,26 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      - name: Set image name
+        run: |
+          if [ "${{ github.repository }}" = "enthrium/enthrium-commercial" ]; then
+            echo "DOCKER_IMAGE=enthrium-commercial" >> $GITHUB_ENV
+          else
+            echo "DOCKER_IMAGE=open-enthrium-ai-platform" >> $GITHUB_ENV
+          fi
+
       - name: Build image
         run: |
           docker build \
             -f Dockerfile \
-            -t "${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${GITHUB_REF_NAME}" \
-            -t "${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest" \
+            -t "${{ secrets.DOCKER_USERNAME }}/${DOCKER_IMAGE}:${GITHUB_REF_NAME}" \
+            -t "${{ secrets.DOCKER_USERNAME }}/${DOCKER_IMAGE}:latest" \
             .
 
       - name: Push to Docker Hub
         run: |
-          docker push "${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${GITHUB_REF_NAME}"
-          docker push "${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest"
+          docker push "${{ secrets.DOCKER_USERNAME }}/${DOCKER_IMAGE}:${GITHUB_REF_NAME}"
+          docker push "${{ secrets.DOCKER_USERNAME }}/${DOCKER_IMAGE}:latest"
 
       - name: Prune old images on runner
         run: docker image prune -f
