@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.0] — 2026-08-04
+
+### Changed
+- Version bump — aligned with platform and runtime release v1.6.0
+
+---
+
 ## [v1.5.1] — 2026-08-02
 
 ### Fixed
