@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.2] — 2026-08-06
+
+### Added
+- **Startup banners** — standalone CLI mode now shows a banner matching server mode (`OE Runtime Standalone vX.X.X / Run AI agents via CLI`)
+
+### Fixed
+- **MCP README** — SSH connector example corrected to use inline `privateKey` PEM content instead of a file path in the wrong field
+- **blockchain-web3 sample** — `oe-config.json` now uses free public RPC (`https://eth.llamarpc.com`); no API key required for testing
+
+---
+
 ## [v1.6.1] — 2026-08-04
 
 ### Fixed

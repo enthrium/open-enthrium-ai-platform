@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.2] — 2026-08-06
+
+### Fixed
+- **README** — SSH connector example corrected to use inline `privateKey` PEM content; was incorrectly showing a file path in the `privateKey` field instead of `privateKeyPath`
+
+---
+
 ## [v1.6.1] — 2026-08-04
 
 ### Changed

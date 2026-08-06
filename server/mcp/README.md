@@ -311,7 +311,7 @@ connectors:
     host: server.company.com
     port: 22
     username: ubuntu
-    privateKey: /path/to/key.pem
+    privateKey: "-----BEGIN OPENSSH PRIVATE KEY-----\nYOUR_PRIVATE_KEY_CONTENT\n-----END OPENSSH PRIVATE KEY-----"
 
   # ── Filesystem ─────────────────────────────────────────
   - name: my-codebase
