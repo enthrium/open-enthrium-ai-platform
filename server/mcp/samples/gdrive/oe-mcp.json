@@ -1,0 +1,18 @@
+{
+  "_setup": "Go to https://console.cloud.google.com → Enable Drive API → Create OAuth 2.0 credentials → use OAuth playground to get refreshToken",
+  "connectors": [
+    {
+      "name": "my-gdrive",
+      "type": "gdrive",
+      "clientId": "xxxx.apps.googleusercontent.com",
+      "clientSecret": "xxxx",
+      "refreshToken": "xxxx"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "Google Drive connected. Can list, read, create, update files and folders."
+    }
+  ]
+}

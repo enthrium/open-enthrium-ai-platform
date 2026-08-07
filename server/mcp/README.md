@@ -24,7 +24,7 @@ OE MCP Server is a standalone binary that implements the [Model Context Protocol
 
 Connect Claude Code, Cursor, Windsurf, or Claude Desktop to your PostgreSQL database, local filesystem, GitHub, Slack, Google Drive, SSH servers, and more — without writing any integration code.
 
-- **No code.** Define connectors in a single YAML file.
+- **No code.** Define connectors in a single JSON file.
 - **45+ connector categories.** 2,600+ enterprise systems supported out of the box.
 - **Two transport modes.** `--stdio` for Claude Code VS Code / desktop apps; `--serve` for Cursor, Windsurf, and cloud deployments.
 - **Persistent memory.** Built-in `memory_set / memory_get / memory_list / memory_delete` tools — context survives across sessions.
@@ -43,7 +43,7 @@ No binary download needed — `npx` handles everything automatically:
     "oe-mcp": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.json"]
     }
   }
 }
@@ -56,7 +56,7 @@ No binary download needed — `npx` handles everything automatically:
     "oe-mcp": {
       "type": "stdio",
       "command": "npx.cmd",
-      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.json"]
     }
   }
 }
@@ -77,7 +77,7 @@ Prefer a standalone binary? Download for your platform:
 | **Windows** | [oe-mcp-win.exe](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-win.exe) |
 | **Linux** | [oe-mcp-linux](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-linux) |
 | **macOS** | [oe-mcp-macos](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-macos) |
-| **Sample configs** | [oe-mcp-samples.zip](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-samples.zip) — ready-to-use `oe-mcp.yaml` for common connectors |
+| **Sample configs** | [oe-mcp-samples.zip](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-samples.zip) — ready-to-use `oe-mcp.json` for common connectors |
 
 ---
 
@@ -90,25 +90,30 @@ Prefer a standalone binary? Download for your platform:
 chmod +x oe-mcp-linux
 ```
 
-**2. Create your config file** (`oe-mcp.yaml`)
+**2. Create your config file** (`oe-mcp.json`)
 
-```yaml
-connectors:
-  - name: my-postgres
-    type: postgresql
-    host: localhost
-    port: 5432
-    database: mydb
-    user: postgres
-    password: secret
-
-  - name: my-codebase
-    type: filesystem
-    basePath: /home/user/projects/myapp
-
-memory:
-  - key: project_context
-    value: "This is our main application database."
+```json
+{
+  "connectors": [
+    {
+      "name": "my-postgres",
+      "type": "postgresql",
+      "host": "localhost",
+      "port": 5432,
+      "database": "mydb",
+      "user": "postgres",
+      "password": "secret"
+    },
+    {
+      "name": "my-codebase",
+      "type": "filesystem",
+      "basePath": "/home/user/projects/myapp"
+    }
+  ],
+  "memory": [
+    { "key": "project_context", "value": "This is our main application database." }
+  ]
+}
 ```
 
 **3. Connect your AI app** — see sections below for Claude Code, Cursor, and Windsurf.
@@ -126,7 +131,7 @@ macOS / Linux:
     "oe-mcp": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.json"]
     }
   }
 }
@@ -139,7 +144,7 @@ Windows:
     "oe-mcp": {
       "type": "stdio",
       "command": "npx.cmd",
-      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.json"]
     }
   }
 }
@@ -155,7 +160,7 @@ Windows:
     "oe-mcp": {
       "type": "stdio",
       "command": "/path/to/oe-mcp-win.exe",
-      "args": ["--stdio", "/path/to/oe-mcp.yaml"]
+      "args": ["--stdio", "/path/to/oe-mcp.json"]
     }
   }
 }
@@ -171,7 +176,7 @@ Start the server manually, then point your AI app at the URL.
 
 ```bash
 # Start the MCP server
-oe-mcp-win.exe --serve --port 4040 oe-mcp.yaml
+oe-mcp-win.exe --serve --port 4040 oe-mcp.json
 # OE MCP Server listening on http://localhost:4040/mcp
 ```
 
@@ -199,7 +204,7 @@ Deploy `oe-mcp-linux` to any cloud server — AWS EC2, fly.io, Railway, DigitalO
 
 ```bash
 # On your cloud server
-./oe-mcp-linux --serve --port 4040 /etc/oe-mcp/oe-mcp.yaml
+./oe-mcp-linux --serve --port 4040 /etc/oe-mcp/oe-mcp.json
 ```
 
 Each developer adds to their Cursor / Windsurf:
@@ -209,138 +214,51 @@ http://your-server.com:4040/mcp
 
 ---
 
-## Config File Reference (`oe-mcp.yaml`)
+## Config File Reference (`oe-mcp.json`)
 
-```yaml
-connectors:
-  - name: <display-name>       # must be unique; shown as the tool prefix
-    type: <connection-type>    # see Connector Catalog below
-    # ... connector-specific credentials
-
-memory:
-  - key: <key>
-    value: <value>             # seed defaults; overridden at runtime via memory_set
+```json
+{
+  "connectors": [
+    {
+      "name": "<display-name>",
+      "type": "<connection-type>",
+      "...": "connector-specific credentials"
+    }
+  ],
+  "memory": [
+    { "key": "<key>", "value": "<value>" }
+  ]
+}
 ```
 
 ### Example — Multiple Connectors
 
-```yaml
-connectors:
-
-  # ── SQL Databases ──────────────────────────────────────
-  - name: my-postgres
-    type: postgresql
-    host: db.company.com
-    port: 5432
-    database: production
-    user: readonly
-    password: secret
-
-  - name: my-mysql
-    type: mysql
-    host: localhost
-    port: 3306
-    database: mydb
-    user: root
-    password: secret
-
-  # ── NoSQL ──────────────────────────────────────────────
-  - name: my-mongo
-    type: mongodb
-    uri: mongodb://localhost:27017
-    database: mydb
-
-  - name: my-redis
-    type: redis
-    host: localhost
-    port: 6379
-
-  - name: my-elastic
-    type: elasticsearch
-    node: https://localhost:9200
-    apiKey: xxxxxxxxxxxx
-
-  # ── Object Storage ─────────────────────────────────────
-  - name: my-s3
-    type: s3
-    accessKeyId: AKIAXXXXXXXX
-    secretAccessKey: xxxxxxxxxxxx
-    region: us-east-1
-    bucket: my-bucket
-
-  # ── Cloud Drives ───────────────────────────────────────
-  - name: my-gdrive
-    type: gdrive
-    clientId: xxxx.apps.googleusercontent.com
-    clientSecret: xxxx
-    refreshToken: xxxx
-
-  # ── Code & Issue Tracking ──────────────────────────────
-  - name: my-github
-    type: github
-    token: ghp_xxxxxxxxxxxx
-
-  - name: my-jira
-    type: jira
-    host: https://company.atlassian.net
-    email: you@company.com
-    apiToken: xxxx
-
-  # ── Team Messaging ─────────────────────────────────────
-  - name: my-slack
-    type: slack
-    botToken: xoxb-xxxxxxxxxxxx
-
-  # ── Email ──────────────────────────────────────────────
-  - name: my-gmail
-    type: gmail
-    clientId: xxxx.apps.googleusercontent.com
-    clientSecret: xxxx
-    refreshToken: xxxx
-
-  - name: my-smtp
-    type: smtp
-    host: smtp.company.com
-    port: 587
-    user: you@company.com
-    password: secret
-
-  # ── SSH / Remote Server ────────────────────────────────
-  - name: my-server
-    type: ssh
-    host: server.company.com
-    port: 22
-    username: ubuntu
-    privateKey: "-----BEGIN OPENSSH PRIVATE KEY-----\nYOUR_PRIVATE_KEY_CONTENT\n-----END OPENSSH PRIVATE KEY-----"
-
-  # ── Filesystem ─────────────────────────────────────────
-  - name: my-codebase
-    type: filesystem
-    basePath: /home/user/projects
-
-  # ── REST API ───────────────────────────────────────────
-  - name: my-api
-    type: rest-api
-    baseUrl: https://api.company.com
-    headers:
-      Authorization: Bearer xxxx
-
-  # ── CRM ────────────────────────────────────────────────
-  - name: my-hubspot
-    type: hubspot
-    accessToken: pat-xxxxxxxxxxxx
-
-  # ── Message Queues ─────────────────────────────────────
-  - name: my-kafka
-    type: kafka
-    brokers:
-      - localhost:9092
-
-memory:
-  - key: team
-    value: "Platform Engineering"
-  - key: environment
-    value: "production"
+```json
+{
+  "connectors": [
+    { "name": "my-postgres",  "type": "postgresql",     "host": "db.company.com", "port": 5432, "database": "production", "user": "readonly", "password": "secret" },
+    { "name": "my-mysql",     "type": "mysql",          "host": "localhost",       "port": 3306, "database": "mydb",       "user": "root",     "password": "secret" },
+    { "name": "my-mongo",     "type": "mongodb",        "uri": "mongodb://localhost:27017",       "database": "mydb" },
+    { "name": "my-redis",     "type": "redis",          "host": "localhost",       "port": 6379 },
+    { "name": "my-elastic",   "type": "elasticsearch",  "node": "https://localhost:9200",         "apiKey": "xxxxxxxxxxxx" },
+    { "name": "my-s3",        "type": "s3",             "accessKeyId": "AKIAXXXXXXXX",            "secretAccessKey": "xxxxxxxxxxxx", "region": "us-east-1", "bucket": "my-bucket" },
+    { "name": "my-gdrive",    "type": "gdrive",         "clientId": "xxxx.apps.googleusercontent.com", "clientSecret": "xxxx", "refreshToken": "xxxx" },
+    { "name": "my-github",    "type": "github",         "repoUrl": "https://github.com/your-org/your-repo", "personalAccessToken": "ghp_xxxxxxxxxxxx" },
+    { "name": "my-jira",      "type": "jira",           "host": "https://company.atlassian.net",  "email": "you@company.com", "apiToken": "xxxx" },
+    { "name": "my-slack",     "type": "slack",          "botToken": "xoxb-xxxxxxxxxxxx" },
+    { "name": "my-gmail",     "type": "gmail",          "clientId": "xxxx.apps.googleusercontent.com", "clientSecret": "xxxx", "refreshToken": "xxxx" },
+    { "name": "my-smtp",      "type": "smtp",           "host": "smtp.company.com", "port": 587,  "user": "you@company.com", "password": "secret" },
+    { "name": "my-server",    "type": "ssh",            "host": "server.company.com", "port": 22, "username": "ubuntu", "privateKey": "-----BEGIN OPENSSH PRIVATE KEY-----\nYOUR_PRIVATE_KEY_CONTENT\n-----END OPENSSH PRIVATE KEY-----" },
+    { "name": "my-codebase",  "type": "filesystem",    "basePath": "/home/user/projects" },
+    { "name": "my-api",       "type": "rest-api",       "baseUrl": "https://api.company.com",     "headers": { "Authorization": "Bearer xxxx" } },
+    { "name": "my-hubspot",   "type": "hubspot",        "accessToken": "pat-xxxxxxxxxxxx" },
+    { "name": "my-kafka",     "type": "kafka",          "brokers": ["localhost:9092"] }
+  ],
+  "memory": [
+    { "key": "team",        "value": "Platform Engineering" },
+    { "key": "environment", "value": "production" }
+  ]
+}
 ```
 
 ---
@@ -372,7 +290,7 @@ Built-in memory tools available in every session:
 | `memory_list` | List all stored key-value pairs |
 | `memory_delete` | Remove a stored key |
 
-Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.yaml` and survives restarts.
+Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.json` and survives restarts.
 
 **Example usage in Claude Code:**
 > "Remember that our main database is on prod-db.company.com"
@@ -391,9 +309,9 @@ git clone https://github.com/enthrium/open-enthrium-ai-mcp-server.git
 cd open-enthrium-ai-mcp-server/server
 yarn install
 # stdio mode (Claude Code)
-node mcp/index.js --stdio /path/to/oe-mcp.yaml
+node mcp/index.js --stdio /path/to/oe-mcp.json
 # serve mode (Cursor, Windsurf, cloud)
-node mcp/index.js --serve --port 4040 /path/to/oe-mcp.yaml
+node mcp/index.js --serve --port 4040 /path/to/oe-mcp.json
 ```
 
 All other connectors (PostgreSQL, MySQL, MongoDB, Redis, S3, Slack, GitHub, REST API, SSH, filesystem, etc.) work directly with the binary — no Node.js required.
@@ -434,9 +352,9 @@ All other connectors (PostgreSQL, MySQL, MongoDB, Redis, S3, Slack, GitHub, REST
 
 Download [oe-mcp-samples.zip](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-samples.zip) for ready-to-use configs:
 
-`postgres` · `mysql` · `mongodb` · `github` · `slack` · `gdrive` · `ssh` · `filesystem` · `oracle` · `multi-connector`
+`postgres` · `mysql` · `mongodb` · `github` · `slack` · `gdrive` · `ssh` · `filesystem` · `oracle` · `salesforce` · `servicenow` · `telegram` · `notion` · `confluence` · `graphql` · `zoho-mail` · `sftp` · `dropbox` · `multi-connector`
 
-Each sample includes the complete `oe-mcp.yaml` with setup instructions in comments.
+Each sample includes the complete `oe-mcp.json` with setup instructions in comments.
 
 ---
 

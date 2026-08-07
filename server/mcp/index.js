@@ -42,21 +42,26 @@ function usage() {
    --stdio          Run in stdio mode (for Claude Code / Claude Desktop)
    --help, -h       Show this help
 
- Config format (oe-mcp.yaml):
-   connectors:
-     - name: sales-db
-       type: mysql
-       host: db.company.com
-       port: 3306
-       database: sales
-       user: admin
-       password: secret
+ Config format (oe-mcp.json):
+   {
+     "connectors": [
+       {
+         "name": "sales-db",
+         "type": "mysql",
+         "host": "db.company.com",
+         "port": 3306,
+         "database": "sales",
+         "user": "admin",
+         "password": "secret"
+       }
+     ]
+   }
 `);
   process.exit(0);
 }
 
 function parseArgs(args) {
-  const result = { config: "oe-mcp.yaml", port: null, stdio: false };
+  const result = { config: "oe-mcp.json", port: null, stdio: false };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--help" || args[i] === "-h")  usage();
     else if (args[i] === "--stdio")                { result.stdio = true; }
@@ -325,7 +330,9 @@ async function main() {
 
   MEMORY_FILE = path.join(path.dirname(path.resolve(configFile)), "oe-mcp-memory.json");
 
-  const config     = yaml.load(fs.readFileSync(configFile, "utf8"));
+  const raw        = fs.readFileSync(configFile, "utf8");
+  const ext        = path.extname(configFile).toLowerCase();
+  const config     = (ext === ".yaml" || ext === ".yml") ? yaml.load(raw) : JSON.parse(raw);
   const connectors = prepareConnectors(config.connectors);
   const port       = cliPort || config.server?.port || 4040;
   const name       = config.server?.name || "OE MCP";

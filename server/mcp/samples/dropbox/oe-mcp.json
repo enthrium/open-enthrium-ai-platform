@@ -1,0 +1,16 @@
+{
+  "_setup": "Go to https://www.dropbox.com/developers/apps → Create app → generate an access token, or use OAuth to get refreshToken + appKey + appSecret",
+  "connectors": [
+    {
+      "name": "my-dropbox",
+      "type": "dropbox",
+      "accessToken": "sl.xxxxxxxxxxxx"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "Dropbox connected. Can list files, read file content, and search across your Dropbox."
+    }
+  ]
+}

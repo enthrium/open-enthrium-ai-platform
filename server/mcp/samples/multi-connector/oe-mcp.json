@@ -1,0 +1,42 @@
+{
+  "connectors": [
+    {
+      "name": "my-postgres",
+      "type": "postgresql",
+      "host": "localhost",
+      "port": 5432,
+      "database": "mydb",
+      "user": "admin",
+      "password": "secret"
+    },
+    {
+      "name": "my-slack",
+      "type": "slack",
+      "botToken": "xoxb-your-token-here"
+    },
+    {
+      "name": "my-github",
+      "type": "github",
+      "repoUrl": "https://github.com/your-org/your-repo",
+      "personalAccessToken": "ghp_xxxxxxxxxxxx"
+    },
+    {
+      "name": "my-s3",
+      "type": "s3",
+      "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+      "secretAccessKey": "your-secret-key",
+      "region": "us-east-1",
+      "bucket": "my-bucket"
+    }
+  ],
+  "memory": [
+    {
+      "key": "project_context",
+      "value": "This is the Open Enthrium project. Repos: community, commercial, website. Stack: Node.js, React, Prisma, Docker."
+    },
+    {
+      "key": "sync_rules",
+      "value": "Never overwrite commercial .gitignore during sync. commercial/ is gitignored in community repo."
+    }
+  ]
+}

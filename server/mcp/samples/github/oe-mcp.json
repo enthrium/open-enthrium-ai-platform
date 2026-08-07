@@ -1,0 +1,17 @@
+{
+  "_setup": "Go to https://github.com/settings/tokens → Generate new token (classic) → select scopes: repo, read:org → paste token below",
+  "connectors": [
+    {
+      "name": "my-github",
+      "type": "github",
+      "repoUrl": "https://github.com/your-org/your-repo",
+      "personalAccessToken": "ghp_xxxxxxxxxxxx"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "GitHub connected. Can list repos, read files, create issues, list PRs, search code."
+    }
+  ]
+}

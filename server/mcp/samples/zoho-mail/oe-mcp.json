@@ -1,0 +1,17 @@
+{
+  "_setup": "In Zoho Mail → Settings → Security → App Passwords → Generate a new App Password for the email below",
+  "connectors": [
+    {
+      "name": "my-zoho-mail",
+      "type": "zoho-mail",
+      "email": "you@yourcompany.com",
+      "appPassword": "xxxxxxxxxxxx"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "Zoho Mail connected. Can send emails, read inbox, and search messages."
+    }
+  ]
+}

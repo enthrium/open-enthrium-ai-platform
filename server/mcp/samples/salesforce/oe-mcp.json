@@ -1,0 +1,20 @@
+{
+  "_setup": "Go to Salesforce Setup → App Manager → New Connected App → Enable OAuth → copy clientId and clientSecret",
+  "connectors": [
+    {
+      "name": "my-salesforce",
+      "type": "salesforce",
+      "clientId": "xxxxxxxxxxxx",
+      "clientSecret": "xxxxxxxxxxxx",
+      "username": "you@company.com",
+      "password": "yourpassword",
+      "securityToken": "xxxxxxxxxxxx"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "Salesforce CRM connected. Can query leads, contacts, opportunities, accounts."
+    }
+  ]
+}

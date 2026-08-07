@@ -1,0 +1,19 @@
+{
+  "connectors": [
+    {
+      "name": "my-postgres",
+      "type": "postgresql",
+      "host": "localhost",
+      "port": 5432,
+      "database": "mydb",
+      "user": "postgres",
+      "password": "secret"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "PostgreSQL database connected. Can run queries, inspect schema, analyze data."
+    }
+  ]
+}

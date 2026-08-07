@@ -5,6 +5,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.4] — 2026-08-07
+
+### Changed
+- Config format switched from `oe-mcp.yaml` to `oe-mcp.json`; YAML still accepted as fallback via file extension detection
+- Fixed GitHub connector in all docs and samples: `token` → `repoUrl` + `personalAccessToken`
+- Fixed SSH `privateKey` docs: path reference → inline PEM content
+- Updated npm package description: "one YAML config" → "one JSON config"
+- All 11 existing samples converted from YAML to JSON format
+
+### Added
+- 7 new connector samples: `telegram`, `notion`, `confluence`, `graphql`, `zoho-mail`, `sftp`, `dropbox`
+- Samples now include `_setup` hint field with setup instructions
+
+---
+
 ## [v1.6.3] — 2026-08-07
 
 ### Changed

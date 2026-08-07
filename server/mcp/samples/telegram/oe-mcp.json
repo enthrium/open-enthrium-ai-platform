@@ -1,0 +1,19 @@
+{
+  "_setup": "Go to https://t.me/BotFather → /newbot → copy the token → replace YOUR_BOT_TOKEN below",
+  "connectors": [
+    {
+      "name": "my-telegram",
+      "type": "rest-api",
+      "baseUrl": "https://api.telegram.org/botYOUR_BOT_TOKEN",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "Telegram Bot API connected. Can send messages, get updates, and manage chats."
+    }
+  ]
+}

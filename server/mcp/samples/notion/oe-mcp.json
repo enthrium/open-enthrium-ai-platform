@@ -1,0 +1,16 @@
+{
+  "_setup": "Go to https://www.notion.so/my-integrations → New integration → copy the Internal Integration Secret",
+  "connectors": [
+    {
+      "name": "my-notion",
+      "type": "notion",
+      "integrationToken": "secret_xxxxxxxxxxxx"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "Notion workspace connected. Can search pages, read page content, and create new pages."
+    }
+  ]
+}

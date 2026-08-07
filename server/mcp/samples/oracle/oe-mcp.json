@@ -1,0 +1,20 @@
+{
+  "_setup": "Oracle requires Node.js mode (not standalone binary). Run: node mcp/index.js --stdio /path/to/oe-mcp.json",
+  "connectors": [
+    {
+      "name": "my-oracle",
+      "type": "oracle",
+      "host": "localhost",
+      "port": 1521,
+      "database": "ORCL",
+      "user": "system",
+      "password": "secret"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "Oracle database connected. Can run queries, inspect schema. Requires Node.js mode."
+    }
+  ]
+}

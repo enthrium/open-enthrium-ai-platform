@@ -1,0 +1,16 @@
+{
+  "connectors": [
+    {
+      "name": "my-mongo",
+      "type": "mongodb",
+      "uri": "mongodb://localhost:27017",
+      "database": "mydb"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "MongoDB connected. Can run aggregations, find documents, inspect collections."
+    }
+  ]
+}

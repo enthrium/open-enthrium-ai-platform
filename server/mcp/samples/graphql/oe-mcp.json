@@ -1,0 +1,17 @@
+{
+  "_setup": "Set baseUrl to your GraphQL endpoint. Use bearerToken for Authorization or apiKey for API key auth.",
+  "connectors": [
+    {
+      "name": "my-graphql",
+      "type": "graphql",
+      "baseUrl": "https://api.company.com/graphql",
+      "bearerToken": "xxxxxxxxxxxx"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "GraphQL API connected. Can run queries and mutations against the endpoint."
+    }
+  ]
+}

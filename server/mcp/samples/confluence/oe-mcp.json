@@ -1,0 +1,18 @@
+{
+  "_setup": "Go to https://id.atlassian.com/manage-profile/security/api-tokens → Create API token → use your Atlassian email + token below",
+  "connectors": [
+    {
+      "name": "my-confluence",
+      "type": "confluence",
+      "domain": "your-company.atlassian.net",
+      "email": "you@company.com",
+      "apiToken": "xxxxxxxxxxxx"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "Confluence connected. Can search pages, read page content, and list spaces."
+    }
+  ]
+}

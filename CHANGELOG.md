@@ -5,6 +5,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.4] — 2026-08-07
+
+### Changed
+- MCP config format switched from `oe-mcp.yaml` to `oe-mcp.json` (YAML still accepted as fallback)
+- Fixed GitHub connector field in all docs: `token` → `repoUrl` + `personalAccessToken`
+- Fixed SSH connector docs: `privateKey` path → inline PEM content
+
+### Added
+- 7 new MCP connector samples: `telegram`, `notion`, `confluence`, `graphql`, `zoho-mail`, `sftp`, `dropbox`
+- New blog post: OE MCP persistent memory for Claude Code, Cursor & Windsurf
+- All 11 existing MCP samples converted from YAML to JSON format
+- MCP config reference on mcp.html updated to JSON syntax
+
+---
+
 ## [v1.6.3] — 2026-08-07
 
 ### Added

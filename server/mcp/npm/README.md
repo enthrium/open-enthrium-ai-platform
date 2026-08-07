@@ -1,6 +1,6 @@
 # OE MCP Server · `@openenthrium/oe-mcp`
 
-**Connect Claude Code, Cursor & Windsurf to 2,600+ enterprise data sources — databases, APIs, files, SSH, messaging, and more. One binary. One YAML config.**
+**Connect Claude Code, Cursor & Windsurf to 2,600+ enterprise data sources — databases, APIs, files, SSH, messaging, and more. One binary. One JSON config.**
 
 [![npm](https://img.shields.io/npm/v/@openenthrium/oe-mcp?color=0284c7)](https://www.npmjs.com/package/@openenthrium/oe-mcp)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](https://github.com/enthrium/open-enthrium-ai-mcp-server/blob/main/LICENSE)
@@ -11,7 +11,7 @@
 
 ## What is OE MCP?
 
-OE MCP is a standalone binary that implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io). Define your connectors in a single `oe-mcp.yaml` file and expose them all as tools to your AI coding assistant — no code, no separate servers, no per-connector installs.
+OE MCP is a standalone binary that implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io). Define your connectors in a single `oe-mcp.json` file and expose them all as tools to your AI coding assistant — no code, no separate servers, no per-connector installs.
 
 Replace 50+ individual MCP servers with one config file.
 
@@ -19,129 +19,34 @@ Replace 50+ individual MCP servers with one config file.
 
 ## Quick Start
 
-**1. Create your config file** (`oe-mcp.yaml`)
+**1. Create your config file** (`oe-mcp.json`)
 
-```yaml
-connectors:
-  # SQL Database
-  - name: my-postgres
-    type: postgresql
-    host: localhost
-    port: 5432
-    database: mydb
-    user: postgres
-    password: secret
-
-  # MySQL
-  - name: my-mysql
-    type: mysql
-    host: localhost
-    port: 3306
-    database: mydb
-    user: root
-    password: secret
-
-  # MongoDB
-  - name: my-mongo
-    type: mongodb
-    uri: mongodb://localhost:27017
-    database: mydb
-
-  # Redis
-  - name: my-redis
-    type: redis
-    host: localhost
-    port: 6379
-
-  # AWS S3
-  - name: my-s3
-    type: s3
-    accessKeyId: AKIAXXXXXXXX
-    secretAccessKey: xxxxxxxxxxxx
-    region: us-east-1
-    bucket: my-bucket
-
-  # Google Drive
-  - name: my-gdrive
-    type: gdrive
-    clientId: xxxx.apps.googleusercontent.com
-    clientSecret: xxxx
-    refreshToken: xxxx
-
-  # GitHub
-  - name: my-github
-    type: github
-    token: ghp_xxxxxxxxxxxx
-
-  # Slack
-  - name: my-slack
-    type: slack
-    botToken: xoxb-xxxxxxxxxxxx
-
-  # Gmail
-  - name: my-gmail
-    type: gmail
-    clientId: xxxx.apps.googleusercontent.com
-    clientSecret: xxxx
-    refreshToken: xxxx
-
-  # SMTP (any email)
-  - name: my-email
-    type: smtp
-    host: smtp.company.com
-    port: 587
-    user: you@company.com
-    password: secret
-
-  # SSH / Remote Server
-  - name: my-server
-    type: ssh
-    host: server.company.com
-    port: 22
-    username: ubuntu
-    privateKey: "-----BEGIN OPENSSH PRIVATE KEY-----\nYOUR_PRIVATE_KEY_CONTENT\n-----END OPENSSH PRIVATE KEY-----"
-
-  # Local Filesystem
-  - name: my-codebase
-    type: filesystem
-    basePath: /home/user/projects/myapp
-
-  # REST API
-  - name: my-api
-    type: rest-api
-    baseUrl: https://api.company.com
-    headers:
-      Authorization: Bearer xxxx
-
-  # Jira
-  - name: my-jira
-    type: jira
-    host: https://company.atlassian.net
-    email: you@company.com
-    apiToken: xxxx
-
-  # HubSpot
-  - name: my-hubspot
-    type: hubspot
-    accessToken: pat-xxxxxxxxxxxx
-
-  # Kafka
-  - name: my-kafka
-    type: kafka
-    brokers:
-      - localhost:9092
-
-  # Elasticsearch
-  - name: my-elastic
-    type: elasticsearch
-    node: https://localhost:9200
-    apiKey: xxxxxxxxxxxx
-
-memory:
-  - key: team
-    value: "Platform Engineering"
-  - key: environment
-    value: "production"
+```json
+{
+  "connectors": [
+    { "name": "my-postgres", "type": "postgresql",    "host": "localhost", "port": 5432, "database": "mydb", "user": "postgres", "password": "secret" },
+    { "name": "my-mysql",    "type": "mysql",         "host": "localhost", "port": 3306, "database": "mydb", "user": "root",     "password": "secret" },
+    { "name": "my-mongo",    "type": "mongodb",       "uri": "mongodb://localhost:27017", "database": "mydb" },
+    { "name": "my-redis",    "type": "redis",         "host": "localhost", "port": 6379 },
+    { "name": "my-s3",       "type": "s3",            "accessKeyId": "AKIAXXXXXXXX", "secretAccessKey": "xxxxxxxxxxxx", "region": "us-east-1", "bucket": "my-bucket" },
+    { "name": "my-gdrive",   "type": "gdrive",        "clientId": "xxxx.apps.googleusercontent.com", "clientSecret": "xxxx", "refreshToken": "xxxx" },
+    { "name": "my-github",   "type": "github",        "repoUrl": "https://github.com/your-org/your-repo", "personalAccessToken": "ghp_xxxxxxxxxxxx" },
+    { "name": "my-slack",    "type": "slack",         "botToken": "xoxb-xxxxxxxxxxxx" },
+    { "name": "my-gmail",    "type": "gmail",         "clientId": "xxxx.apps.googleusercontent.com", "clientSecret": "xxxx", "refreshToken": "xxxx" },
+    { "name": "my-email",    "type": "smtp",          "host": "smtp.company.com", "port": 587, "user": "you@company.com", "password": "secret" },
+    { "name": "my-server",   "type": "ssh",           "host": "server.company.com", "port": 22, "username": "ubuntu", "privateKey": "-----BEGIN OPENSSH PRIVATE KEY-----\nYOUR_PRIVATE_KEY_CONTENT\n-----END OPENSSH PRIVATE KEY-----" },
+    { "name": "my-codebase", "type": "filesystem",   "basePath": "/home/user/projects/myapp" },
+    { "name": "my-api",      "type": "rest-api",      "baseUrl": "https://api.company.com", "headers": { "Authorization": "Bearer xxxx" } },
+    { "name": "my-jira",     "type": "jira",          "host": "https://company.atlassian.net", "email": "you@company.com", "apiToken": "xxxx" },
+    { "name": "my-hubspot",  "type": "hubspot",       "accessToken": "pat-xxxxxxxxxxxx" },
+    { "name": "my-kafka",    "type": "kafka",         "brokers": ["localhost:9092"] },
+    { "name": "my-elastic",  "type": "elasticsearch", "node": "https://localhost:9200", "apiKey": "xxxxxxxxxxxx" }
+  ],
+  "memory": [
+    { "key": "team",        "value": "Platform Engineering" },
+    { "key": "environment", "value": "production" }
+  ]
+}
 ```
 
 **2. Add to Claude Code** (`~/.mcp.json`)
@@ -153,7 +58,7 @@ macOS / Linux:
     "oe-mcp": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "/path/to/oe-mcp.json"]
     }
   }
 }
@@ -166,7 +71,7 @@ Windows:
     "oe-mcp": {
       "type": "stdio",
       "command": "npx.cmd",
-      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.yaml"]
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "C:\\path\\to\\oe-mcp.json"]
     }
   }
 }

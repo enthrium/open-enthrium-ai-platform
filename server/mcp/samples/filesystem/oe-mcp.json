@@ -1,0 +1,15 @@
+{
+  "connectors": [
+    {
+      "name": "my-codebase",
+      "type": "filesystem",
+      "basePath": "/home/user/projects/myapp"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "Local filesystem connected. Can read, write, search files in the configured directory."
+    }
+  ]
+}

@@ -30,7 +30,7 @@ open-enthrium-ai-mcp-server/
 │   ├── mcp/
 │   │   ├── index.js          # MCP server — stdio + HTTP serve modes, memory tools
 │   │   ├── sea-config.json   # Node.js SEA build config
-│   │   └── samples/          # Ready-to-use oe-mcp.yaml configs
+│   │   └── samples/          # Ready-to-use oe-mcp.json configs
 │   │       └── <name>/
 │   │           └── oe-mcp.yaml
 │   ├── src/                  # Shared adapter source (synced from platform repo)

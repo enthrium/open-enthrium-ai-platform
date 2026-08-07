@@ -1,0 +1,17 @@
+{
+  "connectors": [
+    {
+      "name": "my-servicenow",
+      "type": "servicenow",
+      "instance": "your-instance",
+      "username": "admin",
+      "password": "secret"
+    }
+  ],
+  "memory": [
+    {
+      "key": "context",
+      "value": "ServiceNow connected. Can query incidents, change requests, and CMDB records."
+    }
+  ]
+}
