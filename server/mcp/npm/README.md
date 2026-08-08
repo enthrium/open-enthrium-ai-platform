@@ -1,6 +1,6 @@
 # OE MCP Server · `@openenthrium/oe-mcp`
 
-**Connect Claude Code, Cursor & Windsurf to 2,600+ enterprise data sources — databases, APIs, files, SSH, messaging, and more. One binary. One JSON config.**
+**Connect Claude Code, Cursor, Windsurf, Codex, Claude Desktop, and VS Code to 2,600+ enterprise data sources — databases, APIs, files, SSH, messaging, and more. One binary. One JSON config.**
 
 [![npm](https://img.shields.io/npm/v/@openenthrium/oe-mcp?color=0284c7)](https://www.npmjs.com/package/@openenthrium/oe-mcp)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](https://github.com/enthrium/open-enthrium-ai-mcp-server/blob/main/LICENSE)
@@ -9,11 +9,17 @@
 
 ---
 
-## What is OE MCP?
+## What is OE MCP Server?
 
-OE MCP is a standalone binary that implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io). Define your connectors in a single `oe-mcp.json` file and expose them all as tools to your AI coding assistant — no code, no separate servers, no per-connector installs.
+OE MCP Server is a standalone binary that implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io) and exposes your enterprise data sources as tools that AI apps can use directly.
 
-Replace 50+ individual MCP servers with one config file.
+Connect Claude Code, Cursor, Windsurf, Codex, Claude Desktop, or VS Code to your PostgreSQL database, local filesystem, GitHub, Slack, Google Drive, SSH servers, and more — without writing any integration code.
+
+- **No code.** Define connectors in a single JSON file.
+- **45+ connector categories.** 2,600+ enterprise systems supported out of the box.
+- **Two transport modes.** `--stdio` for Claude Code, Cursor, Windsurf, Codex, and Claude Desktop (launched as a child process); `--serve` for cloud deployments or sharing one server across a team.
+- **Persistent memory.** Built-in `memory_set / memory_get / memory_list / memory_delete` tools — context survives across sessions.
+- **Self-hosted.** Runs on your own machine. No cloud dependency. Own your data.
 
 ---
 
@@ -49,7 +55,7 @@ Replace 50+ individual MCP servers with one config file.
 }
 ```
 
-**2. Add to Claude Code** (`~/.mcp.json`)
+**2. Add to your AI app's MCP config** (Claude Code, Cursor, Windsurf, Codex, Claude Desktop, VS Code)
 
 macOS / Linux:
 ```json
@@ -79,7 +85,54 @@ Windows:
 
 > **Note:** `-y` skips npx's install confirmation prompt — without it, npx blocks waiting for keyboard input and the MCP connection never opens.
 
-**3. Reload Claude Code** — your connectors appear as tools automatically.
+**3. Reload your AI app** — your connectors appear as tools automatically.
+
+---
+
+## Test Your Connection and Memory
+
+### Test Connectors
+
+Once connected, ask Claude in plain language:
+
+> **"What connectors do you have access to?"**
+
+Claude will list every connected tool with its available actions. Example response:
+
+| Connector | Tools |
+|---|---|
+| **my-postgres** | `query` |
+| **my-github** | `list_files`, `read_file`, `create_issue`, `get_issue`, `search_issues` |
+| **my-slack** | `list_channels`, `post_message`, `search_messages` |
+| **my-codebase** | `list_dir`, `read_file`, `write_file`, `search_files` |
+
+You can also run `/mcp` in Claude Code to see the server status and total tool count.
+
+### Test Memory
+
+OE MCP has built-in persistent memory that survives restarts. Use plain language or direct tool calls:
+
+**Save a memory:**
+> _"Remember that our production database host is prod-db.company.com"_
+
+Claude calls `memory_set` with `key = main_db_host`, `value = prod-db.company.com`.
+
+**Retrieve a memory:**
+> _"What is our production database host?"_
+
+Claude calls `memory_get` with `key = main_db_host` and returns the stored value.
+
+**List all memories:**
+> _"What do you remember about our project?"_
+
+Claude calls `memory_list` and returns all stored key-value pairs.
+
+**Delete a memory:**
+> _"Forget the production database host."_
+
+Claude calls `memory_delete` with `key = main_db_host` to remove it.
+
+Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.json` and persists across sessions and restarts.
 
 ---
 
@@ -109,8 +162,8 @@ Windows:
 
 | Mode | Flag | Best for |
 |---|---|---|
-| **stdio** | `--stdio` | Claude Code VS Code extension, Claude Desktop |
-| **HTTP** | `--serve --port 4040` | Cursor, Windsurf, shared cloud deployments |
+| **stdio** | `--stdio` | Claude Code, Cursor, Windsurf, Codex, Claude Desktop — binary launched as child process by the AI app |
+| **HTTP** | `--serve --port 4040` | Cloud deployments, multiple developers sharing one server |
 
 ---
 

@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.5] — 2026-08-08
+
+### Added
+- Persistent action log (`oe-mcp-log.json`) stored next to `oe-mcp.json` — every connector tool call appended automatically
+- `log_list` MCP tool — returns recent log entries (newest first, default 50, supports `limit` param)
+- `log_clear` MCP tool — wipes the log file
+- Error path covered — failed calls logged with `result: error` and error message
+- Memory and log tool calls excluded from logging (no noise)
+
+---
+
 ## [v1.6.4] — 2026-08-07
 
 ### Changed

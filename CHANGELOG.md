@@ -5,6 +5,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.5] — 2026-08-08
+
+### Added
+- **OE MCP**: Persistent action log (`oe-mcp-log.json`) — every connector tool call is automatically appended with timestamp, connector name, tool, input, and result
+- **OE MCP**: `log_list` MCP tool — query the action log in plain language from any connected AI app (supports `limit` param, newest first)
+- **OE MCP**: `log_clear` MCP tool — wipe the action log
+- **OE MCP**: Error path logging — failed connector calls logged with `result: error` and error message
+
+---
+
 ## [v1.6.4] — 2026-08-07
 
 ### Changed

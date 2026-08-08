@@ -28,6 +28,25 @@ function saveMemoryFile(store) {
   fs.writeFileSync(MEMORY_FILE, JSON.stringify(store, null, 2), "utf8");
 }
 
+// ── persistent log ─────────────────────────────────────────────────────────
+
+let LOG_FILE = path.join(path.dirname(process.execPath), "oe-mcp-log.json");
+
+function loadLogFile() {
+  try {
+    if (fs.existsSync(LOG_FILE)) {
+      return JSON.parse(fs.readFileSync(LOG_FILE, "utf8"));
+    }
+  } catch {}
+  return [];
+}
+
+function appendLogEntry(entry) {
+  const log = loadLogFile();
+  log.push(entry);
+  fs.writeFileSync(LOG_FILE, JSON.stringify(log, null, 2), "utf8");
+}
+
 // ── arg parsing ────────────────────────────────────────────────────────────
 
 function usage() {
@@ -120,6 +139,24 @@ const MEMORY_TOOLS = [
   },
 ];
 
+const LOG_TOOLS = [
+  {
+    name:        "log_list",
+    description: "List connector action log entries from oe-mcp-log.json. Most recent entries first.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        limit: { type: "number", description: "Max entries to return (default: 50)" },
+      },
+    },
+  },
+  {
+    name:        "log_clear",
+    description: "Clear all entries from the connector action log (oe-mcp-log.json).",
+    inputSchema: { type: "object", properties: {} },
+  },
+];
+
 function buildTools(connectors) {
   const toolList = [];
   const toolMap  = {};
@@ -140,7 +177,27 @@ function buildTools(connectors) {
   }
 
   toolList.push(...MEMORY_TOOLS);
+  toolList.push(...LOG_TOOLS);
   return { toolList, toolMap };
+}
+
+function handleLogTool(name, args) {
+  switch (name) {
+    case "log_list": {
+      const log   = loadLogFile();
+      if (log.length === 0) return "No log entries.";
+      const limit   = (args && args.limit) ? args.limit : 50;
+      const entries = log.slice(-limit).reverse();
+      return entries.map(e =>
+        `[${e.ts}] ${e.connector} → ${e.tool} | result: ${e.result}${e.error ? ` | error: ${e.error}` : ""}`
+      ).join("\n");
+    }
+    case "log_clear":
+      fs.writeFileSync(LOG_FILE, JSON.stringify([], null, 2), "utf8");
+      return "Log cleared.";
+    default:
+      return `Unknown log tool: ${name}`;
+  }
 }
 
 function handleMemoryTool(name, args, store) {
@@ -173,10 +230,33 @@ async function callTool(toolName, args, toolMap, store) {
   if (toolName.startsWith("memory_")) {
     return handleMemoryTool(toolName, args || {}, store);
   }
+  if (toolName.startsWith("log_")) {
+    return handleLogTool(toolName, args || {});
+  }
   const entry = toolMap[toolName];
   if (!entry) return `Unknown tool: ${toolName}`;
-  const result = await entry.adapter.executeTool(entry.action, args || {}, entry.connector, null);
-  return typeof result === "string" ? result : JSON.stringify(result, null, 2);
+  try {
+    const result = await entry.adapter.executeTool(entry.action, args || {}, entry.connector, null);
+    const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    appendLogEntry({
+      ts:        new Date().toISOString(),
+      connector: entry.connector.name,
+      tool:      entry.action,
+      input:     args || {},
+      result:    "ok",
+    });
+    return text;
+  } catch (err) {
+    appendLogEntry({
+      ts:        new Date().toISOString(),
+      connector: entry.connector.name,
+      tool:      entry.action,
+      input:     args || {},
+      result:    "error",
+      error:     err.message,
+    });
+    throw err;
+  }
 }
 
 // ── stdio MCP transport (no SDK dependency) ────────────────────────────────
@@ -329,6 +409,7 @@ async function main() {
   }
 
   MEMORY_FILE = path.join(path.dirname(path.resolve(configFile)), "oe-mcp-memory.json");
+  LOG_FILE    = path.join(path.dirname(path.resolve(configFile)), "oe-mcp-log.json");
 
   const raw        = fs.readFileSync(configFile, "utf8");
   const ext        = path.extname(configFile).toLowerCase();
