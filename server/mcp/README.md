@@ -25,7 +25,7 @@ OE MCP Server is a standalone binary that implements the [Model Context Protocol
 Connect Claude Code, Cursor, Windsurf, Codex, Claude Desktop, or VS Code to your PostgreSQL database, local filesystem, GitHub, Slack, Google Drive, SSH servers, and more — without writing any integration code.
 
 - **No code.** Define connectors in a single JSON file.
-- **45+ connector categories.** 2,600+ enterprise systems supported out of the box.
+- **45+ connector categories.** Enterprise systems supported out of the box.
 - **Two transport modes.** `--stdio` for Claude Code, Cursor, Windsurf, Codex, and Claude Desktop (launched as a child process); `--serve` for cloud deployments or sharing one server across a team.
 - **Persistent memory.** Built-in `memory_set / memory_get / memory_list / memory_delete` tools — context survives across sessions.
 - **Self-hosted.** Runs on your own machine. No cloud dependency. Own your data.
@@ -317,6 +317,66 @@ Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.json` and survives
 > "Remember that our main database is on prod-db.company.com"
 > → Claude calls `memory_set` with key `main_db_host` and value `prod-db.company.com`
 
+### Action Log Tools
+
+Built-in log tools that record every connector tool call:
+
+| Tool | Description |
+|---|---|
+| `log_list` | List recent connector action log entries (newest first, supports `limit` param) |
+| `log_clear` | Clear all entries from the action log |
+
+Every connector tool call is automatically appended to `oe-mcp-log.json` next to your `oe-mcp.json` with timestamp, connector name, tool, input, and result. Memory and log tool calls are excluded.
+
+**Example usage:**
+> "Show me the action log"
+> → Claude calls `log_list` and returns recent connector activity
+
+**Example log entry:**
+```json
+{
+  "ts": "2026-08-08T04:59:33.289Z",
+  "connector": "my-postgres",
+  "tool": "query",
+  "input": { "sql": "SELECT * FROM users LIMIT 10" },
+  "result": "ok"
+}
+```
+
+### Agent Runner Tool
+
+OE MCP can run [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) YAML agents directly from Claude Code, Cursor, Windsurf, Codex, or any MCP-compatible AI app — no terminal required.
+
+| Tool | Description |
+|---|---|
+| `run_agent` | Run an OE Runtime YAML agent and return the full output |
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `file` | string | ✅ | Absolute path to the `agent.yaml` file |
+| `params` | object | ❌ | Key-value pairs passed to the agent as `--param key=value` flags |
+
+**Config auto-detection:** OE MCP looks for `oe-config.json` in the same directory as `agent.yaml`. If found, it uses that config (correct LLM + connector credentials for that agent). Otherwise it falls back to the `oe-mcp.json` config.
+
+**Example — ask Claude to run an agent:**
+> _"Run my database analyst agent at /home/user/agents/db-analyst/agent.yaml"_
+> → Claude calls `run_agent` with `file = /home/user/agents/db-analyst/agent.yaml`
+
+**Example — run with params:**
+> _"Run my report agent for the month of July"_
+> → Claude calls `run_agent` with `file = /agents/report.yaml` and `params = { "month": "July" }`
+
+**What happens under the hood:**
+```
+npx -y @openenthrium/oe-runtime agent.yaml --config oe-config.json [--param key=value ...]
+```
+
+OE Runtime executes the YAML agent — calling connectors, running LLM steps, and returning the full output back to your AI app.
+
+> **Requires OE Runtime.** The agent directory must have a valid `oe-config.json` with `llm` and `connectors` configured. See [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) for agent authoring docs.
+
 ---
 
 ## Binary vs Node.js Mode
@@ -341,7 +401,7 @@ All other connectors (PostgreSQL, MySQL, MongoDB, Redis, S3, Slack, GitHub, REST
 
 ## Connector Catalog
 
-**2,600+ connectors across 45+ categories:**
+**Connectors across 45+ categories:**
 
 | Category | Examples |
 |---|---|

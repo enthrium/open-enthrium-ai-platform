@@ -5,6 +5,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.6] — 2026-08-08
+
+### Added
+- `run_agent` MCP tool — run any OE Runtime YAML agent directly from Claude Code, Cursor, Windsurf, Codex, or any MCP-compatible AI app
+- Auto-detects `oe-config.json` in the agent's directory; falls back to `oe-mcp.json` if not found
+- Supports optional `params` object — key-value pairs passed to the agent as `--param` flags
+- READMEs updated with `run_agent` documentation and usage examples
+
+### Changed
+- Removed inflated connector count claims from all docs (no more "2,600+")
+
+---
+
 ## [v1.6.5] — 2026-08-08
 
 ### Added

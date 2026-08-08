@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 "use strict";
 
-const fs           = require("fs");
-const path         = require("path");
-const yaml         = require("js-yaml");
-const express      = require("express");
-const cors         = require("cors");
+const fs             = require("fs");
+const path           = require("path");
+const yaml           = require("js-yaml");
+const express        = require("express");
+const cors           = require("cors");
 const { randomUUID } = require("crypto");
+const { execSync }   = require("child_process");
 
 const { ADAPTERS } = require("../src/utils/tools/registry");
 const restApi      = require("../src/utils/tools/adapters/rest-api");
@@ -14,6 +15,7 @@ const restApi      = require("../src/utils/tools/adapters/rest-api");
 // ── persistent memory ──────────────────────────────────────────────────────
 
 let MEMORY_FILE = path.join(path.dirname(process.execPath), "oe-mcp-memory.json");
+let CONFIG_FILE = "oe-mcp.json";
 
 function loadMemoryFile() {
   try {
@@ -157,6 +159,42 @@ const LOG_TOOLS = [
   },
 ];
 
+const AGENT_TOOLS = [
+  {
+    name:        "run_agent",
+    description: "Run an OE Runtime YAML agent and return the full output. Pass the path to agent.yaml and optional params.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        file:   { type: "string", description: "Path to the agent.yaml file" },
+        params: { type: "object", description: "Optional key-value params passed to the agent via --param flags" },
+      },
+      required: ["file"],
+    },
+  },
+];
+
+function handleAgentTool(args) {
+  const file      = args.file;
+  const params    = args.params || {};
+  const agentDir  = path.dirname(path.resolve(file));
+  const agentConf = path.join(agentDir, "oe-config.json");
+  const confFlag  = fs.existsSync(agentConf) ? `--config "${agentConf}"` : `--config "${CONFIG_FILE}"`;
+
+  const paramFlags = Object.entries(params)
+    .map(([k, v]) => `--param ${k}=${JSON.stringify(v)}`)
+    .join(" ");
+
+  const cmd = `npx -y @openenthrium/oe-runtime "${file}" ${confFlag}${paramFlags ? " " + paramFlags : ""}`;
+
+  try {
+    const output = execSync(cmd, { encoding: "utf8", timeout: 300000 });
+    return output || "Agent completed with no output.";
+  } catch (err) {
+    return `Agent error: ${err.message}`;
+  }
+}
+
 function buildTools(connectors) {
   const toolList = [];
   const toolMap  = {};
@@ -178,6 +216,7 @@ function buildTools(connectors) {
 
   toolList.push(...MEMORY_TOOLS);
   toolList.push(...LOG_TOOLS);
+  toolList.push(...AGENT_TOOLS);
   return { toolList, toolMap };
 }
 
@@ -232,6 +271,9 @@ async function callTool(toolName, args, toolMap, store) {
   }
   if (toolName.startsWith("log_")) {
     return handleLogTool(toolName, args || {});
+  }
+  if (toolName === "run_agent") {
+    return handleAgentTool(args || {});
   }
   const entry = toolMap[toolName];
   if (!entry) return `Unknown tool: ${toolName}`;
@@ -410,6 +452,7 @@ async function main() {
 
   MEMORY_FILE = path.join(path.dirname(path.resolve(configFile)), "oe-mcp-memory.json");
   LOG_FILE    = path.join(path.dirname(path.resolve(configFile)), "oe-mcp-log.json");
+  CONFIG_FILE = path.resolve(configFile);
 
   const raw        = fs.readFileSync(configFile, "utf8");
   const ext        = path.extname(configFile).toLowerCase();

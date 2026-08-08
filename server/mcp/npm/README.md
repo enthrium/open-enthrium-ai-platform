@@ -1,6 +1,6 @@
 # OE MCP Server · `@openenthrium/oe-mcp`
 
-**Connect Claude Code, Cursor, Windsurf, Codex, Claude Desktop, and VS Code to 2,600+ enterprise data sources — databases, APIs, files, SSH, messaging, and more. One binary. One JSON config.**
+**Connect Claude Code, Cursor, Windsurf, Codex, Claude Desktop, and VS Code to enterprise data sources — databases, APIs, files, SSH, messaging, and more. One binary. One JSON config.**
 
 [![npm](https://img.shields.io/npm/v/@openenthrium/oe-mcp?color=0284c7)](https://www.npmjs.com/package/@openenthrium/oe-mcp)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](https://github.com/enthrium/open-enthrium-ai-mcp-server/blob/main/LICENSE)
@@ -16,7 +16,7 @@ OE MCP Server is a standalone binary that implements the [Model Context Protocol
 Connect Claude Code, Cursor, Windsurf, Codex, Claude Desktop, or VS Code to your PostgreSQL database, local filesystem, GitHub, Slack, Google Drive, SSH servers, and more — without writing any integration code.
 
 - **No code.** Define connectors in a single JSON file.
-- **45+ connector categories.** 2,600+ enterprise systems supported out of the box.
+- **45+ connector categories.** Enterprise systems supported out of the box.
 - **Two transport modes.** `--stdio` for Claude Code, Cursor, Windsurf, Codex, and Claude Desktop (launched as a child process); `--serve` for cloud deployments or sharing one server across a team.
 - **Persistent memory.** Built-in `memory_set / memory_get / memory_list / memory_delete` tools — context survives across sessions.
 - **Self-hosted.** Runs on your own machine. No cloud dependency. Own your data.
@@ -136,9 +136,36 @@ Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.json` and persists
 
 ---
 
+## Run YAML Agents (`run_agent`)
+
+OE MCP can run [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) YAML agents directly from Claude Code, Cursor, Windsurf, Codex, or any MCP-compatible AI app — no terminal required.
+
+**Just ask Claude:**
+> _"Run my database analyst agent at /home/user/agents/db-analyst/agent.yaml"_
+
+Claude calls `run_agent`, which executes:
+```
+npx -y @openenthrium/oe-runtime agent.yaml --config oe-config.json
+```
+
+And returns the full agent output back to your AI app.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `file` | string | ✅ | Absolute path to the `agent.yaml` file |
+| `params` | object | ❌ | Key-value pairs passed to the agent as `--param key=value` flags |
+
+**Config auto-detection:** OE MCP looks for `oe-config.json` in the same directory as `agent.yaml`. If found, it uses that config. Otherwise it falls back to the `oe-mcp.json` config.
+
+> **Requires OE Runtime.** The agent directory must have a valid `oe-config.json` with `llm` and `connectors` configured. See [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) for agent authoring docs.
+
+---
+
 ## Supported Connectors
 
-**2,600+ connectors across 45+ categories:**
+**Connectors across 45+ categories:**
 
 | Category | Examples |
 |---|---|
@@ -177,6 +204,28 @@ Every session includes persistent memory tools:
 | `memory_get` | Retrieve a stored value |
 | `memory_list` | List all stored pairs |
 | `memory_delete` | Remove a stored key |
+
+Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.json` and survives restarts.
+
+## Built-in Action Log
+
+Every connector tool call is automatically logged to `oe-mcp-log.json`:
+
+| Tool | Description |
+|---|---|
+| `log_list` | List recent connector action log entries (newest first, supports `limit` param) |
+| `log_clear` | Clear all entries from the action log |
+
+**Example log entry:**
+```json
+{
+  "ts": "2026-08-08T04:59:33.289Z",
+  "connector": "my-postgres",
+  "tool": "query",
+  "input": { "sql": "SELECT * FROM users LIMIT 10" },
+  "result": "ok"
+}
+```
 
 ---
 

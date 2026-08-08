@@ -4,7 +4,7 @@
 <h3>Open-Source AI Ecosystem · Apache-2.0 · Self-Hosted</h3>
 
 **Build, deploy, and govern AI Agents, Assistants, RAG, MCP, Workspaces, and Enterprise Automation.**
-No code. No LangChain. No Python. 2,673+ enterprise connectors.
+No code. No LangChain. No Python.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](LICENSE)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jumbocoder/open-enthrium-ai-platform?color=2496ED&logo=docker&logoColor=white)](https://hub.docker.com/r/jumbocoder/open-enthrium-ai-platform)
@@ -19,12 +19,12 @@ No code. No LangChain. No Python. 2,673+ enterprise connectors.
 
 ## What is Open Enthrium AI Platform?
 
-A self-hosted, web-based open-source AI platform for building and running autonomous AI agents without writing code. Deploy it on your own infrastructure and connect to 2,673+ enterprise systems — databases, APIs, cloud storage, messaging, SSH, and IoT — without custom integration code.
+A self-hosted, web-based open-source AI platform for building and running autonomous AI agents without writing code. Deploy it on your own infrastructure and connect to enterprise systems — databases, APIs, cloud storage, messaging, SSH, and IoT — without custom integration code.
 
 - **No code.** Agents are declarative YAML files.
 - **Self-hosted.** Deploy on your own infrastructure. Own your data completely. No call-home.
 - **Human approval gates.** Build human-in-the-loop agentic workflows without writing code.
-- **Enterprise-ready.** Multi-workspace, RAG, MCP, DLP governance, and 2,673 connectors out of the box.
+- **Enterprise-ready.** Multi-workspace, RAG, MCP, DLP governance, and native connectors out of the box.
 
 
 ---
