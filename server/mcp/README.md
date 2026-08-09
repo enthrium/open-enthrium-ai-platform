@@ -462,6 +462,12 @@ OE MCP Server is part of the [Open Enthrium](https://openenthrium.com) platform.
 
 ---
 
+## Contributing
+
+→ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for how to add sample configs and connector adapters.
+
+---
+
 ## License
 
 [Apache-2.0](LICENSE) — free to use, modify, and deploy for any purpose, including commercial use.

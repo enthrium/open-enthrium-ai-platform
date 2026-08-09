@@ -156,6 +156,8 @@ Contributions are welcome. Before opening a PR:
 - Agent YAML examples for the community marketplace
 - Bug fixes with clear reproduction steps
 
+→ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full guide.
+
 ---
 
 ## Community

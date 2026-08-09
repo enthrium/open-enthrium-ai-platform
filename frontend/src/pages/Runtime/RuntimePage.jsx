@@ -232,7 +232,7 @@ export default function RuntimePage() {
             <span className="w-1.5 h-1.5 rounded-full bg-indigo" />
             {VERSION}
           </span>
-          <span className="text-xs text-gray-400 font-medium">Standalone binary · No install required</span>
+          <span className="text-xs text-gray-400 font-medium">npx · Standalone binary · No setup required</span>
         </div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">OE Runtime</h1>
         <p className="text-gray-500 max-w-2xl">
@@ -241,9 +241,48 @@ export default function RuntimePage() {
         </p>
       </div>
 
+      {/* npx quick start */}
+      <div className="border border-indigo/20 bg-indigo/5 rounded-xl p-5">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="px-2 py-0.5 rounded text-xs font-bold bg-indigo/10 text-indigo">Zero Install</span>
+          <h2 className="text-sm font-semibold text-gray-700">Run instantly with npx — no download needed</h2>
+        </div>
+        <div className="bg-gray-900 rounded-lg overflow-hidden">
+          <div className="px-4 py-2 border-b border-gray-800 flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-red-500/60" />
+            <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
+            <span className="w-3 h-3 rounded-full bg-green-500/60" />
+            <span className="ml-2 text-xs text-gray-500">terminal</span>
+          </div>
+          <pre className="p-4 text-sm text-gray-300 font-mono leading-relaxed overflow-x-auto">{`# Run any agent YAML directly — npx fetches the runtime automatically
+npx -y @openenthrium/oe-runtime agent.yaml --config oe-config.json
+
+# With parameters
+npx -y @openenthrium/oe-runtime market-report.yaml \\
+  --config oe-config.json \\
+  --param company="Tesla" \\
+  --param recipient="ceo@company.com"
+
+# HTTP server mode
+npx -y @openenthrium/oe-runtime --serve --config oe-config.json`}</pre>
+        </div>
+        <p className="text-xs text-gray-500 mt-2">
+          Requires Node.js 18+. The runtime is fetched from{" "}
+          <a
+            href="https://www.npmjs.com/package/@openenthrium/oe-runtime"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-indigo hover:underline"
+          >
+            npm (@openenthrium/oe-runtime)
+          </a>{" "}
+          and cached locally — subsequent runs are instant.
+        </p>
+      </div>
+
       {/* Download buttons */}
       <div>
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">Download</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">Download Binary</h2>
         <div className="flex flex-wrap gap-3">
           {DOWNLOADS.map((d) => (
             <a
@@ -273,7 +312,10 @@ export default function RuntimePage() {
             <span className="w-3 h-3 rounded-full bg-green-500/60" />
             <span className="ml-2 text-xs text-gray-500">terminal</span>
           </div>
-          <pre className="p-5 text-sm text-gray-300 font-mono leading-relaxed overflow-x-auto">{`# Run an agent
+          <pre className="p-5 text-sm text-gray-300 font-mono leading-relaxed overflow-x-auto">{`# Using npx (no install needed)
+npx -y @openenthrium/oe-runtime agent.yaml --config oe-config.json
+
+# Using downloaded binary
 oe-runtime agent.yaml --config oe-config.json
 
 # Pass parameters (substitutes {{key}} in instructions and steps)
@@ -291,8 +333,9 @@ oe-runtime market-report.yaml \\
           <span className="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">New in v1.3.5</span>
         </div>
         <p className="text-sm text-gray-500 mb-3">
-          Add <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">--serve</code> to turn the binary into a persistent HTTP API.
-          Call it from mobile apps, web apps, or any HTTP client — no Node.js or Docker required on the server.
+          Add <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">--serve</code> to turn the runtime into a persistent HTTP API.
+          Use <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">npx -y @openenthrium/oe-runtime --serve</code> or the downloaded binary.
+          Call it from mobile apps, web apps, or any HTTP client.
         </p>
         <div className="bg-gray-900 rounded-xl overflow-hidden mb-3">
           <div className="px-4 py-2 border-b border-gray-800 flex items-center gap-2">

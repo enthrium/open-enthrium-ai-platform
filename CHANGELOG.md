@@ -5,6 +5,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.7] — 2026-08-09
+
+### Added
+- **Community contributions**: Drop a `.js` file into `server/src/utils/tools/adapters/` — registry auto-discovers it on startup, no manual registration needed
+- **Connector Library**: `implemented` indicator — connectors with a native adapter show a **Download** button; unimplemented ones show **Soon**; new **Active only** filter to see live connectors instantly
+- **Connector Library**: Auto-sync on startup — new entries in `connectionTypes.json` are seeded into the database on every server restart; no manual seed script needed after updates
+- **Adapter template**: `server/src/utils/tools/adapters/_template.js` — copy-paste starting point for community connector contributions
+- **CONTRIBUTING.md**: 2-step guide for adding a connector adapter (works across Platform, Runtime, and MCP)
+- **Runtime page**: npx install option added alongside binary downloads
+
+### Changed
+- `server/src/utils/adapters/` renamed to `server/src/utils/rag/` — clearer separation between RAG vector store adapters and connector tool adapters
+
+---
+
 ## [v1.6.6] — 2026-08-08
 
 ### Added

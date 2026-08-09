@@ -81,10 +81,11 @@ function downloadSpec(connector) {
 }
 
 export default function ConnectorsLibraryPage() {
-  const [masters,     setMasters]     = useState([]);
-  const [loading,     setLoading]     = useState(true);
-  const [search,      setSearch]      = useState("");
-  const [selectedCat, setSelectedCat] = useState(null);
+  const [masters,       setMasters]       = useState([]);
+  const [loading,       setLoading]       = useState(true);
+  const [search,        setSearch]        = useState("");
+  const [selectedCat,   setSelectedCat]   = useState(null);
+  const [activeOnly,    setActiveOnly]    = useState(false);
 
   useEffect(() => {
     api.get("/admin/connection-masters")
@@ -93,14 +94,17 @@ export default function ConnectorsLibraryPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const implementedCount = useMemo(() => masters.filter(m => m.implemented).length, [masters]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return masters.filter(m => {
       const matchSearch = !q || m.label.toLowerCase().includes(q) || (m.category || "").toLowerCase().includes(q);
       const matchCat    = !selectedCat || m.category === selectedCat;
-      return matchSearch && matchCat;
+      const matchActive = !activeOnly || m.implemented;
+      return matchSearch && matchCat && matchActive;
     });
-  }, [masters, search, selectedCat]);
+  }, [masters, search, selectedCat, activeOnly]);
 
   const grouped = useMemo(() => {
     const map = {};
@@ -122,11 +126,23 @@ export default function ConnectorsLibraryPage() {
           <div>
             <h1 className="text-xl font-bold text-gray-900">Connector Library</h1>
             <p className="text-sm text-gray-400 mt-0.5">
-              {masters.length.toLocaleString()} connectors · download the spec to build your own adapter
+              {masters.length.toLocaleString()} connectors · {implementedCount} active · download the spec to build your own adapter
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <span className="font-semibold text-gray-600">{totalFiltered.toLocaleString()}</span> shown
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setActiveOnly(v => !v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                activeOnly
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-gray-300"
+              }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${activeOnly ? "bg-emerald-500" : "bg-gray-300"}`} />
+              Active only
+            </button>
+            <span className="text-xs text-gray-400">
+              <span className="font-semibold text-gray-600">{totalFiltered.toLocaleString()}</span> shown
+            </span>
           </div>
         </div>
 
@@ -220,7 +236,6 @@ export default function ConnectorsLibraryPage() {
 }
 
 function ConnectorCard({ connector }) {
-  const isLive = !!connector.fields;
   return (
     <div className="group flex items-center gap-3 px-3 py-2.5 rounded-xl border border-gray-100 bg-gray-50/50 hover:border-indigo/25 hover:bg-white hover:shadow-sm transition-all duration-150">
       <div className={`w-7 h-7 rounded-lg ${connector.color || "bg-gray-400"} flex items-center justify-center shrink-0`}>
@@ -228,7 +243,7 @@ function ConnectorCard({ connector }) {
       </div>
       <span className="flex-1 text-sm font-medium text-gray-700 truncate min-w-0">{connector.label}</span>
       <div className="shrink-0">
-        {isLive ? (
+        {connector.implemented ? (
           <button
             onClick={() => downloadSpec(connector)}
             className="flex items-center gap-1 text-[11px] font-semibold text-indigo hover:text-indigo/70 transition-colors whitespace-nowrap">
