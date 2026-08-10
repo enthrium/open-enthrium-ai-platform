@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.8] — 2026-08-10
+
+### Fixed
+- **Binary crash on startup**: `fs.readdirSync` in connector registry wrapped in try/catch — compiled binaries (`oe-mcp`, `oe-runtime`) no longer crash when the adapters directory is absent from the SEA filesystem; static adapter map handles all routing as fallback
+
+---
+
 ## [v1.6.7] — 2026-08-09
 
 ### Added
