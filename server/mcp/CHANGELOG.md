@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.6.9] — 2026-08-11
+
+### Changed
+- Version bump — no MCP-specific changes this release; see OE Runtime v1.6.9 for agent chain support
+
+---
+
 ## [v1.6.8] — 2026-08-10
 
 ### Fixed

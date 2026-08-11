@@ -28,6 +28,8 @@ Connect Claude Code, Cursor, Windsurf, Codex, Claude Desktop, or VS Code to your
 - **45+ connector categories.** Enterprise systems supported out of the box.
 - **Two transport modes.** `--stdio` for Claude Code, Cursor, Windsurf, Codex, and Claude Desktop (launched as a child process); `--serve` for cloud deployments or sharing one server across a team.
 - **Persistent memory.** Built-in `memory_set / memory_get / memory_list / memory_delete` tools — context survives across sessions.
+- **Run AI agents.** `run_agent` executes any OE Runtime YAML agent directly from Claude Code, Cursor, Windsurf, or any MCP-enabled AI chat — no terminal required.
+- **Agent chains.** Chain agents together in YAML — auto chains fire in sequence and return nested results; manual chains pause for human approval via `approve_chain`; works in Claude Code, Cursor, Telegram, or any MCP client.
 - **Self-hosted.** Runs on your own machine. No cloud dependency. Own your data.
 
 ---
@@ -343,39 +345,45 @@ Every connector tool call is automatically appended to `oe-mcp-log.json` next to
 }
 ```
 
-### Agent Runner Tool
+### Agent Runner Tools
 
-OE MCP can run [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) YAML agents directly from Claude Code, Cursor, Windsurf, Codex, or any MCP-compatible AI app — no terminal required.
+OE MCP can run [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) YAML agents directly from Claude Code, Cursor, Windsurf, Codex, or any MCP-compatible AI app — no terminal required. Agents can chain to other agents, with auto or manual approval.
 
 | Tool | Description |
 |---|---|
-| `run_agent` | Run an OE Runtime YAML agent and return the full output |
+| `run_agent` | Run an OE Runtime YAML agent. Returns output, auto-chain results, and any pending manual chains. |
+| `list_pending_chains` | List all manual chains currently waiting for approval — shows `chain_id`, next agent, and output preview. |
+| `approve_chain` | Approve or reject a pending manual chain by `chain_id`. Approved chains run immediately and return their full output. |
 
-**Parameters:**
+**`run_agent` parameters:**
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `file` | string | ✅ | Absolute path to the `agent.yaml` file |
-| `params` | object | ❌ | Key-value pairs passed to the agent as `--param key=value` flags |
+| `params` | object | ❌ | Key-value pairs substituted into the agent prompt via `{{key}}` |
+| `input` | string | ❌ | Optional initial message or context passed to the agent |
 
-**Config auto-detection:** OE MCP looks for `oe-config.json` in the same directory as `agent.yaml`. If found, it uses that config (correct LLM + connector credentials for that agent). Otherwise it falls back to the `oe-mcp.json` config.
+**Config auto-detection:** OE MCP looks for `oe-config.json` in the same directory as `agent.yaml`. If found, it uses that config. Otherwise it falls back to `oe-mcp.json`.
 
-**Example — ask Claude to run an agent:**
-> _"Run my database analyst agent at /home/user/agents/db-analyst/agent.yaml"_
-> → Claude calls `run_agent` with `file = /home/user/agents/db-analyst/agent.yaml`
+**Example — run an agent:**
+> _"Run my security monitor at /agents/security-monitor.yaml"_
+> → Claude calls `run_agent` → output returned + any pending chains listed
 
-**Example — run with params:**
-> _"Run my report agent for the month of July"_
-> → Claude calls `run_agent` with `file = /agents/report.yaml` and `params = { "month": "July" }`
+**Example — manual chain approval:**
+> _"Approve the chain"_
+> → Claude calls `approve_chain` with the `chain_id` from the previous response → chained agent runs → output returned
 
-**What happens under the hood:**
+**Agent chain YAML syntax:**
+```yaml
+chains:
+  - next_agent: ./followup.yaml     # relative path from this agent file
+    trigger_type: auto              # fires immediately after this agent completes
+
+  - next_agent: ./notify.yaml
+    trigger_type: manual            # pauses — Claude asks you before running
 ```
-npx -y @openenthrium/oe-runtime agent.yaml --config oe-config.json [--param key=value ...]
-```
 
-OE Runtime executes the YAML agent — calling connectors, running LLM steps, and returning the full output back to your AI app.
-
-> **Requires OE Runtime.** The agent directory must have a valid `oe-config.json` with `llm` and `connectors` configured. See [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) for agent authoring docs.
+> **Requires OE Runtime config.** The agent directory must have a valid `oe-config.json` with `llm` and `connectors` configured. See [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) for agent authoring docs.
 
 ---
 

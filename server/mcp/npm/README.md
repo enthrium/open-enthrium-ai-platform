@@ -19,6 +19,8 @@ Connect Claude Code, Cursor, Windsurf, Codex, Claude Desktop, or VS Code to your
 - **45+ connector categories.** Enterprise systems supported out of the box.
 - **Two transport modes.** `--stdio` for Claude Code, Cursor, Windsurf, Codex, and Claude Desktop (launched as a child process); `--serve` for cloud deployments or sharing one server across a team.
 - **Persistent memory.** Built-in `memory_set / memory_get / memory_list / memory_delete` tools — context survives across sessions.
+- **Run AI agents.** `run_agent` executes any OE Runtime YAML agent directly from Claude Code, Cursor, Windsurf, or any MCP-enabled AI chat — no terminal required.
+- **Agent chains.** Chain agents together in YAML — auto chains fire in sequence and return nested results; manual chains pause for human approval via `approve_chain`; works in Claude Code, Cursor, Telegram, or any MCP client.
 - **Self-hosted.** Runs on your own machine. No cloud dependency. Own your data.
 
 ---
@@ -136,30 +138,44 @@ Memory is stored in `oe-mcp-memory.json` next to your `oe-mcp.json` and persists
 
 ---
 
-## Run YAML Agents (`run_agent`)
+## Run YAML Agents
 
-OE MCP can run [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) YAML agents directly from Claude Code, Cursor, Windsurf, Codex, or any MCP-compatible AI app — no terminal required.
+OE MCP can run [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) YAML agents directly from Claude Code, Cursor, Windsurf, Codex, or any MCP-compatible AI app — no terminal required. Agents can chain to other agents, with auto or manual approval.
+
+| Tool | Description |
+|---|---|
+| `run_agent` | Run a YAML agent. Returns output, auto-chain results, and any pending manual chains. |
+| `list_pending_chains` | List all manual chains waiting for approval — `chain_id`, next agent, and output preview. |
+| `approve_chain` | Approve or reject a pending manual chain by `chain_id`. Runs immediately and returns full output. |
 
 **Just ask Claude:**
-> _"Run my database analyst agent at /home/user/agents/db-analyst/agent.yaml"_
+> _"Run my security monitor at /agents/security-monitor.yaml"_
+> → Claude calls `run_agent` → output returned, pending manual chains listed
 
-Claude calls `run_agent`, which executes:
-```
-npx -y @openenthrium/oe-runtime agent.yaml --config oe-config.json
-```
+> _"Approve the chain"_
+> → Claude calls `approve_chain` → chained agent runs → output returned
 
-And returns the full agent output back to your AI app.
-
-**Parameters:**
+**`run_agent` parameters:**
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `file` | string | ✅ | Absolute path to the `agent.yaml` file |
-| `params` | object | ❌ | Key-value pairs passed to the agent as `--param key=value` flags |
+| `params` | object | ❌ | Key-value pairs substituted into the agent prompt via `{{key}}` |
+| `input` | string | ❌ | Optional initial message or context passed to the agent |
 
-**Config auto-detection:** OE MCP looks for `oe-config.json` in the same directory as `agent.yaml`. If found, it uses that config. Otherwise it falls back to the `oe-mcp.json` config.
+**Agent chain YAML syntax:**
+```yaml
+chains:
+  - next_agent: ./followup.yaml     # relative path from this agent file
+    trigger_type: auto              # fires immediately after this agent completes
 
-> **Requires OE Runtime.** The agent directory must have a valid `oe-config.json` with `llm` and `connectors` configured. See [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) for agent authoring docs.
+  - next_agent: ./notify.yaml
+    trigger_type: manual            # pauses — Claude asks you before running
+```
+
+**Config auto-detection:** OE MCP looks for `oe-config.json` in the same directory as `agent.yaml`. If found, it uses that config. Otherwise it falls back to `oe-mcp.json`.
+
+> **Requires OE Runtime config.** The agent directory must have a valid `oe-config.json` with `llm` and `connectors` configured. See [OE Runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) for agent authoring docs.
 
 ---
 

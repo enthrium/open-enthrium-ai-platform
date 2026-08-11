@@ -3,12 +3,13 @@
 
 const fs             = require("fs");
 const path           = require("path");
+const os             = require("os");
 const yaml           = require("js-yaml");
 const express        = require("express");
 const cors           = require("cors");
 const { randomUUID } = require("crypto");
-const { execSync }   = require("child_process");
 
+const engine       = require("../src/engine");
 const { ADAPTERS } = require("../src/utils/tools/registry");
 const restApi      = require("../src/utils/tools/adapters/rest-api");
 
@@ -47,6 +48,14 @@ function appendLogEntry(entry) {
   const log = loadLogFile();
   log.push(entry);
   fs.writeFileSync(LOG_FILE, JSON.stringify(log, null, 2), "utf8");
+}
+
+// ── pending manual chains (in-memory) ──────────────────────────────────────
+// chain_id → { nextPath, contextOutput, params, depth, configFile }
+const pendingChains = new Map();
+
+function makeChainId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
 // ── arg parsing ────────────────────────────────────────────────────────────
@@ -92,7 +101,7 @@ function parseArgs(args) {
   return result;
 }
 
-// ── connector prep ─────────────────────────────────────────────────────────
+// ── connector prep (for MCP connector tools) ───────────────────────────────
 
 function prepareConnectors(connectors) {
   return (connectors || []).map((c, i) => {
@@ -109,7 +118,165 @@ function prepareConnectors(connectors) {
   });
 }
 
-// ── tool building ──────────────────────────────────────────────────────────
+// ── config loader — tolerates literal newlines in private keys ────────────
+
+function loadConfig(filePath) {
+  const raw = fs.readFileSync(filePath, "utf8");
+  try { return JSON.parse(raw); } catch (_) {}
+  let out = ""; let inStr = false; let esc = false;
+  for (let i = 0; i < raw.length; i++) {
+    const c = raw[i];
+    if (esc)                 { out += c; esc = false; continue; }
+    if (c === "\\" && inStr) { out += c; esc = true;  continue; }
+    if (c === '"')           { out += c; inStr = !inStr; continue; }
+    if (inStr && c === "\r") continue;
+    if (inStr && c === "\n") { out += "\\n"; continue; }
+    out += c;
+  }
+  return JSON.parse(out);
+}
+
+// ── connector matching for agent runs ────────────────────────────────────
+
+function matchConnectors(yamlConnectors, configConnectors) {
+  let cfgArray;
+  if (Array.isArray(configConnectors)) {
+    cfgArray = configConnectors;
+  } else if (configConnectors && typeof configConnectors === "object") {
+    cfgArray = Object.entries(configConnectors).map(([name, cfg]) => ({
+      connection_name: name, connection_type: cfg.type, ...cfg,
+    }));
+  } else {
+    cfgArray = [];
+  }
+
+  return (yamlConnectors || []).map((yc, i) => {
+    const ycName = yc.connection_name || yc.name;
+    const ycType = yc.connection_type || yc.type;
+    const cc = cfgArray.find(c => (c.connection_name || c.name) === ycName)
+            || cfgArray.find(c => (c.connection_type || c.type) === ycType);
+    if (!cc) return { id: i + 1, name: ycName, type: ycType, status: "active", authConfig: "{}", config: "{}" };
+    const { connection_name, connection_type, name, type, ...creds } = cc;
+    if (creds.privateKeyPath) {
+      const keyPath = creds.privateKeyPath.replace(/^~/, os.homedir());
+      creds.privateKey = fs.readFileSync(keyPath, "utf8").replace(/\r\n/g, "\n");
+      delete creds.privateKeyPath;
+    }
+    if (creds.privateKey) creds.privateKey = creds.privateKey.replace(/\\n/g, "\n").replace(/\r\n/g, "\n");
+    return {
+      id:         i + 1,
+      name:       connection_name || name || ycName,
+      type:       connection_type || type || ycType,
+      status:     "active",
+      authConfig: JSON.stringify(creds),
+      config:     JSON.stringify(creds),
+    };
+  });
+}
+
+// ── agent runner (chain-aware) ─────────────────────────────────────────────
+
+const MAX_CHAIN_DEPTH = 5;
+
+async function runAgentMcp(agentFile, inputContext, params, configFile, depth = 0) {
+  const agentYaml  = yaml.load(fs.readFileSync(agentFile, "utf8"));
+  const config     = loadConfig(configFile);
+  const connectors = matchConnectors(agentYaml.connectors, config.connectors);
+
+  const agentSpec = {
+    systemPrompt: agentYaml.systemPrompt || agentYaml.system_prompt || agentYaml.instructions || "",
+    workflow:     agentYaml.steps        || agentYaml.workflow       || [],
+    params:       agentYaml.params       || [],
+    paramValues:  params || {},
+    maxRounds:    agentYaml.maxRounds    || 25,
+    input:        inputContext
+      ? `Context from previous agent:\n\n${inputContext}\n\nNow execute your task.`
+      : null,
+  };
+
+  const { output } = await engine.run(agentSpec, config.llm, connectors, {
+    onToolCall:   () => {},
+    onToolResult: () => {},
+    onError:      (err) => { throw err; },
+  });
+
+  const result = {
+    agent:          agentYaml.name || path.basename(agentFile),
+    output,
+    chains:         [],
+    pending_chains: [],
+  };
+
+  if (!agentYaml.chains?.length || depth >= MAX_CHAIN_DEPTH) return result;
+
+  for (const chain of agentYaml.chains) {
+    const nextAgent   = chain.next_agent || chain.nextAgent;
+    const triggerType = chain.trigger_type || chain.triggerType || "auto";
+    if (!nextAgent) continue;
+
+    const nextPath = path.resolve(path.dirname(path.resolve(agentFile)), nextAgent);
+    if (!fs.existsSync(nextPath)) {
+      result.chains.push({ agent: nextAgent, error: "chain agent file not found: " + nextPath });
+      continue;
+    }
+
+    const contextInput = `Context from previous agent:\n\n${output}\n\nNow execute your task.`;
+
+    if (triggerType === "manual") {
+      const chainId = makeChainId();
+      pendingChains.set(chainId, {
+        nextPath,
+        contextOutput: output,
+        params,
+        depth:      depth + 1,
+        configFile,
+      });
+      result.pending_chains.push({
+        chain_id:       chainId,
+        next_agent:     nextAgent,
+        output_preview: output.slice(0, 300),
+      });
+    } else {
+      try {
+        const chainResult = await runAgentMcp(nextPath, contextInput, params, configFile, depth + 1);
+        result.chains.push(chainResult);
+      } catch (err) {
+        result.chains.push({ agent: nextAgent, error: err.message });
+      }
+    }
+  }
+
+  return result;
+}
+
+function formatAgentResult(result) {
+  const lines = [];
+  lines.push(`Agent: ${result.agent}\n`);
+  lines.push(result.output);
+
+  if (result.chains?.length) {
+    for (const chain of result.chains) {
+      lines.push(`\n${"─".repeat(40)}`);
+      lines.push(`Chain: ${chain.agent}`);
+      lines.push(chain.error ? `Error: ${chain.error}` : chain.output);
+    }
+  }
+
+  if (result.pending_chains?.length) {
+    lines.push(`\n${"─".repeat(40)}`);
+    lines.push(`⏸  Pending Manual Chains`);
+    for (const pc of result.pending_chains) {
+      lines.push(`\n  chain_id  : ${pc.chain_id}`);
+      lines.push(`  next_agent: ${pc.next_agent}`);
+      lines.push(`  preview   : ${pc.output_preview.slice(0, 150)}${pc.output_preview.length > 150 ? "…" : ""}`);
+      lines.push(`\n  → Call approve_chain with chain_id="${pc.chain_id}" and approved=true to run it.`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
+// ── tool definitions ───────────────────────────────────────────────────────
 
 const MEMORY_TOOLS = [
   {
@@ -162,38 +329,35 @@ const LOG_TOOLS = [
 const AGENT_TOOLS = [
   {
     name:        "run_agent",
-    description: "Run an OE Runtime YAML agent and return the full output. Pass the path to agent.yaml and optional params.",
+    description: "Run an OE Runtime YAML agent. Returns the output plus any chain results. Auto chains fire immediately. Manual chains are returned as pending_chains — approve them with the approve_chain tool.",
     inputSchema: {
       type: "object",
       properties: {
-        file:   { type: "string", description: "Path to the agent.yaml file" },
-        params: { type: "object", description: "Optional key-value params passed to the agent via --param flags" },
+        file:   { type: "string",  description: "Path to the agent.yaml file" },
+        params: { type: "object",  description: "Optional key-value params substituted into the agent prompt via {{key}}" },
+        input:  { type: "string",  description: "Optional initial message or context passed to the agent" },
       },
       required: ["file"],
     },
   },
+  {
+    name:        "list_pending_chains",
+    description: "List all manual chains currently waiting for approval. Returns chain_id, next_agent, and a preview of the output that triggered it.",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name:        "approve_chain",
+    description: "Approve or reject a pending manual chain. Get the chain_id from run_agent or list_pending_chains. Approved chains run immediately and return their full output including any further nested chains.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        chain_id: { type: "string",  description: "The chain_id from pending_chains" },
+        approved: { type: "boolean", description: "true to run the chain, false to reject it" },
+      },
+      required: ["chain_id", "approved"],
+    },
+  },
 ];
-
-function handleAgentTool(args) {
-  const file      = args.file;
-  const params    = args.params || {};
-  const agentDir  = path.dirname(path.resolve(file));
-  const agentConf = path.join(agentDir, "oe-config.json");
-  const confFlag  = fs.existsSync(agentConf) ? `--config "${agentConf}"` : `--config "${CONFIG_FILE}"`;
-
-  const paramFlags = Object.entries(params)
-    .map(([k, v]) => `--param ${k}=${JSON.stringify(v)}`)
-    .join(" ");
-
-  const cmd = `npx -y @openenthrium/oe-runtime "${file}" ${confFlag}${paramFlags ? " " + paramFlags : ""}`;
-
-  try {
-    const output = execSync(cmd, { encoding: "utf8", timeout: 300000 });
-    return output || "Agent completed with no output.";
-  } catch (err) {
-    return `Agent error: ${err.message}`;
-  }
-}
 
 function buildTools(connectors) {
   const toolList = [];
@@ -219,6 +383,8 @@ function buildTools(connectors) {
   toolList.push(...AGENT_TOOLS);
   return { toolList, toolMap };
 }
+
+// ── tool handlers ──────────────────────────────────────────────────────────
 
 function handleLogTool(name, args) {
   switch (name) {
@@ -265,6 +431,67 @@ function handleMemoryTool(name, args, store) {
   }
 }
 
+async function handleAgentTool(name, args) {
+  // ── run_agent ──────────────────────────────────────────────────────────────
+  if (name === "run_agent") {
+    const { file, params = {}, input = null } = args || {};
+    if (!file) return "Error: file is required";
+    if (!fs.existsSync(file)) return `Error: agent file not found: ${file}`;
+
+    // Config: agent's directory first, then global CONFIG_FILE
+    const agentDir  = path.dirname(path.resolve(file));
+    const agentConf = path.join(agentDir, "oe-config.json");
+    const confFile  = fs.existsSync(agentConf) ? agentConf : CONFIG_FILE;
+    if (!fs.existsSync(confFile)) return `Error: config file not found: ${confFile}`;
+
+    try {
+      const result = await runAgentMcp(file, input, params, confFile, 0);
+      return formatAgentResult(result);
+    } catch (err) {
+      return `Agent error: ${err.message}`;
+    }
+  }
+
+  // ── list_pending_chains ────────────────────────────────────────────────────
+  if (name === "list_pending_chains") {
+    if (pendingChains.size === 0) return "No pending chains.";
+    const lines = [];
+    for (const [chainId, chain] of pendingChains) {
+      lines.push(
+        `chain_id  : ${chainId}\n` +
+        `next_agent: ${path.basename(chain.nextPath)}\n` +
+        `preview   : ${chain.contextOutput.slice(0, 200)}${chain.contextOutput.length > 200 ? "…" : ""}`
+      );
+    }
+    return lines.join("\n\n---\n\n");
+  }
+
+  // ── approve_chain ──────────────────────────────────────────────────────────
+  if (name === "approve_chain") {
+    const { chain_id, approved } = args || {};
+    if (!chain_id) return "Error: chain_id is required";
+
+    const pending = pendingChains.get(chain_id);
+    if (!pending) return `Error: chain_id "${chain_id}" not found or already used`;
+
+    pendingChains.delete(chain_id); // one-time use
+
+    if (!approved) return "Chain rejected.";
+
+    const { nextPath, contextOutput, params, depth, configFile } = pending;
+    const contextInput = `Context from previous agent:\n\n${contextOutput}\n\nNow execute your task.`;
+
+    try {
+      const result = await runAgentMcp(nextPath, contextInput, params, configFile, depth);
+      return formatAgentResult(result);
+    } catch (err) {
+      return `Chain error: ${err.message}`;
+    }
+  }
+
+  return `Unknown agent tool: ${name}`;
+}
+
 async function callTool(toolName, args, toolMap, store) {
   if (toolName.startsWith("memory_")) {
     return handleMemoryTool(toolName, args || {}, store);
@@ -272,8 +499,8 @@ async function callTool(toolName, args, toolMap, store) {
   if (toolName.startsWith("log_")) {
     return handleLogTool(toolName, args || {});
   }
-  if (toolName === "run_agent") {
-    return handleAgentTool(args || {});
+  if (["run_agent", "list_pending_chains", "approve_chain"].includes(toolName)) {
+    return handleAgentTool(toolName, args || {});
   }
   const entry = toolMap[toolName];
   if (!entry) return `Unknown tool: ${toolName}`;
@@ -301,7 +528,7 @@ async function callTool(toolName, args, toolMap, store) {
   }
 }
 
-// ── stdio MCP transport (no SDK dependency) ────────────────────────────────
+// ── stdio MCP transport ────────────────────────────────────────────────────
 
 function writeMsg(obj) {
   process.stdout.write(JSON.stringify(obj) + "\n");
