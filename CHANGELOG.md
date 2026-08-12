@@ -5,6 +5,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.7.0] — 2026-08-12
+
+### Added
+- **Project system** (`oe-project.json`): Multi-agent projects — define `agents[]` with `name`, `file`, `description`, `default: true`; link projects together via `links[]`; one config, one project file, many YAML agents
+- **Webhook receiver**: `server.webhook` block inside `oe-config.json` — enable with `{ "enabled": true, "auto_reply": true }`; not a connector type
+- **Telegram webhook** (`POST /webhook/telegram`): receives messages, auto-replies via bot; auto-registers via `setWebhook` on startup when `publicUrl` is set; prints manual curl fallback otherwise
+- **Slack webhook** (`POST /webhook/slack`): receives events, auto-replies via `chat.postMessage`; handles Slack URL verification challenge automatically; skips bot messages to prevent loops
+- **GitHub webhook** (`POST /webhook/github`): receives push/PR events and runs the configured agent
+- **Universal command language**: `/run <name-or-path>`, `/agents`, `/status`, `/approve`, `/cancel`, `/help` — identical across Telegram, Slack, Teams, HTTP (`POST /command`), and MCP
+- **Manual chain approval via chat**: pending chains wait for YES/NO reply in the same chat; `pendingApprovals` keyed by `"platform:chat_id"`
+- **`POST /command` endpoint**: HTTP clients send `{ "text": "/run my-agent" }` — same parser as chat platforms
+- **`GET /status` endpoint**: returns version, uptime, LLM config, connectors, project info as JSON
+- **New samples**: `hello-world/`, `chains/`, `project/` directories with ready-to-run YAML + config; updated `telegram/` sample with `oe-project.json` and `webhook-bot.yaml`
+
+### Fixed
+- **`condition` ReferenceError**: stale variable reference in `pending_chains` push removed — server no longer crashes on manual chain trigger
+
+---
+
 ## [v1.6.9] — 2026-08-11
 
 ### Added

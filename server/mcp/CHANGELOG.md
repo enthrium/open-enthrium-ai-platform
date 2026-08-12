@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.7.0] — 2026-08-12
+
+### Changed
+- Version bump — no MCP-specific changes this release; see OE Runtime v1.7.0 for project system, webhook receiver, and universal command language
+
+---
+
 ## [v1.6.9] — 2026-08-11
 
 ### Changed
