@@ -28,6 +28,7 @@ Connect Claude Code, Cursor, Windsurf, Codex, Claude Desktop, or VS Code to your
 - **45+ connector categories.** Enterprise systems supported out of the box.
 - **Two transport modes.** `--stdio` for Claude Code, Cursor, Windsurf, Codex, and Claude Desktop (launched as a child process); `--serve` for cloud deployments or sharing one server across a team.
 - **Persistent memory.** Built-in `memory_set / memory_get / memory_list / memory_delete` tools — context survives across sessions.
+- **Action log.** Built-in `log_list / log_clear` tools — every connector call is automatically recorded with timestamp, connector, tool, input, and result.
 - **Run AI agents.** `run_agent` executes any OE Runtime YAML agent directly from Claude Code, Cursor, Windsurf, or any MCP-enabled AI chat — no terminal required.
 - **Agent chains.** Chain agents together in YAML — auto chains fire in sequence and return nested results; manual chains pause for human approval via `approve_chain`; works in Claude Code, Cursor, Telegram, or any MCP client.
 - **Self-hosted.** Runs on your own machine. No cloud dependency. Own your data.

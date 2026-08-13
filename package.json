@@ -1,6 +1,6 @@
 {
     "name": "open-enthrium",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "private":  true,
     "workspaces":  [
                        "server",
@@ -9,7 +9,8 @@
                    ],
     "scripts":  {
                     "dev":  "concurrently \"yarn workspace @open-enthrium/server dev\" \"yarn workspace @open-enthrium/processor dev\" \"yarn workspace @open-enthrium/frontend dev\"",
-                    "build":  "yarn workspace @open-enthrium/frontend build"
+                    "build":  "yarn workspace @open-enthrium/frontend build",
+                    "generate-postman": "node server/cli/generate-postman.js"
                 },
     "devDependencies":  {
                             "concurrently":  "^8.2.2"

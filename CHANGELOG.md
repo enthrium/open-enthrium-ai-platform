@@ -5,6 +5,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.7.1] — 2026-08-13
+
+### Added
+- **Postman collection auto-generation**: `generate-postman.js` reads all `samples/*/agent.yaml` files and regenerates `oe-runtime.postman_collection.json` at release time via `sync-cli.yml`
+
+### Changed
+- **`blockchain-web3` sample**: simplified to a single-step agent; switched to `ethereum.publicnode.com` RPC (no API key); added `walletAddress` to `oe-config.json`
+
+### Fixed
+- **Web3 adapter**: reads `walletAddress` from connector config as a default — `get_balance` no longer requires an explicit address argument when one is configured
+
+---
+
 ## [v1.7.0] — 2026-08-12
 
 ### Added

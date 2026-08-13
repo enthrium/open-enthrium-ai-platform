@@ -5,6 +5,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.7.1] — 2026-08-13
+
+No changes to OE MCP in this release.
+
+---
+
 ## [v1.7.0] — 2026-08-12
 
 ### Changed
