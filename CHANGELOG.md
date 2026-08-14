@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.7.2] — 2026-08-14
+
+### Fixed
+- **Release pipeline**: sync-cli.yml Postman generation step now uses `|| true` fallback — was causing the entire agent runtime release to be skipped when `js-yaml` was unavailable on the CI runner
+- **release.yml**: Postman generation calls the correct script path (`cli/generate-postman.js`)
+
+---
+
 ## [v1.7.1] — 2026-08-13
 
 ### Added

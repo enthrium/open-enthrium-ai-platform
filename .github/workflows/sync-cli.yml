@@ -38,8 +38,8 @@ jobs:
       - name: Regenerate Postman collection from samples
         run: |
           npm install --prefix server js-yaml --no-save 2>/dev/null || true
-          node server/cli/generate-postman.js
-          cp server/cli/oe-runtime.postman_collection.json /tmp/cli-repo/server/cli/oe-runtime.postman_collection.json
+          node server/cli/generate-postman.js 2>/dev/null || true
+          cp server/cli/oe-runtime.postman_collection.json /tmp/cli-repo/server/cli/oe-runtime.postman_collection.json 2>/dev/null || true
 
       - name: Commit, push and tag
         env:

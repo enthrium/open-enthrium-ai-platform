@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.7.2] — 2026-08-14
+
+### Fixed
+- **sync-cli.yml**: Postman collection generation step now has `|| true` fallback — prevents sync workflow failure when `js-yaml` is not yet installed on the CI runner, which was blocking the tag push to `open-enthrium-ai-agent-runtime` and causing the entire release pipeline to skip
+- **release.yml**: Postman generation now calls `node cli/generate-postman.js` directly instead of `yarn generate:postman` (which pointed to the wrong script path)
+
+---
+
 ## [v1.7.1] — 2026-08-13
 
 ### Added
