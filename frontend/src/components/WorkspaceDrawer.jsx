@@ -3,6 +3,7 @@ import api from "../utils/api";
 import SourcesPanel from "./SourcesPanel";
 import ConnectorsPanel, { EnterpriseConnectorsPanel } from "./ConnectorsPanel";
 import ConfirmDialog from "./ConfirmDialog";
+import { useAuth } from "../context/AuthContext";
 
 function Spinner() {
   return <div className="w-6 h-6 border-4 border-indigo border-t-transparent rounded-full animate-spin" />;
@@ -358,6 +359,9 @@ export function AgentSharingSection({ ws }) {
 // ── Chat Settings tab ─────────────────────────────────────────────────────────
 
 function ChatSettingsTab({ ws, setWs, setError, onUpdated }) {
+  const { user }  = useAuth();
+  const canManage = user?.role === "admin" || user?.role === "manager";
+
   const DEFAULT_SYSTEM_PROMPT =
 `You are a knowledgeable assistant for this workspace. Follow these rules strictly:
 
@@ -517,26 +521,28 @@ function ChatSettingsTab({ ws, setWs, setError, onUpdated }) {
         )}
       </div>
 
-      {/* Public Embed Access */}
-      <div className="flex items-start justify-between gap-4 rounded-xl border border-gray-200 px-4 py-3.5 bg-gray-50">
-        <div>
-          <p className="text-sm font-medium text-slate-700">Public Embed Access</p>
-          <p className="text-xs text-gray-400 mt-0.5">
-            Allow this workspace to be embedded on external websites without login. Visible in Developer → Embed.
-          </p>
+      {/* Public Embed Access — admin/manager only */}
+      {canManage && (
+        <div className="flex items-start justify-between gap-4 rounded-xl border border-gray-200 px-4 py-3.5 bg-gray-50">
+          <div>
+            <p className="text-sm font-medium text-slate-700">Public Embed Access</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Allow this workspace to be embedded on external websites without login. Visible in Developer → Embed.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setEmbedEnabled(v => !v)}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
+              embedEnabled ? "bg-indigo" : "bg-gray-300"
+            }`}
+          >
+            <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 ${
+              embedEnabled ? "translate-x-5" : "translate-x-0"
+            }`} />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setEmbedEnabled(v => !v)}
-          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-            embedEnabled ? "bg-indigo" : "bg-gray-300"
-          }`}
-        >
-          <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 ${
-            embedEnabled ? "translate-x-5" : "translate-x-0"
-          }`} />
-        </button>
-      </div>
+      )}
 
       <div className="flex items-center justify-end gap-3 pt-1">
         {saved && <span className="text-green-600 text-sm font-medium">Saved!</span>}
@@ -1213,7 +1219,7 @@ export default function WorkspaceDrawer({ workspaceId, mode = "chat", initialTab
   const TABS =
     mode === "connectors" ? [["databases", "Databases"], ["integrations", "Connectors"]] :
     mode === "agents"     ? [["agents", "Agents"]] :
-    /* chat */              [["sources", "Knowledge Base"], ["chat", "Chat Settings"], ["members", "Members"]];
+    /* chat */              [["sources", "Knowledge Base"], ["chat", "Chat Settings"]];
 
   return (
     <div className="fixed inset-0 z-50 flex">
@@ -1271,9 +1277,6 @@ export default function WorkspaceDrawer({ workspaceId, mode = "chat", initialTab
               )}
               {tab === "chat" && (
                 <ChatSettingsTab ws={ws} setWs={setWs} setError={setError} onUpdated={onUpdated} />
-              )}
-              {tab === "members" && (
-                <MembersTab ws={ws} setWs={setWs} allUsers={allUsers} setError={setError} />
               )}
               {/* connectors mode — render EnterpriseConnectorsPanel directly as top-level tabs */}
               {tab === "databases" && (

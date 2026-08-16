@@ -15,27 +15,21 @@ function AuthRequired({ children }) {
   return children;
 }
 
-import AppLayout      from "./components/layout/AppLayout";
-import Login          from "./pages/Auth/Login";
-import EmbedChat      from "./pages/Embed/EmbedChat";
-import WorkspaceChat       from "./pages/Workspace/WorkspaceChat";
-import WorkspaceConnectorsPage from "./pages/Workspace/WorkspaceConnectorsPage";
-import WorkspaceAgentsPage     from "./pages/Workspace/WorkspaceAgentsPage";
-import WorkspaceApprovalsPage  from "./pages/Workspace/WorkspaceApprovalsPage";
-import WorkspaceRunLogsPage    from "./pages/Workspace/WorkspaceRunLogsPage";
-import WorkspaceSettingsPage   from "./pages/Workspace/WorkspaceSettingsPage";
+import AppLayout            from "./components/layout/AppLayout";
+import Login                from "./pages/Auth/Login";
+import EmbedChat            from "./pages/Embed/EmbedChat";
+import WorkspaceChat        from "./pages/Workspace/WorkspaceChat";
+import WorkspaceSettingsPage  from "./pages/Workspace/WorkspaceSettingsPage";
+import WorkspaceProjectsPage  from "./pages/Workspace/WorkspaceProjectsPage";
+import ProjectDetailPage      from "./pages/Workspace/ProjectDetailPage";
+import WorkspaceEmbedPage     from "./pages/Workspace/WorkspaceEmbedPage";
+import WorkspaceRunLogsPage   from "./pages/Workspace/WorkspaceRunLogsPage";
 
-import DashboardPage   from "./pages/Dashboard/DashboardPage";
-import WorkspacesPage  from "./pages/Workspaces/WorkspacesPage";
-import ChatsPage       from "./pages/Chats/ChatsPage";
-import AgentRunsPage   from "./pages/Agents/AgentRunsPage";
-import SettingsPage    from "./pages/Settings/SettingsPage";
+import DashboardPage  from "./pages/Dashboard/DashboardPage";
+import WorkspacesPage from "./pages/Workspaces/WorkspacesPage";
+import SettingsPage   from "./pages/Settings/SettingsPage";
 import MaintenancePage from "./pages/Settings/MaintenancePage";
-import ApprovalsPage    from "./pages/Agents/ApprovalsPage";
-import MarketplacePage        from "./pages/Marketplace/MarketplacePage";
-import ConnectorsLibraryPage  from "./pages/Agents/ConnectorsLibraryPage";
-import RuntimePage             from "./pages/Runtime/RuntimePage";
-import commercialRoutes        from "@commercial/routes";
+import commercialRoutes from "@commercial/routes";
 
 function AppRoutes() {
   return (
@@ -45,12 +39,12 @@ function AppRoutes() {
       <Route path="/embed/:slug"  element={<EmbedChat />} />
 
       {/* Full-screen routes — auth required, no sidebar shell */}
-      <Route path="/workspace/:slug" element={<AuthRequired><WorkspaceChat /></AuthRequired>} />
-      <Route path="/workspace/:slug/connectors" element={<AuthRequired><WorkspaceConnectorsPage /></AuthRequired>} />
-      <Route path="/workspace/:slug/agents"     element={<AuthRequired><WorkspaceAgentsPage /></AuthRequired>} />
-      <Route path="/workspace/:slug/approvals" element={<AuthRequired><WorkspaceApprovalsPage /></AuthRequired>} />
-      <Route path="/workspace/:slug/run-logs"  element={<AuthRequired><WorkspaceRunLogsPage /></AuthRequired>} />
-      <Route path="/workspace/:slug/settings"  element={<AuthRequired><WorkspaceSettingsPage /></AuthRequired>} />
+      <Route path="/workspace/:slug"                               element={<AuthRequired><WorkspaceChat /></AuthRequired>} />
+      <Route path="/workspace/:slug/projects"                      element={<AuthRequired><WorkspaceProjectsPage /></AuthRequired>} />
+      <Route path="/workspace/:slug/projects/:projectId"           element={<AuthRequired><ProjectDetailPage /></AuthRequired>} />
+      <Route path="/workspace/:slug/settings"                      element={<AuthRequired><WorkspaceSettingsPage /></AuthRequired>} />
+      <Route path="/workspace/:slug/embed"                          element={<AuthRequired><WorkspaceEmbedPage /></AuthRequired>} />
+      <Route path="/workspace/:slug/run-logs"                       element={<AuthRequired><WorkspaceRunLogsPage /></AuthRequired>} />
 
       {/* Authenticated shell — AppLayout handles auth guard + sidebar */}
       <Route element={<AppLayout />}>
@@ -58,14 +52,8 @@ function AppRoutes() {
         <Route path="/admin"               element={<HomeRedirect />} />
         <Route path="/dashboard"           element={<DashboardPage />} />
         <Route path="/workspaces"          element={<WorkspacesPage />} />
-        <Route path="/chats"               element={<ChatsPage />} />
-        <Route path="/agent-runs"          element={<AgentRunsPage />} />
-        <Route path="/approvals"           element={<ApprovalsPage />} />
-        <Route path="/marketplace"           element={<MarketplacePage />} />
-        <Route path="/connectors-library"    element={<ConnectorsLibraryPage />} />
-        <Route path="/runtime"               element={<RuntimePage />} />
         <Route path="/settings"            element={<SettingsPage />} />
-        <Route path="/settings/maintenance"  element={<MaintenancePage />} />
+        <Route path="/settings/maintenance" element={<MaintenancePage />} />
         {commercialRoutes.map(r => <Route key={r.path} path={r.path} element={r.element} />)}
         <Route path="*"                    element={<HomeRedirect />} />
       </Route>

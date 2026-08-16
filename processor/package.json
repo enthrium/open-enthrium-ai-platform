@@ -1,6 +1,6 @@
 {
   "name": "@open-enthrium/processor",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.js",

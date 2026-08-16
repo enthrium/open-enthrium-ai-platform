@@ -21,26 +21,9 @@ const NAV_GROUPS = [
         id: "workspaces", label: "Workspaces", path: "/workspaces",
         icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />,
       },
-    ],
-  },
-  {
-    label: "Agents",
-    items: [
       {
-        id: "marketplace", label: "Templates", path: "/marketplace",
-        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />,
-      },
-      {
-        id: "agent-builder", label: "Builder", path: "/agent-builder", managerOnly: true, enterpriseOnly: true,
-        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />,
-      },
-      {
-        id: "connectors-library", label: "Connectors", path: "/connectors-library",
-        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />,
-      },
-      {
-        id: "runtime", label: "Runtime", path: "/runtime",
-        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />,
+        id: "users", label: "Users", path: "/users", adminOnly: true,
+        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />,
       },
     ],
   },
@@ -141,7 +124,7 @@ export default function AppLayout() {
     });
   }
 
-  const isFullBleed = pathname === "/agent-builder";
+  const isFullBleed = false;
 
   return (
     <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">

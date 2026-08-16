@@ -5,6 +5,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.7.3] — 2026-08-16
+
+### Added
+- **Agent Projects — member access**: Regular workspace users can now list, run, and view logs for Agent Projects without admin/manager role; cannot create, edit, delete, copy, rename, or import projects
+- **Members management on `/workspaces`**: Members tab moved from the chat drawer to the Workspaces page — each workspace card now has a Members icon that opens a modal for adding/removing members
+- **Run Logs page**: Full-width page (`/workspace/:slug/run-logs`) with dark gradient header matching Agent Projects page; back button returns to projects; ConfirmDialog replaces browser `alert` for clear action
+- **`oe-config.json` save → auto-mask**: After saving `oe-config.json` in the project detail page, the panel automatically returns to masked (read-only) mode
+
+### Changed
+- **Public Embed Access toggle**: Hidden from regular users in Chat Settings drawer — visible to admins and managers only
+- **v1 API removed**: `/api/v1/*` REST API (old `Agent`/`AgentRun` model) deleted; superseded by Project-based runs via UI, CLI, and CLI server mode; `swagger-ui-express` dependency removed
+- **Agent Builder removed**: `agentBuilder.js` route and all frontend references removed from Maintenance page; commercial route index cleaned up
+
+### Fixed
+- **Web3 connector from UI**: Connector credentials from `oe-config.json` are now properly wrapped into `authConfig`/`config` JSON strings (mirroring CLI's `prepareConnectors`) — resolves "RPC URL not configured" error when running web3 agents from the browser
+
+---
+
 ## [v1.7.2] — 2026-08-14
 
 ### Fixed

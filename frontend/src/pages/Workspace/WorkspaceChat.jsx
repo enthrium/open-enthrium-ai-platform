@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import VisualizationCard from "../../components/VisualizationCard";
-import { exportMD, exportPDF, exportFilename } from "../../utils/exportOutput";
+import { exportMD, exportFilename } from "../../utils/exportOutput";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../utils/api";
@@ -197,34 +197,9 @@ function MarkdownContent({ content }) {
 
 function ChatMessage({ msg, ttsSettings, onShowSources }) {
   const isUser = msg.role === "user";
-  const [speaking, setSpeaking]   = React.useState(false);
-  const [copied, setCopied]       = React.useState(false);
-  const [exportOpen, setExportOpen] = React.useState(false);
+  const [speaking, setSpeaking] = React.useState(false);
+  const [copied, setCopied]     = React.useState(false);
   const audioRef = React.useRef(null);
-
-  const isAgentMsg = /^\*\*@/.test(msg.content);
-
-  function getExportContent() {
-    // Strip **@slug** — prefix and trailing chain note
-    return msg.content
-      .replace(/^\*\*@[^*]+\*\*\s*(\(chained\)\s*)?—\s*/, "")
-      .replace(/\n\n\*🔗 Chaining to[^*]+…\*$/, "")
-      .trim();
-  }
-
-  function getExportFilename() {
-    const slug = (msg.content.match(/^\*\*@([^*]+)\*\*/) || [])[1] || "agent-output";
-    const date = new Date().toISOString().slice(0, 10);
-    return `${slug}-${date}`;
-  }
-
-  function doExportMD() { exportMD(getExportContent(), getExportFilename()); setExportOpen(false); }
-  function doExportPDF() { exportPDF(getExportContent(), getExportFilename()); setExportOpen(false); }
-  function doExportCSV() {
-    const csv = `"Role","Message","Date"\n"${msg.role}","${getExportContent().replace(/"/g,'""')}","${msg.createdAt ? new Date(msg.createdAt).toLocaleString() : ""}"`;
-    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8;"}));
-    a.download = getExportFilename()+".csv"; a.click(); setExportOpen(false);
-  }
 
   function stopSpeech() {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
@@ -294,31 +269,6 @@ function ChatMessage({ msg, ttsSettings, onShowSources }) {
       <div className="flex-1 min-w-0 pb-1">
         <MarkdownContent content={msg.content} />
 
-        {/* Tool calls */}
-        {msg.toolCalls?.length > 0 && (
-          <details className="mt-2 group/tc">
-            <summary className="cursor-pointer list-none flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 w-fit select-none">
-              <svg className="w-3 h-3 transition-transform group-open/tc:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-              🔧 {msg.toolCalls.length} tool call{msg.toolCalls.length > 1 ? "s" : ""}
-            </summary>
-            <div className="mt-1.5 ml-1 flex flex-col gap-1">
-              {Object.entries(msg.toolCalls.reduce((acc, tc) => {
-                const name = tc.name || tc;
-                acc[name] = (acc[name] || 0) + 1;
-                return acc;
-              }, {})).map(([name, count]) => (
-                <div key={name} className="flex items-center gap-2 text-xs text-gray-500">
-                  <span className="text-green-500 text-sm leading-none">✅</span>
-                  <span className="font-mono">{name}</span>
-                  {count > 1 && <span className="text-gray-400">×{count}</span>}
-                </div>
-              ))}
-            </div>
-          </details>
-        )}
-
         {/* Visualization card */}
         {msg.visualization && <VisualizationCard visualization={msg.visualization} />}
 
@@ -363,33 +313,6 @@ function ChatMessage({ msg, ttsSettings, onShowSources }) {
             </button>
           )}
 
-          {/* Export — agent messages only */}
-          {isAgentMsg && (
-            <div className="relative ml-1">
-              <button
-                onClick={() => setExportOpen(o => !o)}
-                title="Export"
-                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              </button>
-              {exportOpen && (
-                <div className="absolute bottom-8 left-0 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-36 z-50">
-                  <button onClick={doExportCSV} className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                    <span className="font-mono text-gray-400">.csv</span> CSV
-                  </button>
-                  <button onClick={doExportMD} className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                    <span className="font-mono text-gray-400">.md</span> Markdown
-                  </button>
-                  <button onClick={doExportPDF} className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                    <span className="font-mono text-gray-400">.pdf</span> PDF
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -447,9 +370,6 @@ export default function WorkspaceChat() {
   const [input, setInput]               = useState("");
   const [streaming, setStreaming]         = useState(false);
   const [streamingText, setStreamingText] = useState("");
-  const [activeToolCalls, setActiveToolCalls] = useState([]);
-  const [activeRunId, setActiveRunId]     = useState(null);
-  const activeRunIdRef                    = useRef(null);
   const abortControllerRef                = useRef(null);
   const [showExport, setShowExport]     = useState(false);
 
@@ -473,19 +393,6 @@ export default function WorkspaceChat() {
   // History breadcrumbs
   const [showHistory, setShowHistory] = useState(false);
   const messageRefs = useRef(new Map());
-
-  const [agents, setAgents]                   = useState([]);
-  const [connectors, setConnectors]           = useState([]);
-  const [mentionSearch, setMentionSearch]     = useState(null); // null = closed, string = filtering
-  const [myAgents, setMyAgents]               = useState([]);
-
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("oe_marketplace_saved") || "[]");
-      setMyAgents(saved);
-    } catch { /* */ }
-  }, []);
-  const [runningAgentCount, setRunningAgentCount] = useState(0);
 
   // Drawer
   const [drawerWorkspaceId, setDrawerWorkspaceId] = useState(null);
@@ -536,32 +443,6 @@ export default function WorkspaceChat() {
     api.get("/settings")
       .then(r => setTtsSettings(r.data.settings || {}))
       .catch(() => {});
-    api.get(`/workspaces/${slug}/agents`)
-      .then(r => setAgents((r.data.agents || []).filter(a => a.slug)))
-      .catch(() => {});
-    api.get(`/workspaces/${slug}/connectors`)
-      .then(r => setConnectors((r.data.connectors || []).filter(c => c.name)))
-      .catch(() => {});
-  }, [slug]);
-
-  useEffect(() => {
-    const refresh = () => api.get(`/workspaces/${slug}/agents`)
-      .then(r => setAgents((r.data.agents || []).filter(a => a.slug)))
-      .catch(() => {});
-    window.addEventListener("agents-changed", refresh);
-    return () => window.removeEventListener("agents-changed", refresh);
-  }, [slug]);
-
-  useEffect(() => {
-    if (!slug) return;
-    const check = () => {
-      api.get(`/workspaces/${slug}/agent-runs?period=7d`)
-        .then(r => setRunningAgentCount((r.data.runs || []).filter(x => x.status === "running").length))
-        .catch(() => {});
-    };
-    check();
-    const id = setInterval(check, 8000);
-    return () => clearInterval(id);
   }, [slug]);
 
   const reloadMessages = () => {
@@ -781,7 +662,6 @@ export default function WorkspaceChat() {
       let accumulated = "";
       let finalSources = [];
       let finalVisualization = null;
-      let allToolCalls = [];
       let sseBuffer = "";
       let dlpIntercepted = false;
 
@@ -802,13 +682,7 @@ export default function WorkspaceChat() {
               setMessages(m => [...m, { id: Date.now() + 1, role: "assistant", content: evt.dlp.message }]);
               setDlpPrompt({ type: "warn", policyNames: evt.dlp.policyNames, originalText: text });
             }
-            if (evt.run_id) { setActiveRunId(evt.run_id); activeRunIdRef.current = evt.run_id; }
-            if (evt.tool_calls) {
-              allToolCalls = allToolCalls.map(t => ({ ...t, done: true }));
-              evt.tool_calls.forEach(name => allToolCalls.push({ name, done: false }));
-              setActiveToolCalls([...allToolCalls]);
-            }
-            if (evt.chunk) { accumulated += evt.chunk; setStreamingText(accumulated); setActiveToolCalls(allToolCalls.map(t => ({ ...t, done: true }))); }
+            if (evt.chunk) { accumulated += evt.chunk; setStreamingText(accumulated); }
             if (evt.done)  { finalSources = evt.sources || []; finalVisualization = evt.visualization || null; if (evt.content) accumulated = evt.content; }
             if (evt.error) { accumulated = `*Error: ${evt.error}*`; }
           } catch { /* partial */ }
@@ -816,8 +690,7 @@ export default function WorkspaceChat() {
       }
 
       if (!dlpIntercepted) {
-        const finalToolCalls = allToolCalls.map(t => ({ ...t, done: true }));
-        setMessages(m => [...m, { id: Date.now() + 1, role: "assistant", content: accumulated, sources: finalSources, toolCalls: finalToolCalls.length ? finalToolCalls : undefined, visualization: finalVisualization }]);
+        setMessages(m => [...m, { id: Date.now() + 1, role: "assistant", content: accumulated, sources: finalSources, visualization: finalVisualization }]);
         // Auto-rename thread from first message
         const currentThread = threads.find(t => t.uid === activeThreadId);
         if (!silent && currentThread && currentThread.name === "New Thread" && messages.length === 0) {
@@ -826,9 +699,6 @@ export default function WorkspaceChat() {
         }
       }
       setStreamingText("");
-      setActiveToolCalls([]);
-      setActiveRunId(null);
-      activeRunIdRef.current = null;
     } catch (err) {
       if (err?.name !== "AbortError") {
         setMessages(m => [...m, { id: Date.now() + 1, role: "assistant", content: "Sorry, I encountered an error. Please try again." }]);
@@ -836,9 +706,6 @@ export default function WorkspaceChat() {
     } finally {
       abortControllerRef.current = null;
       setStreaming(false);
-      setActiveToolCalls([]);
-      setActiveRunId(null);
-      activeRunIdRef.current = null;
       inputRef.current?.focus();
     }
   }
@@ -935,33 +802,25 @@ export default function WorkspaceChat() {
           ))}
         </div>
 
-        {/* Bottom workspace nav */}
+        {/* Bottom nav */}
         <div className="shrink-0 border-t border-gray-200 px-3 py-3 space-y-0.5">
-          <button className="flex items-center gap-2.5 w-full px-2 py-2 rounded-lg text-sm bg-indigo/10 text-indigo font-semibold">
-            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            Chat
-          </button>
-          <button onClick={() => navigate(`/workspace/${slug}/connectors`)} className="flex items-center gap-2.5 w-full px-2 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
-            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-            </svg>
-            Connectors
-          </button>
-          <button onClick={() => navigate(`/workspace/${slug}/agents`)} className="flex items-center gap-2.5 w-full px-2 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
-            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            <span className="flex-1 text-left">Agents</span>
-            {runningAgentCount > 0 && (
-              <span className="relative flex h-2 w-2 mr-1">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
-              </span>
-            )}
-          </button>
+          {[
+            { id: "projects", label: "Agent Projects", path: `/workspace/${slug}/projects`, icon: "M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" },
+            { id: "embed",    label: "Embed",    path: `/workspace/${slug}/embed`,    icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" },
+          ].map(item => (
+            <button
+              key={item.id}
+              onClick={() => navigate(item.path)}
+              className="flex items-center gap-2.5 w-full px-2 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} />
+              </svg>
+              {item.label}
+            </button>
+          ))}
         </div>
+
       </div>
 
       {/* ── Main chat area ─────────────────────────────────────────────────── */}
@@ -1136,53 +995,10 @@ export default function WorkspaceChat() {
             {streaming && !streamingText && (
               <div className="flex gap-4">
                 <div className="w-8 h-8 rounded-full bg-gray-900 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white mt-0.5">E</div>
-                <div className="flex flex-col gap-1.5 mt-1">
-                  {activeToolCalls.length > 0 ? (
-                    <div className="flex flex-col gap-1">
-                      {activeToolCalls.map((tc, i) => {
-                        const label = tc.name || tc;
-                        const isDone = tc.done;
-                        return (
-                          <div key={i} className="flex items-center gap-2 text-xs font-medium">
-                            {isDone
-                              ? <span className="text-green-500 text-sm leading-none">✅</span>
-                              : <div className="w-3.5 h-3.5 border-2 border-indigo border-t-transparent rounded-full animate-spin shrink-0" />
-                            }
-                            <span className={isDone ? "text-gray-400" : "text-indigo"}>{label}{isDone ? "" : "…"}</span>
-                          </div>
-                        );
-                      })}
-                      {activeRunId && (
-                        <button onClick={async () => {
-                            const runId = activeRunIdRef.current;
-                            // Abort SSE stream immediately — stops tool calls appearing in UI
-                            abortControllerRef.current?.abort();
-                            // Clear UI state right away
-                            setActiveToolCalls([]);
-                            setStreamingText("");
-                            setStreaming(false);
-                            setActiveRunId(null);
-                            activeRunIdRef.current = null;
-                            // Show stopped confirmation in chat
-                            setMessages(m => [...m, { id: Date.now() + 1, role: "assistant", content: "⛔ Run stopped by user." }]);
-                            // Tell server to mark run as cancelled
-                            if (runId) {
-                              try { await api.post(`/workspaces/${slug}/agents/0/runs/${runId}/cancel`); }
-                              catch { /* ignore */ }
-                            }
-                          }}
-                          className="mt-1 self-start flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold text-red-600 bg-red-50 border border-red-200 rounded-full hover:bg-red-100 transition-colors">
-                          ⏹ Stop
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5">
-                      {[0, 1, 2].map(i => (
-                        <div key={i} className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
-                      ))}
-                    </div>
-                  )}
+                <div className="flex items-center gap-1.5 mt-1">
+                  {[0, 1, 2].map(i => (
+                    <div key={i} className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                  ))}
                 </div>
               </div>
             )}
@@ -1194,76 +1010,6 @@ export default function WorkspaceChat() {
         {/* Input bar — ChatGPT style */}
         <div className="px-6 pb-5 pt-3 bg-white">
           <div className="max-w-[720px] mx-auto relative">
-            {/* @mention autocomplete dropdown */}
-            {mentionSearch !== null && (() => {
-              const filteredAgents   = agents.filter(a => a.slug?.startsWith(mentionSearch));
-              const filteredConns    = connectors.filter(c => c.name?.startsWith(mentionSearch));
-              const filteredMyAgents = myAgents.filter(a => a.name?.toLowerCase().startsWith(mentionSearch.toLowerCase()));
-              const hasResults = filteredAgents.length > 0 || filteredConns.length > 0 || filteredMyAgents.length > 0;
-              function pickMention(name) {
-                setInput(input.replace(/@[\w-]*$/, `@${name} `));
-                setMentionSearch(null);
-                setTimeout(() => inputRef.current?.focus(), 0);
-              }
-              return (
-                <div className="absolute bottom-full mb-2 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden max-h-72 overflow-y-auto">
-                  {!hasResults && (
-                    <p className="text-sm text-gray-400 px-3 py-3">No matching agents or connectors</p>
-                  )}
-                  {filteredAgents.length > 0 && (
-                    <>
-                      <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-3 pt-2 pb-1">Agents</p>
-                      {filteredAgents.map(a => (
-                        <button key={a.id} type="button"
-                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-indigo/5 text-left transition-colors"
-                          onMouseDown={e => { e.preventDefault(); pickMention(a.slug || a.name); }}>
-                          <span className="w-7 h-7 rounded-full bg-indigo flex items-center justify-center text-white font-bold text-xs shrink-0">
-                            {a.name?.[0]?.toUpperCase()}
-                          </span>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-800">{a.name}</p>
-                            <p className="text-xs text-indigo font-mono">@{a.slug}</p>
-                          </div>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                  {filteredConns.length > 0 && (
-                    <>
-                      <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-3 pt-2 pb-1">Connectors</p>
-                      {filteredConns.map(c => (
-                        <button key={c.id} type="button"
-                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-emerald-50 text-left transition-colors"
-                          onMouseDown={e => { e.preventDefault(); pickMention(c.name); }}>
-                          <span className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                            {c.name?.[0]?.toUpperCase()}
-                          </span>
-                          <p className="text-sm font-semibold text-gray-800">{c.name}</p>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                  {filteredMyAgents.length > 0 && (
-                    <>
-                      <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-3 pt-2 pb-1">My Agents</p>
-                      {filteredMyAgents.map((a, i) => (
-                        <button key={i} type="button"
-                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-purple-50 text-left transition-colors"
-                          onMouseDown={e => { e.preventDefault(); pickMention(a.name.toLowerCase().replace(/\s+/g, "-")); }}>
-                          <span className="w-7 h-7 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                            {a.name?.[0]?.toUpperCase()}
-                          </span>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-800">{a.name}</p>
-                            <p className="text-xs text-purple-500 font-mono">runtime agent</p>
-                          </div>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                </div>
-              );
-            })()}
             {/* DLP warn prompt */}
             {dlpPrompt?.type === "warn" && (
               <div className="mb-3 rounded-xl border-2 border-amber-300 bg-amber-50 p-4 shadow-sm">
@@ -1314,17 +1060,13 @@ export default function WorkspaceChat() {
                   rows={1}
                   value={input}
                   onChange={e => {
-                    const val = e.target.value;
-                    setInput(val);
+                    setInput(e.target.value);
                     autoGrow(e.target);
-                    const m = val.match(/@([\w-]*)$/);
-                    setMentionSearch(m ? m[1] : null);
                   }}
                   onKeyDown={e => {
-                    if (mentionSearch !== null && e.key === "Escape") { setMentionSearch(null); return; }
                     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
                   }}
-                  placeholder={activeThreadId ? "Ask anything — or type @ to run an agent" : "Select a thread to start chatting…"}
+                  placeholder={activeThreadId ? "Ask anything about your workspace documents…" : "Select a thread to start chatting…"}
                   disabled={streaming || !activeThreadId}
                   className="flex-1 resize-none bg-transparent text-[15px] text-gray-900 placeholder-gray-400 outline-none py-1.5 leading-relaxed overflow-hidden disabled:opacity-60"
                   style={{ minHeight: "36px", maxHeight: "160px" }}

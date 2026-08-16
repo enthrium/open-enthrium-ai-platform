@@ -5,6 +5,174 @@ import api from "../../utils/api";
 import { Spinner, EmptyState, ErrorBanner } from "../../components/ui";
 import ConfirmDialog from "../../components/ConfirmDialog";
 
+// ── Members modal ──────────────────────────────────────────────────────────────
+function MembersModal({ ws, onClose }) {
+  const [members,    setMembers]    = useState([]);
+  const [allUsers,   setAllUsers]   = useState([]);
+  const [loading,    setLoading]    = useState(true);
+  const [adding,     setAdding]     = useState(false);
+  const [removing,   setRemoving]   = useState(null);
+  const [selectedId, setSelectedId] = useState("");
+  const [search,     setSearch]     = useState("");
+  const [focused,    setFocused]    = useState(false);
+  const { user: me } = useAuth();
+  const canManage = me?.role === "admin" || me?.role === "manager";
+
+  useEffect(() => {
+    Promise.all([
+      api.get(`/admin/workspaces/${ws.id}`),
+      api.get("/admin/users"),
+    ]).then(([wsRes, usersRes]) => {
+      setMembers(wsRes.data.workspace.users.map(u => u.user));
+      setAllUsers(usersRes.data.users || []);
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, [ws.id]);
+
+  const memberIds = new Set(members.map(m => m.id));
+  const available = allUsers.filter(u => !memberIds.has(u.id) &&
+    (!search.trim() || u.name?.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase()))
+  );
+  const showDropdown = focused && available.length > 0;
+
+  async function addMember() {
+    if (!selectedId) return;
+    setAdding(true);
+    try {
+      await api.post(`/admin/workspaces/${ws.id}/members`, { userId: parseInt(selectedId) });
+      const u = allUsers.find(u => u.id === parseInt(selectedId));
+      if (u) setMembers(m => [...m, u]);
+      setSelectedId(""); setSearch("");
+    } catch { /* ignore */ }
+    finally { setAdding(false); }
+  }
+
+  async function removeMember(userId) {
+    setRemoving(userId);
+    try {
+      await api.delete(`/admin/workspaces/${ws.id}/members/${userId}`);
+      setMembers(m => m.filter(u => u.id !== userId));
+    } catch { /* ignore */ }
+    finally { setRemoving(null); }
+  }
+
+  function roleBadge(role) {
+    const styles = { admin: "bg-purple-100 text-purple-700", manager: "bg-blue-100 text-blue-700", default: "bg-gray-100 text-gray-600" };
+    return <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${styles[role] || styles.default}`}>{role}</span>;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[85vh]">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h3 className="font-bold text-gray-900 text-base">{ws.name}</h3>
+            <p className="text-xs text-gray-400 mt-0.5">Members · {members.length} total</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
+          {loading ? (
+            <div className="flex justify-center py-8"><Spinner /></div>
+          ) : (
+            <>
+              {/* Add member row */}
+              {canManage && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Add Member</p>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" /></svg>
+                      <input
+                        type="text"
+                        value={search}
+                        onChange={e => { setSearch(e.target.value); setSelectedId(""); }}
+                        onFocus={() => setFocused(true)}
+                        onBlur={() => setTimeout(() => setFocused(false), 150)}
+                        placeholder="Search users…"
+                        className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo/30"
+                      />
+                    </div>
+                    <button
+                      onClick={addMember}
+                      disabled={!selectedId || adding}
+                      className="px-4 py-2 text-sm font-medium bg-indigo text-white rounded-lg hover:bg-indigo/90 transition-colors disabled:opacity-40"
+                    >
+                      {adding ? "…" : "Add"}
+                    </button>
+                  </div>
+                  {showDropdown && (
+                    <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm max-h-52 overflow-y-auto">
+                      {available.slice(0, 8).map(u => (
+                        <button
+                          key={u.id}
+                          onMouseDown={e => e.preventDefault()}
+                          onClick={() => { setSelectedId(String(u.id)); setSearch(u.name || u.email); setFocused(false); }}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0 ${selectedId === String(u.id) ? "bg-indigo/5" : ""}`}
+                        >
+                          <div className="w-7 h-7 rounded-full bg-indigo flex items-center justify-center text-xs font-bold text-white shrink-0">
+                            {(u.name || u.email)[0].toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-800 truncate">{u.name || "—"}</p>
+                            <p className="text-xs text-gray-400 truncate">{u.email}</p>
+                          </div>
+                          {roleBadge(u.role)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Members list */}
+              <div className="flex flex-col gap-1">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Current Members</p>
+                {members.length === 0 ? (
+                  <p className="text-sm text-gray-400 py-4 text-center">No members yet.</p>
+                ) : (
+                  members.map(u => (
+                    <div key={u.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 group">
+                      <div className="w-8 h-8 rounded-full bg-indigo flex items-center justify-center text-sm font-bold text-white shrink-0">
+                        {(u.name || u.email)[0].toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-800 truncate">{u.name || "—"}</p>
+                        <p className="text-xs text-gray-400 truncate">{u.email}</p>
+                      </div>
+                      {roleBadge(u.role)}
+                      {canManage && (
+                        <button
+                          onClick={() => removeMember(u.id)}
+                          disabled={removing === u.id}
+                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50"
+                          title="Remove"
+                        >
+                          {removing === u.id
+                            ? <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                            : <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                          }
+                        </button>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main page ──────────────────────────────────────────────────────────────────
 export default function WorkspacesPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -24,8 +192,11 @@ export default function WorkspacesPage() {
   const editInputRef                = useRef();
 
   // delete
-  const [confirmDelete, setConfirmDelete] = useState(null); // workspace object
+  const [confirmDelete, setConfirmDelete] = useState(null);
   const [deleting, setDeleting]           = useState(false);
+
+  // members modal
+  const [membersWs, setMembersWs] = useState(null);
 
   const canManage = user?.role === "admin" || user?.role === "manager";
 
@@ -142,80 +313,73 @@ export default function WorkspacesPage() {
                     )}
                     <p className="text-[10px] text-gray-400 font-mono truncate mt-0.5">{ws.slug}</p>
                   </div>
-                  {canManage && editingId !== ws.id && (
-                    <div className="flex items-center gap-0.5 shrink-0">
-                      <button
-                        onClick={() => navigate(`/workspace/${ws.slug}?settings=1`)}
-                        title="Settings"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-indigo hover:bg-indigo/8 transition-colors"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => startEdit(ws)}
-                        title="Rename"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-indigo hover:bg-indigo/8 transition-colors opacity-0 group-hover/card:opacity-100 transition-opacity duration-150"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => setConfirmDelete(ws)}
-                        title="Delete"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover/card:opacity-100 transition-opacity duration-150"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    {canManage && editingId !== ws.id && (
+                      <>
+                        <button
+                          onClick={() => setMembersWs(ws)}
+                          title="Members"
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-indigo hover:bg-indigo/8 transition-colors"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => startEdit(ws)}
+                          title="Rename"
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-indigo hover:bg-indigo/8 transition-colors"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setConfirmDelete(ws)}
+                          title="Delete"
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {/* Stats */}
                 <div className="px-4 pt-3 pb-3 flex flex-wrap gap-1.5">
                   {[
-                    { v: ws._count.documents,       label: "docs"        },
-                    { v: ws._count.chats,           label: "chats"       },
-                    { v: ws._count.users,           label: "members"     },
-                    { v: ws._count.agents ?? 0,     label: "agents"      },
-                    { v: ws._count.connectors ?? 0, label: "connections" },
+                    { v: ws._count.documents, label: "docs"    },
+                    { v: ws._count.chats,     label: "chats"   },
+                    { v: ws._count.users,     label: "members" },
                   ].map(s => (
                     <span key={s.label} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{s.v} {s.label}</span>
                   ))}
                 </div>
 
-                {/* 3 action sections */}
-                <div className="mt-auto border-t border-gray-100 grid grid-cols-3 divide-x divide-gray-100">
+                {/* Actions — Chat | Agent Projects */}
+                <div className="mt-auto border-t border-gray-100 flex divide-x divide-gray-100">
                   <button
                     onClick={() => navigate(`/workspace/${ws.slug}`)}
-                    className="flex flex-col items-center gap-1 py-3 text-gray-500 hover:bg-indigo/5 hover:text-indigo transition-colors"
+                    title="Open Chat"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-semibold text-gray-500 hover:bg-indigo/5 hover:text-indigo transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
-                    <span className="text-[10px] font-semibold">Chat</span>
+                    Chat
                   </button>
                   <button
-                    onClick={() => navigate(`/workspace/${ws.slug}/connectors`)}
-                    className="flex flex-col items-center gap-1 py-3 text-gray-500 hover:bg-indigo/5 hover:text-indigo transition-colors"
+                    onClick={() => navigate(`/workspace/${ws.slug}/projects`)}
+                    title="Open Agent Projects"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-semibold text-gray-500 hover:bg-indigo/5 hover:text-indigo transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
                     </svg>
-                    <span className="text-[10px] font-semibold">Connectors</span>
-                  </button>
-                  <button
-                    onClick={() => navigate(`/workspace/${ws.slug}/agents`)}
-                    className="flex flex-col items-center gap-1 py-3 text-gray-500 hover:bg-indigo/5 hover:text-indigo transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-[10px] font-semibold">Agents</span>
+                    Agent Projects
                   </button>
                 </div>
 
@@ -236,6 +400,10 @@ export default function WorkspacesPage() {
           onConfirm={handleDelete}
           onCancel={() => !deleting && setConfirmDelete(null)}
         />
+      )}
+
+      {membersWs && (
+        <MembersModal ws={membersWs} onClose={() => setMembersWs(null)} />
       )}
     </div>
   );
