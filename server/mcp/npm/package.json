@@ -1,6 +1,6 @@
 {
     "name": "@openenthrium/oe-mcp",
-    "version": "1.7.3",
+    "version": "1.7.4",
     "description":  "OE MCP Server - connect Claude Code, Cursor \u0026 Windsurf to enterprise data sources. One binary, one JSON config.",
     "homepage":  "https://www.openenthrium.com/mcp.html",
     "repository":  {
