@@ -5,6 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.7.5] — 2026-08-19
+
+### Added
+- **OE Runtime SDK** (`@openenthrium/oe-runtime-sdk`): importable npm library — embed agent execution directly inside any Node.js application without spawning a subprocess or making HTTP calls. Same engine as the CLI. `runAgent(agentPath, configPath, params, hooks)` and `runAgentFromObject(agentYaml, config, params, hooks)` APIs. Connector packages are optional peer dependencies; install only what you need.
+- **Shared `prepareConnectors` utility** (`server/src/utils/prepareConnectors.js`): extracted from CLI and server.js into a shared module used by CLI, server mode, and SDK — eliminates duplication and ensures consistent connector credential merging across all delivery surfaces.
+- **Release pipeline — SDK npm publish**: `release.yml` now publishes `@openenthrium/oe-runtime-sdk` to npm on every tag, alongside `@openenthrium/oe-runtime`.
+
+### Fixed
+- **SDK publish path resolution**: `server/sdk/index.js` uses adaptive path resolution — detects `./src/` (npm-installed context) vs `../src/` (monorepo context) at runtime, ensuring the published package is fully self-contained.
+
+---
+
 ## [v1.7.4] — 2026-08-18
 
 ### Fixed
