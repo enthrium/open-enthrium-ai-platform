@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.2] — 2026-08-25
+
+### Fixed
+- **OE Runtime SKILL.md path resolution via npx**: agent file path now resolved to absolute on startup, fixing broken skill paths when npx changes the working directory
+
+---
+
 ## [v1.8.1] — 2026-08-25
 
 ### Fixed
