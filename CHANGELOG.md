@@ -5,6 +5,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.0] — 2026-08-25
+
+### Added
+- **SKILL.md execution** — OE Runtime natively parses and runs SKILL.md files. Frontmatter (`name`, `description`, `params`, `max-rounds`, `allowed-tools`) is read as agent config; `## Heading` sections become workflow steps; the body becomes the system prompt.
+- **Skills runner** — `skills:` block in `agent.yaml` runs local SKILL.md files sequentially, passing each step's output as context to the next. `trigger_type: manual` prompts for approval before running.
+- **Plugins runner** — `plugins:` block fetches remote SKILL.md files from any URL (GitHub `tree/` URLs are auto-converted to raw) and executes them as skills. Enables a community plugin ecosystem — any public SKILL.md is a one-line import.
+- **Auto-discovery of `oe-config.json`** — `--config` flag is now optional. Runtime first looks for `oe-config.json` in the same directory as the agent file, then in the current working directory. Clear error message if not found in either location.
+- **Folder as agent argument** — pass a folder path instead of a file; runtime resolves `agent.yaml` inside it automatically.
+- **Skills library** — 18 skill categories added under `server/cli/skills/`: `hello-world`, `email`, `blockchain-web3`, `cloud-drives`, `graphql`, `image-generation`, `iot-messaging`, `local-exec`, `message-queues`, `music-generation`, `nosql-cache`, `ocr-vision`, `productivity-crm`, `rest-api`, `speech-audio`, `sql-databases`, `ssh`, `team-messaging`, `telegram`, `video-generation`, `web-search`. Each has a `SKILL.md` and a ready-to-run `agents/openai.yaml`.
+- **Skills demo sample** — `server/cli/samples/skills-demo/`: two-skill pipeline — `prospect-researcher` feeds output into `email-drafter`, demonstrating chained skill execution.
+
+### Changed
+- **Error message for missing config** — now reports both locations searched and reminds user to use `--config` for a custom path.
+
+---
+
 ## [v1.7.5] — 2026-08-19
 
 ### Added
