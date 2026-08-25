@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.3] — 2026-08-25
+
+### Fixed
+- **OE Runtime SKILL.md not found in binary / npx**: `path.resolve` inside a `pkg`-compiled binary incorrectly treated already-absolute Windows paths as relative, producing broken paths. Fixed by using `path.join` from the already-resolved agent directory in `runSkills`.
+
+---
+
 ## [v1.8.2] — 2026-08-25
 
 ### Fixed
