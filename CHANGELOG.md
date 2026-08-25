@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.1] — 2026-08-25
+
+### Fixed
+- **OE Runtime hang on `npx` / binary when `server.enabled: true` in config**: passing an agent file (`oe-runtime agent.yaml`) now always runs in single-run mode regardless of the `server.enabled` flag in `oe-config.json`
+
+---
+
 ## [v1.8.0] — 2026-08-25
 
 ### Added
