@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.4] — 2026-08-26
+
+### Fixed
+- **SDK crashes when installed standalone** (`@openenthrium/oe-runtime-sdk`): `registry.js` had 30 bare `require()` calls at module load for optional connector adapters (mongodb, elasticsearch, googleapis, etc.). When the SDK was installed without those optional peer deps, the first missing `require()` threw and crashed the whole module. Wrapped every adapter require with a `tryRequire()` helper that returns `null` on failure — missing adapters are silently skipped and the SDK initialises cleanly.
+
+---
+
 ## [v1.8.3] — 2026-08-25
 
 ### Fixed
