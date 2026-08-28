@@ -16,7 +16,11 @@ if (!BINARY) {
   process.exit(1);
 }
 
-const BIN_PATH = path.join(__dirname, "bin", BINARY);
+// Look in npm/bin/ first (published package layout), then dist/ (dev layout)
+let BIN_PATH = path.join(__dirname, "bin", BINARY);
+if (!fs.existsSync(BIN_PATH)) {
+  BIN_PATH = path.join(__dirname, "..", "dist", BINARY);
+}
 
 if (!fs.existsSync(BIN_PATH)) {
   console.error("OE MCP: binary not found. Try reinstalling: npm install -g @openenthrium/oe-mcp");

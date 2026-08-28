@@ -5,6 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.5] — 2026-08-28
+
+### Added
+- **SKILL.md support** — agent.yaml can now reference a `SKILL.md` file via `skills: - path: ./SKILL.md` instead of inline `instructions` + `steps`. The SKILL.md follows the [agentskills.io](https://agentskills.io) open spec (name, description, license, compatibility, metadata).
+- **23 new SKILL.md samples** — all samples converted to SKILL.md format: sql-databases, email, team-messaging, web-search, file-storage, nosql-cache, graphql, image-generation, music-generation, speech-audio, video-generation, blog-to-video, rest-api, ssh, cloud-drives, directory-identity, iot-messaging, message-queues, ocr-vision, productivity-crm, blockchain-web3, local-exec, hello-world.
+- **HTTP API skills support** — `POST /run-file` now executes SKILL.md skills end-to-end (previously skills only ran via CLI). Agents with `skills:` and no inline `steps` skip the empty main agent call and go straight to the SKILL.md.
+- **Postman collection updated** — SKILL.md agents route to `/run-file`; `oe-project.json` folders generate sub-folders with one request per agent; `oe-native-*` folders included as regular requests.
+- **`postgres` adapter alias** — `connection_type: postgres` now works as an alias for `postgresql` in connector config.
+
+### Changed
+- **Sample folders renamed** — `chains`, `my-ai-project`, `telegram` renamed to `oe-native-chains`, `oe-native-my-ai-project`, `oe-native-telegram` to distinguish native-format agents from SKILL.md agents.
+
+---
+
 ## [v1.8.4] — 2026-08-26
 
 ### Fixed
