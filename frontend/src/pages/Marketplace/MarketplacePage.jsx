@@ -126,8 +126,8 @@ export default function MarketplacePage() {
   const [loadingSamples, setLoadingSamples] = useState(true);
 
   useEffect(() => {
-    api.get("/marketplace/samples")
-      .then(r => setSamples((r.data.samples || []).map(parseSample)))
+    api.get("/marketplace/skills")
+      .then(r => setSamples((r.data.skills || []).map(parseSample)))
       .catch(() => {})
       .finally(() => setLoadingSamples(false));
   }, []);

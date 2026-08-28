@@ -5,6 +5,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.6] — 2026-08-28
+
+### Changed
+- **`samples/` renamed to `skills/`** — the CLI skill library folder is now `server/cli/skills/`. All references updated across codebase, website, blog posts, Postman collection, workflows, and documentation.
+- **`oe-runtime-samples.zip` → `oe-runtime-skills.zip`** — release artifact and all download links updated site-wide.
+- **Skills root files** — `agent.yaml`, `oe-project.json`, and `oe-config.json` added at the `skills/` root level to describe and wire the full collection.
+- **`llms.txt` updated** — version, agent count (27), categories list, `skills:` field description, SKILL.md section, and `oe-project.json` description updated.
+
+---
+
 ## [v1.8.5] — 2026-08-28
 
 ### Added
@@ -56,7 +66,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Auto-discovery of `oe-config.json`** — `--config` flag is now optional. Runtime first looks for `oe-config.json` in the same directory as the agent file, then in the current working directory. Clear error message if not found in either location.
 - **Folder as agent argument** — pass a folder path instead of a file; runtime resolves `agent.yaml` inside it automatically.
 - **Skills library** — 18 skill categories added under `server/cli/skills/`: `hello-world`, `email`, `blockchain-web3`, `cloud-drives`, `graphql`, `image-generation`, `iot-messaging`, `local-exec`, `message-queues`, `music-generation`, `nosql-cache`, `ocr-vision`, `productivity-crm`, `rest-api`, `speech-audio`, `sql-databases`, `ssh`, `team-messaging`, `telegram`, `video-generation`, `web-search`. Each has a `SKILL.md` and a ready-to-run `agents/openai.yaml`.
-- **Skills demo sample** — `server/cli/samples/skills-demo/`: two-skill pipeline — `prospect-researcher` feeds output into `email-drafter`, demonstrating chained skill execution.
+- **Skills demo sample** — `server/cli/skills/skills-demo/`: two-skill pipeline — `prospect-researcher` feeds output into `email-drafter`, demonstrating chained skill execution.
 
 ### Changed
 - **Error message for missing config** — now reports both locations searched and reminds user to use `--config` for a custom path.
@@ -111,7 +121,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [v1.7.1] — 2026-08-13
 
 ### Added
-- **Postman collection auto-generation**: `generate-postman.js` reads all `samples/*/agent.yaml` files and regenerates `oe-runtime.postman_collection.json` at release time via `sync-cli.yml`
+- **Postman collection auto-generation**: `generate-postman.js` reads all `skills/*/agent.yaml` files and regenerates `oe-runtime.postman_collection.json` at release time via `sync-cli.yml`
 
 ### Changed
 - **`blockchain-web3` sample**: simplified to a single-step agent; switched to `ethereum.publicnode.com` RPC (no API key); added `walletAddress` to `oe-config.json`
@@ -412,7 +422,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Commercial overlay architecture** — drop a `commercial/` folder next to the community repo to unlock commercial features; no env vars, no license keys; folder presence is detected at startup by both the server and Vite
 - **`@commercial` / `@core` Vite aliases** — commercial frontend pages import community utilities via `@core/context/`, `@core/components/`, etc.; community builds to a stub when the folder is absent
 - **`server/src/data/connectionTypes.json`** — 2,654 connector type entries as the single source of truth; replaces the hardcoded array in both the seed script and the connector screen JSX
-- **`generate:postman` script** — `yarn generate:postman` (or `node scripts/generate-postman.js`) auto-builds `cli/oe-runtime.postman_collection.json` from all `cli/samples/*/agent.yaml` files; 21 sample requests in a "Samples" folder, one per sample agent
+- **`generate:postman` script** — `yarn generate:postman` (or `node scripts/generate-postman.js`) auto-builds `cli/oe-runtime.postman_collection.json` from all `cli/skills/*/agent.yaml` files; 21 sample requests in a "Samples" folder, one per sample agent
 - **Postman collection auto-generated on release** — `runtime-release.yml` runs `generate:postman` before uploading to GitHub Releases so every release ships a fresh, complete collection
 
 ### Changed
@@ -491,8 +501,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [v1.3.5] — 2026-07-23
 
 ### Added
-- **Sample library** — `cli/samples/` folder with 20 capability-specific starter kits, each containing a ready-to-run `agent.yaml` + `oe-config.json` (SQL, NoSQL, S3, Cloud Drives, Email, Slack, SSH, REST API, GraphQL, GitHub, Kafka, Web Search, OCR, Image Generation, Speech, Video, Music, Blockchain, LDAP, MQTT)
-- **`oe-runtime-samples.zip`** — all 20 sample kits bundled and uploaded automatically on every release tag; always downloadable from `/releases/latest/download/oe-runtime-samples.zip`
+- **Sample library** — `cli/skills/` folder with 20 capability-specific starter kits, each containing a ready-to-run `agent.yaml` + `oe-config.json` (SQL, NoSQL, S3, Cloud Drives, Email, Slack, SSH, REST API, GraphQL, GitHub, Kafka, Web Search, OCR, Image Generation, Speech, Video, Music, Blockchain, LDAP, MQTT)
+- **`oe-runtime-skills.zip`** — all 20 sample kits bundled and uploaded automatically on every release tag; always downloadable from `/releases/latest/download/oe-runtime-skills.zip`
 - **`server.enabled` config flag** — set `server.enabled: true` in `oe-config.json` to activate HTTP server mode without the `--serve` CLI flag; `--serve` still works as a quick override
 - **Per-capability "Download starter kit" buttons** on runtime website — each of the 20 capability cards generates and downloads the matching `agent.yaml` + `oe-config.json` directly in the browser
 - **Platform-coloured download buttons** on runtime website — Windows (blue), Linux (orange), macOS (dark)

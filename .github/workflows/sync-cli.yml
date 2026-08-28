@@ -35,7 +35,7 @@ jobs:
           mkdir -p /tmp/cli-repo/.github/workflows
           cp server/cli/.github/workflows/release.yml /tmp/cli-repo/.github/workflows/release.yml
 
-      - name: Regenerate Postman collection from samples
+      - name: Regenerate Postman collection from skills
         run: |
           npm install --prefix server js-yaml --no-save 2>/dev/null || true
           node server/cli/generate-postman.js 2>/dev/null || true
