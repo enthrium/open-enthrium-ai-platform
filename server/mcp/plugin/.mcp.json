@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "oe-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@openenthrium/oe-mcp", "--stdio", "$OE_MCP_CONFIG_PATH"]
+    }
+  }
+}

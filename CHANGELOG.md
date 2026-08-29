@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.8] — 2026-08-29
+
+### Added
+- **Claude Code plugin** — `server/mcp/plugin/` adds OE MCP Server as a validated Claude Code plugin. Includes `.claude-plugin/plugin.json`, `.mcp.json` (stdio via `$OE_MCP_CONFIG_PATH`), and 3 bundled skills: `setup`, `query-data`, `run-agent`. Submitted to `@claude-community` marketplace.
+
+---
+
 ## [v1.8.7] — 2026-08-29
 
 ### Changed
