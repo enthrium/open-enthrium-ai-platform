@@ -5,6 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.7] — 2026-08-29
+
+### Changed
+- **README simplifications** — all 6 READMEs rewritten for clarity: `app/README.md`, `server/cli/README.md`, `server/cli/npm/README.md`, `server/sdk/README.md`, `server/mcp/README.md`, `server/mcp/npm/README.md`.
+- **SKILL.md execution front and centre** — CLI and npm READMEs now lead with the SKILL.md folder structure (`SKILL.md` + `agent.yaml` + `oe-config.json`) as the primary usage pattern.
+- **CONTRIBUTING.md** — main `CONTRIBUTING.md` restored to full adapter template; `server/cli/CONTRIBUTING.md` simplified to concise bullet format with hyperlinks.
+- **Removed telemetry** — `server/src/telemetry/` folder deleted; bootstrap call removed from `server/src/index.js`.
+- **Server readiness gate** — frontend now polls `/api/health` before rendering login UI, preventing ECONNREFUSED on `yarn dev` fast startup.
+- **Prisma schema** — added missing `ConnectionMaster` model that caused `db:seed-masters` to fail.
+
+---
+
 ## [v1.8.6] — 2026-08-28
 
 ### Changed

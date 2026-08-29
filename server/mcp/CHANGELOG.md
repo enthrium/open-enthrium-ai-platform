@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.7] — 2026-08-29
+
+### Changed
+- **README rewritten** — `README.md` and `npm/README.md` simplified; removed connector catalog table, verbose test/memory narrative sections, binary vs node mode. Added SKILL.md mention in `run_agent` description. Added Part of Open Enthrium ecosystem table.
+
+---
+
 ## [v1.8.6] — 2026-08-28
 
 No changes to OE MCP in this release.

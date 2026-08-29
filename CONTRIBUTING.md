@@ -59,7 +59,7 @@ module.exports = { getToolDefinitions, getAnthropicToolDefinitions, executeTool 
 
 ### Step 2 — Register the connector
 
-Add one entry to `server/src/data/connectionTypes.json`:
+Add one entry to [`server/src/data/connectionTypes.json`](server/src/data/connectionTypes.json):
 
 ```json
 {

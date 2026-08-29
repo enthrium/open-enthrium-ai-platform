@@ -1,6 +1,36 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+
+function useServerReady() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    async function poll() {
+      while (!cancelled) {
+        try {
+          const res = await fetch("/api/health");
+          if (res.ok) { setReady(true); return; }
+        } catch {}
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
+    poll();
+    return () => { cancelled = true; };
+  }, []);
+  return ready;
+}
+
+function ServerGate({ children }) {
+  const ready = useServerReady();
+  if (!ready) return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-white dark:bg-[#111]">
+      <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      <p className="text-sm text-gray-500 dark:text-gray-400">Starting server…</p>
+    </div>
+  );
+  return children;
+}
 
 function HomeRedirect() {
   const { user } = useAuth();
@@ -62,5 +92,5 @@ function AppRoutes() {
 }
 
 export default function App() {
-  return <AuthProvider><AppRoutes /></AuthProvider>;
+  return <ServerGate><AuthProvider><AppRoutes /></AuthProvider></ServerGate>;
 }

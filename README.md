@@ -1,9 +1,9 @@
 <div align="center">
 
 <h1>Open Enthrium AI Platform</h1>
-<h3>Open-Source AI Ecosystem · Apache-2.0 · Self-Hosted</h3>
+<h3>Self-Hosted Web-Based AI Platform · Apache-2.0 · Open Source</h3>
 
-**Build, deploy, and govern AI Agents, Assistants, RAG, MCP, Workspaces, and Enterprise Automation.**
+**Run SKILL.md agents · Build an enterprise knowledge base with RAG · Private chat box on your own infrastructure.**
 No code. No LangChain. No Python.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](LICENSE)
@@ -19,12 +19,13 @@ No code. No LangChain. No Python.
 
 ## What is Open Enthrium AI Platform?
 
-A self-hosted, web-based open-source AI platform for building and running autonomous AI agents without writing code. Deploy it on your own infrastructure and connect to enterprise systems — databases, APIs, cloud storage, messaging, SSH, and IoT — without custom integration code.
+A self-hosted, web-based open-source AI platform with three core capabilities:
 
-- **No code.** Agents are declarative YAML files.
-- **Self-hosted.** Deploy on your own infrastructure. Own your data completely. No call-home.
-- **Human approval gates.** Build human-in-the-loop agentic workflows without writing code.
-- **Enterprise-ready.** Multi-workspace, RAG, MCP, DLP governance, and native connectors out of the box.
+- **SKILL.md agents** — run portable, declarative AI agents defined in Markdown. Drop a `SKILL.md` into any workspace; OE wires it to your connectors and executes it via the built-in runtime. The same skill runs unchanged on Claude, Cursor, Windsurf, or the CLI.
+- **Enterprise knowledge base with RAG** — ingest documents (24+ formats), chunk and embed them into your chosen vector database, and retrieve with cited answers. All on your own infrastructure, no data leaving your network.
+- **Private chat box** — a fully private AI assistant backed by your own LLM, your own knowledge base, and your own connectors. Embed it as a website widget or use it internally across workspaces.
+
+**Self-hosted. No call-home. Own your data completely.**
 
 
 ---
@@ -69,76 +70,11 @@ yarn dev
 
 ---
 
-## Platform Capabilities
-
-| Feature | Description |
-|---|---|
-| **AI Assistant / Chat** | SSE streaming chat with RAG, tool calling, @connector and @agent routing |
-| **Workspaces** | Multi-tenant workspaces with per-workspace LLM, embedding, and vector DB overrides |
-| **RBAC** | Role-based access control — admin, member, viewer per workspace |
-| **Agent Builder** | Conversational YAML designer with visual flow and step validation |
-| **Marketplace** | Browse and deploy community agent templates (Security, Sales, Marketing, DevOps, Analytics) |
-| **Agent Chains** | Sequential agent execution with `always / on_success / on_critical / on_warning` conditions |
-| **Cron Scheduling** | Schedule any agent on a cron expression |
-| **RAG** | Document ingestion, chunking, embedding, vector upsert, cited retrieval |
-| **8 Vector DBs** | LanceDB (default), Pinecone, Qdrant, Chroma, Weaviate, PgVector, Milvus, Zilliz |
-| **MCP** | Connect to MCP servers — 25 catalog entries included |
-| **Human Approval Gates** | Pause any workflow step for human review and approval |
-| **DLP / Governance** | Block, warn, redact, and audit content policies *(Enterprise)* |
-| **Observability** | Per-user / per-workspace token usage, cost dashboards, activity log *(Enterprise)* |
-| **Connector Library** | Browse all 2,673 connectors by category with dynamic credential forms |
-
----
-
 ## Connector Catalog
 
-**2,673 connectors across 45+ categories:**
+2,673 connectors across 45+ categories. Databases (PostgreSQL, MySQL, MongoDB, Snowflake, BigQuery), cloud storage (S3, GCS, Azure Blob), communication (Slack, Teams, Gmail, Telegram), developer tools (GitHub, Jira, Linear), CRM (HubSpot, Salesforce), AI media (DALL-E, ElevenLabs, Runway), IoT (MQTT, Kafka), blockchain (Ethereum, Polygon), and more.
 
-| Category | Connectors |
-|---|---|
-| **Databases** | PostgreSQL, MySQL, MSSQL, Oracle, SQLite, Snowflake, BigQuery, Redshift, CockroachDB, TiDB, Supabase, PlanetScale |
-| **NoSQL** | MongoDB, Redis, Elasticsearch, DynamoDB, Cassandra, Couchbase, FaunaDB |
-| **Object Storage** | AWS S3, Google Cloud Storage, Azure Blob, MinIO, Cloudflare R2, Backblaze B2 |
-| **Cloud Drives** | Google Drive, OneDrive, SharePoint, Dropbox, Box |
-| **CRM** | HubSpot, Salesforce, Pipedrive, Zoho CRM, Freshsales |
-| **Support** | Zendesk, Freshdesk, Intercom, ServiceNow, Help Scout |
-| **Project Management** | Jira, Asana, Linear, Monday.com, Trello, ClickUp |
-| **Developer Tools** | GitHub, GitLab, Bitbucket, CircleCI, Jenkins, Vercel |
-| **Communication** | Slack, Microsoft Teams, Discord, Telegram, WhatsApp Business |
-| **Email** | Gmail, Outlook, Zoho Mail, SMTP/IMAP, SendGrid, Mailchimp |
-| **Finance** | Stripe, QuickBooks, Xero, Plaid, Square, Paddle |
-| **HR** | BambooHR, Workday, ADP, Greenhouse, Lever |
-| **E-commerce** | Shopify, WooCommerce, BigCommerce, Magento |
-| **Image Generation** | OpenAI gpt-image-1, FLUX, Stable Diffusion, Ideogram |
-| **Speech & Audio** | ElevenLabs, OpenAI TTS, Azure Speech, Google TTS |
-| **Video Generation** | Runway, Kling, Pika |
-| **Music Generation** | kie.ai, Udio |
-| **Search** | Perplexity, Google Custom Search, Bing |
-| **OCR / Vision** | Azure Vision, Google Vision, AWS Textract, Tesseract |
-| **Message Queues** | Kafka, RabbitMQ, AWS SQS, Azure Service Bus, Google Pub/Sub |
-| **IoT** | MQTT, AWS IoT, HiveMQ, Mosquitto |
-| **Blockchain / Web3** | Ethereum, Polygon, Solana, Avalanche, Infura, Alchemy |
-| **Directory** | LDAP, Active Directory, Azure AD, OpenLDAP |
-| **Healthcare** | FHIR, Epic, Cerner |
-| **ERP** | SAP, Oracle ERP, Microsoft Dynamics |
-| **Marketing** | Google Ads, Facebook Ads, HubSpot Marketing, Marketo, ActiveCampaign |
-| **Analytics** | Google Analytics, Mixpanel, Amplitude, Segment, PostHog |
-| **+ 17 more** | Legal, Education, GIS, Logistics, Real Estate, Government, ... |
-
----
-
-## Environment Variables
-
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `JWT_SECRET` | Yes | — | Signs and verifies login tokens. Keep the same value across restarts. |
-| `SUPER_ADMIN_EMAIL` | Yes | — | Email for the super admin account |
-| `SUPER_ADMIN_PASSWORD` | Yes | — | Password for the super admin account |
-| `FRONTEND_PORT` | No | `3000` | Vite dev server port |
-| `SERVER_PORT` | No | `3001` | API server port |
-| `PROCESSOR_PORT` | No | `3002` | Document processor port |
-
-All LLM, embedding, and vector database settings are configured from the admin panel — no `.env` changes needed after initial setup.
+All connectors are configurable from the admin panel — no `.env` changes, no code. The full catalog lives in [`server/src/data/connectionTypes.json`](server/src/data/connectionTypes.json).
 
 ---
 
@@ -152,8 +88,9 @@ Contributions are welcome. Before opening a PR:
 4. **Open a PR** with a clear description of what and why
 
 **Where contributions are most valuable:**
-- New connector adapters (`server/src/utils/tools/adapters/`)
-- Agent YAML examples for the community marketplace
+- New connector adapters ([`server/src/utils/tools/adapters/`](server/src/utils/tools/adapters/))
+- New connector entries — add to [`server/src/data/connectionTypes.json`](server/src/data/connectionTypes.json) and re-run `yarn workspace @open-enthrium/server db:seed-masters`
+- Agent SKILL.md examples for the community marketplace
 - Bug fixes with clear reproduction steps
 
 → See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full guide.

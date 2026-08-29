@@ -1,6 +1,6 @@
 {
     "name": "open-enthrium",
-    "version": "1.8.4",
+    "version": "1.8.7",
     "private":  true,
     "workspaces":  [
                        "server",
