@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, Outlet, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import UserMenu from "../UserMenu";
+import api from "../../utils/api";
+
+function checkLlmConfigured(s) {
+  if (!s) return false;
+  const noKey = ["ollama", "lmstudio", "generic-openai"].includes(s.llm_provider);
+  return noKey ? !!s.llm_base_url : s.llm_api_key === "********";
+}
 
 const NAV_GROUPS = [
   {
@@ -92,6 +99,14 @@ export default function AppLayout() {
   );
   const [licenseType, setLicenseType]   = useState("community");
   const [branding, setBranding]         = useState(null);
+  const [llmConfigured, setLlmConfigured] = useState(null); // null = checking
+  const prevPathRef = useRef(pathname);
+
+  useEffect(() => {
+    const handler = () => setLlmConfigured(true);
+    window.addEventListener("oe-llm-configured", handler);
+    return () => window.removeEventListener("oe-llm-configured", handler);
+  }, []);
 
   useEffect(() => {
     fetch("/api/instance")
@@ -107,6 +122,19 @@ export default function AppLayout() {
       .catch(() => {});
   }, []);
 
+  // Check LLM configuration — on mount and whenever we navigate away from /settings
+  useEffect(() => {
+    if (!user || user.role !== "admin") { setLlmConfigured(true); return; }
+    const wasOnSettings = prevPathRef.current.startsWith("/settings");
+    const nowOnSettings = pathname.startsWith("/settings");
+    prevPathRef.current = pathname;
+    // Re-fetch on first load (wasOnSettings is irrelevant) or when leaving settings
+    if (llmConfigured !== null && !wasOnSettings) return;
+    api.get("/settings")
+      .then(({ data }) => setLlmConfigured(checkLlmConfigured(data.settings || {})))
+      .catch(() => setLlmConfigured(true));
+  }, [user, pathname]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -115,6 +143,20 @@ export default function AppLayout() {
     );
   }
   if (!user) return <Navigate to="/login" replace />;
+
+  // While checking LLM config for admin, show a brief spinner
+  if (user.role === "admin" && llmConfigured === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-indigo border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Redirect admin to /settings if LLM not configured yet
+  if (user.role === "admin" && llmConfigured === false && !pathname.startsWith("/settings")) {
+    return <Navigate to="/settings" replace />;
+  }
 
   function toggleGroup(label) {
     setExpandedGroups(prev => {
@@ -217,6 +259,15 @@ export default function AppLayout() {
         </aside>
 
         <main className={`flex-1 flex flex-col ${isFullBleed ? "overflow-hidden" : "overflow-y-auto"}`}>
+          {user.role === "admin" && llmConfigured === false && (
+            <div style={{ background:"#fef3c7", borderBottom:"1px solid #fcd34d", padding:"0.6rem 1.5rem", display:"flex", alignItems:"center", gap:"0.5rem", fontSize:"0.8125rem", color:"#92400e", flexShrink:0 }}>
+              <svg style={{width:"1rem",height:"1rem",flexShrink:0}} fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+              </svg>
+              <span>LLM not configured — please set up your API key to use the platform.</span>
+              <Link to="/settings" style={{fontWeight:600, textDecoration:"underline", marginLeft:"0.25rem", color:"#92400e"}}>Configure now →</Link>
+            </div>
+          )}
           <div className={`flex-1 ${isFullBleed ? "overflow-hidden" : "p-8"}`}>
             <Outlet />
           </div>

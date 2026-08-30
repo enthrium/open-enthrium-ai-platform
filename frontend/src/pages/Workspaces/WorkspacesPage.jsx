@@ -354,12 +354,13 @@ export default function WorkspacesPage() {
                     { v: ws._count.documents, label: "docs"    },
                     { v: ws._count.chats,     label: "chats"   },
                     { v: ws._count.users,     label: "members" },
+                    { v: ws._count.projects,  label: "agents"  },
                   ].map(s => (
                     <span key={s.label} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{s.v} {s.label}</span>
                   ))}
                 </div>
 
-                {/* Actions — Chat | Agent Projects */}
+                {/* Actions — Chat | Agents */}
                 <div className="mt-auto border-t border-gray-100 flex divide-x divide-gray-100">
                   <button
                     onClick={() => navigate(`/workspace/${ws.slug}`)}
@@ -373,13 +374,13 @@ export default function WorkspacesPage() {
                   </button>
                   <button
                     onClick={() => navigate(`/workspace/${ws.slug}/projects`)}
-                    title="Open Agent Projects"
+                    title="Open Agents"
                     className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-semibold text-gray-500 hover:bg-indigo/5 hover:text-indigo transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
                     </svg>
-                    Agent Projects
+                    Agents
                   </button>
                 </div>
 

@@ -805,7 +805,7 @@ export default function WorkspaceChat() {
         {/* Bottom nav */}
         <div className="shrink-0 border-t border-gray-200 px-3 py-3 space-y-0.5">
           {[
-            { id: "projects", label: "Agent Projects", path: `/workspace/${slug}/projects`, icon: "M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" },
+            { id: "projects", label: "Agents", path: `/workspace/${slug}/projects`, icon: "M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" },
             { id: "embed",    label: "Embed",    path: `/workspace/${slug}/embed`,    icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" },
           ].map(item => (
             <button

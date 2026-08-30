@@ -83,8 +83,14 @@ export default function WorkspaceRunLogsPage() {
     const ms = new Date(r.completedAt) - new Date(r.startedAt);
     return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
   };
-  const triggeredByLabel = (r) =>
-    r.triggeredBy ? (r.triggeredBy.name || r.triggeredBy.email) : "Manual";
+  const triggeredByLabel = (r) => {
+    const who  = r.triggeredBy ? (r.triggeredBy.name || r.triggeredBy.email) : null;
+    const type = (r.triggerType || "manual").toLowerCase();
+    if (type === "auto")      return who ? `Auto (${who})` : "Auto";
+    if (type === "scheduled") return "Scheduler";
+    if (type === "chained")   return "Chained";
+    return who ? who : "Manual";
+  };
 
   return (
     <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
@@ -133,7 +139,7 @@ export default function WorkspaceRunLogsPage() {
             {runs.length > 0 && (
               <div className="flex gap-0 border border-white/20 rounded-lg overflow-hidden bg-white/10">
                 <button onClick={() => {
-                  const headers = ["Project", "Agent", "Status", "Triggered By", "Started", "Duration", "Output", "Error"];
+                  const headers = ["Project", "Skill", "Status", "Triggered By", "Started", "Duration", "Output", "Error"];
                   const rows = runs.map(r => [
                     r.project?.name || "", r.agent?.name || "", r.status,
                     triggeredByLabel(r), fmt(r.startedAt), duration(r),
@@ -196,7 +202,7 @@ export default function WorkspaceRunLogsPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  {["Project", "Agent", "Status", "Triggered By", "Started", "Duration", "Logs"].map(h => (
+                  {["Project", "Skill", "Status", "Triggered By", "Started", "Duration", "Logs"].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -225,7 +231,7 @@ export default function WorkspaceRunLogsPage() {
                             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Output</span>
                             <div className="flex gap-0 border border-gray-200 rounded-lg overflow-hidden bg-white">
                               <button onClick={() => {
-                                const headers = ["Project", "Agent", "Status", "Triggered By", "Started", "Duration", "Output", "Error"];
+                                const headers = ["Project", "Skill", "Status", "Triggered By", "Started", "Duration", "Output", "Error"];
                                 const row = [r.project?.name || "", r.agent?.name || "", r.status, triggeredByLabel(r), fmt(r.startedAt), duration(r), r.output || "", r.error || ""];
                                 const csv = [headers, row].map(cols => cols.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
                                 const a = document.createElement("a");
@@ -236,7 +242,7 @@ export default function WorkspaceRunLogsPage() {
 
                               <button onClick={() => {
                                 const lines = [
-                                  `# ${r.project?.name || "Project"} › ${r.agent?.name || "Agent"} — Run Log`,
+                                  `# ${r.project?.name || "Project"} › ${r.agent?.name || "Skill"} — Run Log`,
                                   `- **Status:** ${r.status}  **By:** ${triggeredByLabel(r)}  **Started:** ${fmt(r.startedAt)}  **Duration:** ${duration(r)}`,
                                   "",
                                 ];

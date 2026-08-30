@@ -96,11 +96,14 @@ export default function Login() {
     const token  = params.get("sso_token");
     const err    = params.get("sso_error");
     if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        login(token, { id: payload.id, email: payload.email, role: payload.role, name: payload.name }, true);
-        navigate("/");
-      } catch { setError("SSO login failed — invalid token"); }
+      (async () => {
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          const u = { id: payload.id, email: payload.email, role: payload.role, name: payload.name };
+          login(token, u, true);
+          navigate(await getPostLoginDest(u));
+        } catch { setError("SSO login failed — invalid token"); }
+      })();
       return;
     }
     if (err) {
@@ -122,11 +125,24 @@ export default function Login() {
     try {
       const { data } = await api.post("/auth/login", { email, password });
       login(data.token, data.user, remember);
-      navigate("/");
+      navigate(await getPostLoginDest(data.user));
     } catch (err) {
       setError(err.response?.data?.error || "Login failed");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function getPostLoginDest(user) {
+    if (user?.role !== "admin") return "/";
+    try {
+      const { data: sd } = await api.get("/settings");
+      const s = sd.settings || {};
+      const noKey = ["ollama", "lmstudio", "generic-openai"].includes(s.llm_provider);
+      const configured = noKey ? !!s.llm_base_url : s.llm_api_key === "********";
+      return configured ? "/" : "/settings";
+    } catch {
+      return "/";
     }
   }
 

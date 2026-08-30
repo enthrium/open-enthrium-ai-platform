@@ -5,6 +5,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.9.0] — 2026-08-30
+
+### Added
+
+#### Platform — Project / Skill Runner
+- **Chain execution in Run modal** — multi-skill projects now have a "Run Chain" button that executes all skills sequentially; output of each skill feeds as input to the next
+- **`trigger_type` UI in Run modal** — `auto` skills show a green banner ("runs from SKILL.md, no input needed"); `manual` skills show a textarea for input
+- **Manual skill approval in chain** — `trigger_type: manual` skills (after the first) pause the chain and show an inline approval panel with an editable textarea; user reviews/edits the previous output then clicks "Approve & Continue"
+- **Chain step status list** — live step list with icons: ✓ done / spinner running / ⏸ awaiting approval / ✗ error; shows per-step duration and tool-call count
+- **Save Project button** — top-right header button saves agent.yaml + SKILL.md + oe-config in one click; skips oe-config save when keys are masked
+- **Custom delete confirmation modal** — replaces browser `confirm()` with an in-app dialog for skill deletion
+- **Discard new skill** — ✕ button on unsaved new skill entry cancels creation without saving
+- **`triggerType` on ProjectRun** — run records now store whether a skill was triggered as `auto` or `manual`; shown in Run Logs "Triggered By" column (Auto / Manual / user name)
+
+#### Platform — Projects Page
+- **Projects count on workspace cards** — workspace cards now show skill/project count alongside docs, chats, members
+- **ZIP import root-folder stripping** — ZIPs created by OS or GitHub (with a wrapping root folder) now import correctly; the common prefix is stripped before processing
+- **ZIP download round-trip fix** — multi-skill ZIP exports now use `skills[].path` from agent.yaml as the folder name so re-importing the ZIP resolves SKILL.md correctly
+
+### Changed
+
+#### Platform — Projects / Skills UI
+- **"Agents" → "Skills"** throughout the project detail page — panel header, labels, buttons, dialogs, and empty states all use "Skills" / "Skill"
+- **Run Logs "Agent" column → "Skill"** — table header, CSV export, and MD export all renamed
+- **SKILL.md as system prompt** — both the workspace run route and admin run route now strip YAML frontmatter from `skillContent` and use the body as the system prompt (was falling back to yaml `instructions:` only)
+- **Default run input** — sending empty input to the run endpoint now defaults to `"Run"` server-side so auto skills execute without needing explicit user input
+- **LLM key + model copied on template import** — `isPlaceholderKey()` detects template placeholder strings (`YOUR_OPENAI_API_KEY`, `<key>`, etc.) and replaces them with the workspace's real LLM config including model
+- **Download architecture** — ZIP export no longer includes `oe-project.json`; single-skill projects export `agent.yaml` + `SKILL.md` at root; multi-skill projects export `agent.yaml` + `{path}/SKILL.md` per skill; sensitive keys masked as `YOUR_API_KEY`
+- **Duplicate / copy** — `skillContent` now correctly included when duplicating a project
+
+### Fixed
+- **`ws._count.projects` (was `.agents`)** — workspace card project count was always 0; fixed by counting `projects` relation instead of the legacy `agents` relation
+- **ZIP import SKILL.md not loaded** — root-folder prefix in ZIP paths caused `findSkillMd` to miss all SKILL.md files; fixed by stripping the common prefix after reading the ZIP
+
+---
+
 ## [v1.8.9] — 2026-08-30
 
 ### Changed

@@ -21,7 +21,6 @@ const ICONS = {
 
 // ─── Sensitive key/value masking ─────────────────────────────────────────────
 const SENSITIVE_KEY_RE = /key|password|secret|token|auth|pass|credential|connection_string|apikey|private/i;
-// Mask URLs that have an embedded API token (e.g. Telegram: /bot{id}:{hash}, Slack webhooks, etc.)
 const EMBEDDED_TOKEN_RE = /https?:\/\/\S*[:/][A-Za-z0-9_\-]{20,}/;
 
 function isSensitive(key, val) {
@@ -56,10 +55,13 @@ export default function ProjectDetailPage() {
   const [agents,        setAgents]        = useState([]);
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [yamlContent,   setYamlContent]   = useState("");
+  const [skillContent,  setSkillContent]  = useState("");
   const [loading,       setLoading]       = useState(true);
   const [error,         setError]         = useState("");
   const [saving,        setSaving]        = useState(false);
   const [saveMsg,       setSaveMsg]       = useState("");
+  const [skillSaving,   setSkillSaving]   = useState(false);
+  const [skillSaveMsg,  setSkillSaveMsg]  = useState("");
   const [isNew,         setIsNew]         = useState(false);
 
   // oe-config.json right panel
@@ -68,6 +70,10 @@ export default function ProjectDetailPage() {
   const [oeSaved,       setOeSaved]       = useState(false);
   const [oeError,       setOeError]       = useState("");
   const [hideKeys,      setHideKeys]      = useState(true);
+
+  const [savingAll,     setSavingAll]     = useState(false);
+  const [saveAllMsg,    setSaveAllMsg]    = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(null); // agent to delete
 
   const yamlInputRef = useRef();
 
@@ -80,11 +86,22 @@ export default function ProjectDetailPage() {
         const prRes = await api.get(`/admin/workspaces/${ws.id}/projects/${projectId}`);
         const proj  = prRes.data.project;
         setProject({ ...proj, workspaceId: ws.id });
-        // Initialise oe-config panel
         try {
-          const cfg = JSON.parse(proj.oeConfig || "{}");
-          setOeRaw(JSON.stringify(cfg, null, 2));
-        } catch { setOeRaw("{}"); }
+          const raw = proj.oeConfig || "{}";
+          const cfg = JSON.parse(raw);
+          const isEmpty = Object.keys(cfg).length === 0;
+          if (isEmpty) {
+            // Auto-copy real LLM key from dedicated export endpoint
+            let llmCfg = { provider: "openai", model: "gpt-4o", apiKey: "" };
+            try {
+              const { data: sd } = await api.get("/settings/oe-config");
+              if (sd.llm) llmCfg = sd.llm;
+            } catch {}
+            setOeRaw(JSON.stringify({ llm: llmCfg, connectors: [] }, null, 2));
+          } else {
+            setOeRaw(JSON.stringify(cfg, null, 2));
+          }
+        } catch { setOeRaw(JSON.stringify({ llm: { provider: "openai", model: "gpt-4o", apiKey: "" }, connectors: [] }, null, 2)); }
         const ags = proj.agents || [];
         setAgents(ags);
         const def = ags.find(a => a.isDefault) || ags[0];
@@ -97,20 +114,44 @@ export default function ProjectDetailPage() {
   function selectAgent(agent) {
     setSelectedAgent(agent);
     setYamlContent(agent.yamlContent || "");
+    setSkillContent(agent.skillContent || "");
     setIsNew(false);
     setSaveMsg("");
+    setSkillSaveMsg("");
   }
 
   function newAgent() {
+    const defaultSkill = `---
+name: New Skill
+description: Describe what this skill does
+license: Apache-2.0
+metadata:
+  author: Open Enthrium
+  version: "1.0"
+---
+
+You are a helpful assistant.
+
+## Steps
+
+### Step 1: Understand the request
+Read the user's input carefully and identify what they need.
+
+### Step 2: Respond
+Provide a clear, accurate, and helpful response.
+`;
     const blank = {
       id: null, name: "new-agent", description: "", fileName: "agent.yaml",
       yamlContent: "name: New Agent\ndescription: \ninstructions: You are a helpful assistant.\nsteps:\n  - name: Main\n    content: |\n      Answer the user's question.\n",
+      skillContent: defaultSkill,
       isDefault: false,
     };
     setSelectedAgent(blank);
     setYamlContent(blank.yamlContent);
+    setSkillContent(defaultSkill);
     setIsNew(true);
     setSaveMsg("");
+    setSkillSaveMsg("");
   }
 
   // ── Import single YAML ───────────────────────────────────────────────────────
@@ -128,29 +169,33 @@ export default function ProjectDetailPage() {
           description: doc.description || "",
           fileName: file.name,
           yamlContent: content,
+          skillContent: "",
           isDefault: false,
         });
         setYamlContent(content);
+        setSkillContent("");
         setIsNew(true);
         setSaveMsg("");
+        setSkillSaveMsg("");
       } catch { setSaveMsg("Invalid YAML"); }
     };
     reader.readAsText(file);
     e.target.value = "";
   }
 
-  // ── Save agent ───────────────────────────────────────────────────────────────
+  // ── Save agent (yaml + skillContent together) ────────────────────────────────
   async function saveAgent() {
     setSaving(true); setSaveMsg("");
     try {
       let agentName = selectedAgent.name;
       try { const d = yamlLoad(yamlContent); if (d?.name) agentName = d.name; } catch {}
       const payload = {
-        name:        agentName,
-        description: selectedAgent.description || null,
-        fileName:    selectedAgent.fileName || "agent.yaml",
+        name:         agentName,
+        description:  selectedAgent.description || null,
+        fileName:     selectedAgent.fileName || "agent.yaml",
         yamlContent,
-        isDefault:   selectedAgent.isDefault || false,
+        skillContent,
+        isDefault:    selectedAgent.isDefault || false,
       };
       if (isNew) {
         const { data } = await api.post(`/admin/workspaces/${project.workspaceId}/projects/${projectId}/agents`, payload);
@@ -169,14 +214,32 @@ export default function ProjectDetailPage() {
     } finally { setSaving(false); }
   }
 
+  // ── Save SKILL.md only ───────────────────────────────────────────────────────
+  async function saveSkillMd() {
+    if (!selectedAgent?.id) { setSkillSaveMsg("Save the skill first."); return; }
+    setSkillSaving(true); setSkillSaveMsg("");
+    try {
+      const { data } = await api.put(`/admin/workspaces/${project.workspaceId}/projects/${projectId}/agents/${selectedAgent.id}`, { skillContent });
+      setAgents(a => a.map(ag => ag.id === data.agent.id ? data.agent : ag));
+      setSelectedAgent(prev => ({ ...prev, skillContent: data.agent.skillContent }));
+      setSkillSaveMsg("Saved ✓");
+    } catch (e) {
+      setSkillSaveMsg(e.response?.data?.error || "Save failed");
+    } finally { setSkillSaving(false); }
+  }
+
   // ── Delete agent ─────────────────────────────────────────────────────────────
-  async function deleteAgent(agent) {
-    if (!confirm(`Delete agent "${agent.name}"?`)) return;
+  function deleteAgent(agent) {
+    setConfirmDelete(agent);
+  }
+  async function confirmDeleteAgent() {
+    const agent = confirmDelete;
+    setConfirmDelete(null);
     try {
       await api.delete(`/admin/workspaces/${project.workspaceId}/projects/${projectId}/agents/${agent.id}`);
       setAgents(a => a.filter(ag => ag.id !== agent.id));
       if (selectedAgent?.id === agent.id) { setSelectedAgent(null); setIsNew(false); }
-    } catch { alert("Delete failed"); }
+    } catch { /* silent */ }
   }
 
   // ── Save oe-config.json ──────────────────────────────────────────────────────
@@ -192,6 +255,48 @@ export default function ProjectDetailPage() {
     } catch (e) {
       setOeError(e instanceof SyntaxError ? "Invalid JSON" : (e.response?.data?.error || "Save failed"));
     } finally { setOeSaving(false); }
+  }
+
+  // ── Save all (agent.yaml + SKILL.md + oe-config) ─────────────────────────────
+  async function saveAll() {
+    setSavingAll(true); setSaveAllMsg("");
+    const errs = [];
+    try {
+      // 1. Save agent (yaml + skill) if one is selected
+      if (selectedAgent) {
+        try {
+          let agentName = selectedAgent.name;
+          try { const d = yamlLoad(yamlContent); if (d?.name) agentName = d.name; } catch {}
+          const payload = { name: agentName, description: selectedAgent.description || null, fileName: selectedAgent.fileName || "agent.yaml", yamlContent, skillContent, isDefault: selectedAgent.isDefault || false };
+          if (isNew) {
+            const { data } = await api.post(`/admin/workspaces/${project.workspaceId}/projects/${projectId}/agents`, payload);
+            setAgents(a => [...a, data.agent]);
+            setSelectedAgent(data.agent);
+            setIsNew(false);
+            setSaveMsg("Saved ✓");
+          } else {
+            const { data } = await api.put(`/admin/workspaces/${project.workspaceId}/projects/${projectId}/agents/${selectedAgent.id}`, payload);
+            setAgents(a => a.map(ag => ag.id === data.agent.id ? data.agent : ag));
+            setSelectedAgent(data.agent);
+            setSaveMsg("Saved ✓");
+          }
+          setSkillSaveMsg("Saved ✓");
+        } catch (e) { errs.push("Agent: " + (e.response?.data?.error || "failed")); }
+      }
+      // 2. Save oe-config — skip when keys are masked (hideKeys=true) to avoid writing "••••••••" to DB
+      if (!hideKeys) {
+        try {
+          const parsed = JSON.parse(oeRaw);
+          const { data } = await api.put(`/admin/workspaces/${project.workspaceId}/projects/${projectId}`, { oeConfig: parsed });
+          setProject(p => ({ ...p, oeConfig: data.project.oeConfig }));
+          setOeSaved(true); setTimeout(() => setOeSaved(false), 2000);
+          setOeError("");
+        } catch (e) { errs.push("Config: " + (e instanceof SyntaxError ? "invalid JSON" : (e.response?.data?.error || "failed"))); }
+      }
+
+      setSaveAllMsg(errs.length === 0 ? "All saved ✓" : errs.join(" · "));
+      setTimeout(() => setSaveAllMsg(""), 3000);
+    } finally { setSavingAll(false); }
   }
 
   // ── Render ────────────────────────────────────────────────────────────────────
@@ -218,29 +323,55 @@ export default function ProjectDetailPage() {
         </button>
         <div>
           <h1 className="text-white font-semibold text-sm">{project?.name}</h1>
-          <p className="text-white/50 text-[10px]">Agents</p>
+          <p className="text-white/50 text-[10px]">Skills</p>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          {saveAllMsg && (
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${saveAllMsg.includes("failed") || saveAllMsg.includes("failed") ? "bg-red-500/20 text-red-200" : "bg-green-500/20 text-green-200"}`}>
+              {saveAllMsg}
+            </span>
+          )}
+          <button
+            onClick={saveAll}
+            disabled={savingAll}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition-colors disabled:opacity-50"
+          >
+            <Icon d={ICONS.save} size="3.5" />
+            {savingAll ? "Saving…" : "Save Project"}
+          </button>
         </div>
       </header>
 
-      {/* 3-panel body */}
+      {/* 4-panel body */}
       <div className="flex flex-1 overflow-hidden">
 
-        {/* Left — agent list */}
-        <aside className="w-56 bg-white border-r border-gray-200 flex flex-col shrink-0">
+        {/* Panel 1 — skill list */}
+        <aside className="w-48 bg-white border-r border-gray-200 flex flex-col shrink-0">
           <div className="flex items-center justify-between px-3 py-3 border-b border-gray-100">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Agents</span>
-            <button onClick={newAgent} className="p-1 rounded-lg text-indigo hover:bg-indigo/10 transition-colors" title="New agent">
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Skills</span>
+            <button onClick={newAgent} className="p-1 rounded-lg text-indigo hover:bg-indigo/10 transition-colors" title="New skill">
               <Icon d={ICONS.plus} size="4" />
             </button>
           </div>
           <div className="flex-1 overflow-y-auto py-1.5">
             {agents.length === 0 && !isNew && (
-              <p className="text-xs text-gray-400 text-center py-6 px-3">No agents yet.<br />Import a YAML or click +.</p>
+              <p className="text-xs text-gray-400 text-center py-6 px-3">No skills yet.<br />Import a project or click +.</p>
             )}
             {isNew && (
-              <div className="mx-2 my-1 px-3 py-2.5 rounded-lg bg-indigo/10 border border-indigo/20">
-                <p className="text-sm font-semibold text-indigo">New Agent</p>
-                <p className="text-[10px] text-indigo/60">Unsaved</p>
+              <div className="group mx-2 my-1 px-3 py-2.5 rounded-lg bg-indigo/10 border border-indigo/20 flex items-start justify-between gap-1">
+                <div>
+                  <p className="text-sm font-semibold text-indigo">New Skill</p>
+                  <p className="text-[10px] text-indigo/60">Unsaved</p>
+                </div>
+                <button
+                  onClick={() => { setIsNew(false); setSelectedAgent(agents[0] || null); if (agents[0]) { setYamlContent(agents[0].yamlContent || ""); setSkillContent(agents[0].skillContent || ""); } }}
+                  className="p-0.5 rounded text-indigo/40 hover:text-red-500 hover:bg-red-50 transition-all mt-0.5 shrink-0"
+                  title="Discard new skill"
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
             )}
             {agents.map(agent => (
@@ -252,7 +383,6 @@ export default function ProjectDetailPage() {
                       {agent.name}
                       {agent.isDefault && <span className="ml-1 text-[9px] font-bold text-gray-400 uppercase">default</span>}
                     </p>
-                    <p className="text-[10px] text-gray-400 truncate">{agent.fileName}</p>
                   </div>
                   <button onClick={e => { e.stopPropagation(); deleteAgent(agent); }}
                     className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-gray-400 hover:text-red-500 transition-all shrink-0 mt-0.5">
@@ -264,7 +394,7 @@ export default function ProjectDetailPage() {
           </div>
         </aside>
 
-        {/* Center — YAML editor */}
+        {/* Panel 2 — agent.yaml editor (shared across all skills) */}
         <main className="flex-1 flex flex-col overflow-hidden border-r border-gray-200 min-w-0">
           {!selectedAgent ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
@@ -276,17 +406,21 @@ export default function ProjectDetailPage() {
           ) : (
             <>
               <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-gray-800">{selectedAgent.name || "New Agent"}</span>
-                  <span className="text-xs text-gray-400 font-mono">{selectedAgent.fileName}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-sm font-bold text-gray-800 shrink-0">{selectedAgent.fileName || "agent.yaml"}</span>
+                  {yamlContent && (
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0">
+                      {yamlContent.split("\n").length} lines
+                    </span>
+                  )}
                   {saveMsg && (
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${saveMsg.includes("✓") ? "text-emerald-600 bg-emerald-50" : "text-red-600 bg-red-50"}`}>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${saveMsg.includes("✓") ? "text-emerald-600 bg-emerald-50" : "text-red-600 bg-red-50"}`}>
                       {saveMsg}
                     </span>
                   )}
                 </div>
                 <button onClick={saveAgent} disabled={saving}
-                  className="btn-primary flex items-center gap-1.5 px-3 py-1.5 text-xs">
+                  className="btn-primary flex items-center gap-1.5 px-3 py-1.5 text-xs shrink-0 ml-2">
                   <Icon d={ICONS.save} size="3.5" />
                   {saving ? "Saving…" : "Save"}
                 </button>
@@ -304,27 +438,68 @@ export default function ProjectDetailPage() {
           )}
         </main>
 
-        {/* Right — oe-config.json */}
-        <aside className="w-[380px] shrink-0 bg-gray-50 flex flex-col overflow-hidden border-l border-gray-200">
+        {/* Panel 3 — SKILL.md editor */}
+        <aside className="flex-1 flex flex-col overflow-hidden border-r border-gray-200 min-w-0">
+          {!selectedAgent ? (
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
+              <svg className="w-10 h-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              <p className="text-sm">SKILL.md will appear here</p>
+            </div>
+          ) : (
+            <>
+              <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-gray-800">SKILL.md</span>
+                  {skillContent && (
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 border border-emerald-100">
+                      {skillContent.split("\n").length} lines
+                    </span>
+                  )}
+                  {skillSaveMsg && (
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${skillSaveMsg.includes("✓") ? "text-emerald-600 bg-emerald-50" : "text-amber-600 bg-amber-50"}`}>
+                      {skillSaveMsg}
+                    </span>
+                  )}
+                </div>
+                <button onClick={saveSkillMd} disabled={skillSaving}
+                  className="btn-primary flex items-center gap-1.5 px-3 py-1.5 text-xs shrink-0">
+                  <Icon d={ICONS.save} size="3.5" />
+                  {skillSaving ? "Saving…" : "Save"}
+                </button>
+              </div>
+              <div className="flex-1 overflow-hidden p-3 flex flex-col">
+                <textarea
+                  value={skillContent}
+                  onChange={e => setSkillContent(e.target.value)}
+                  spellCheck={false}
+                  className="flex-1 w-full font-mono text-xs text-gray-200 bg-gray-950 rounded-lg p-4 outline-none resize-none leading-relaxed focus:ring-1 focus:ring-indigo/50"
+                  placeholder={"# My Skill\n\nDescribe what this skill does and how to use it.\n\n## Steps\n\n1. Step one\n2. Step two\n"}
+                />
+              </div>
+            </>
+          )}
+        </aside>
+
+        {/* Panel 4 — oe-config.json */}
+        <aside className="w-[320px] shrink-0 bg-gray-50 flex flex-col overflow-hidden border-l border-gray-200">
           <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
             <div>
               <h3 className="text-sm font-semibold text-gray-800">oe-config.json</h3>
               <p className="text-[10px] text-gray-400 mt-0.5">LLM · connectors · server</p>
             </div>
             <div className="flex items-center gap-2">
-              {/* Hide / Show keys toggle */}
               <button
                 onClick={() => setHideKeys(v => !v)}
                 title={hideKeys ? "Show sensitive values" : "Hide sensitive values"}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
               >
                 {hideKeys ? (
-                  /* eye-off */
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                   </svg>
                 ) : (
-                  /* eye */
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -361,6 +536,30 @@ export default function ProjectDetailPage() {
         </aside>
 
       </div>
+
+      {/* ── Delete confirm dialog ─────────────────────────────────────────────── */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-80 p-6 flex flex-col gap-5">
+            <div>
+              <h2 className="text-base font-bold text-gray-900">Delete skill?</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                <span className="font-semibold text-gray-700">"{confirmDelete.name}"</span> will be permanently removed. This cannot be undone.
+              </p>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setConfirmDelete(null)}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">
+                Cancel
+              </button>
+              <button onClick={confirmDeleteAgent}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
