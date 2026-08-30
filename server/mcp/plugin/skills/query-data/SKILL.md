@@ -1,5 +1,5 @@
 ---
-name: oe-mcp:query-data
+name: query-data
 description: Query enterprise data sources — databases, files, APIs, cloud storage — using OE MCP connectors. Use when the user asks to search, retrieve, analyse, or report on data from a connected source.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: oe-mcp:run-agent
+name: run-agent
 description: Run an OE Runtime SKILL.md agent or YAML agent directly from Claude Code via the run_agent tool. Use when the user wants to execute an automated workflow, schedule a task, or run a multi-step agent against their enterprise data.
 ---
 

@@ -5,6 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.9] — 2026-08-30
+
+### Changed
+- **Skills system** — replaced old chain-based `runAgentMcp` with `runSkillsMcp`; `run_agent` now returns `pending_skill_chain: { chain_id, skill_name }` for manual skills instead of `pending_chains` array.
+- **`list_pending_chains` → `list_pending_skills`** — tool renamed to match new skill-based flow.
+- **`approve_chain` updated** — supports `approved: true` (run), `approved: false` (skip and continue), `abort: true` (stop pipeline). Chain entry shape updated: `remainingSkills / lastOutput / agentFile / configFile / depth`.
+- **Skip LLM when no work** — `hasWork` check added; orchestrator agents with no instructions or steps skip the LLM call and enter the skill pipeline directly.
+- **Connector scoping** — skill-level `connectors:` field respected in `runSkillsMcp` (same `Array.isArray` fix as CLI).
+- **READMEs** — `README.md` and `npm/README.md` updated: `list_pending_chains` → `list_pending_skills`, `approve_chain` parameters table with `abort` field, Agent Skill Approval Flow section added.
+
+---
+
 ## [v1.8.8] — 2026-08-29
 
 ### Added

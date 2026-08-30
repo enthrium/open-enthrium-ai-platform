@@ -5,6 +5,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.8.9] — 2026-08-30
+
+### Changed
+
+#### OE Runtime (CLI + HTTP Server)
+- **Skill pipeline approval flow** — `trigger_type: manual` skills in HTTP server mode now use `pending_skill_chain` (singular object) instead of the old `pending_chains` array. Response field renamed: `skill_id` → `chain_id`, `output_preview` removed.
+- **`/approve-chain` supports approve / skip / abort** — `approved: true` runs the skill; `approved: false` skips it and continues to the next; `abort: true` kills the entire pipeline immediately. Telegram/Slack: `YES` = approve, `NO` = skip, `ABORT`/`STOP` = abort.
+- **Skip output is `null`** — when a skill is skipped, `output` in the response is `null` (not the previous skill's repeated text) unless an auto-skill ran in between.
+- **Connector scoping fix** — `connectors: []` on a skill now correctly scopes to zero connectors; was previously falling back to all connectors due to falsy check on empty array (`?.length`).
+- **Skip LLM when no work** — orchestrator agents with no `instructions:` or `steps:` no longer make a blank LLM call before running the skill pipeline.
+- **Orchestrator `agent.yaml`** — removed `path: ./` self-reference that was poisoning downstream skill context. All 23 skills now have explicit `connectors:` scoping.
+- **Removed chain code** — `chains:` field in `agent.yaml` is no longer supported in CLI or HTTP server. All pipelines use `skills:`.
+- **Postman collection** — merged three approval requests (Approve / Skip / Abort) into a single "Approve Chain" request. Removed all example responses for a cleaner collection.
+- **READMEs** — rewritten with skill pipeline docs, approval flow curl examples, encoding fixes; `agent.yaml` description updated to remove chain references.
+
+#### OE MCP Server
+- **Skills system** — replaced old chain-based `runAgentMcp` with new skill-pipeline system matching the CLI (`runSkillsMcp`). `run_agent` now returns `pending_skill_chain` for manual skills.
+- **`list_pending_chains` → `list_pending_skills`** — tool renamed.
+- **`approve_chain` updated** — now handles `approved: true/false` and `abort: true` for skill-based pipelines. Same approve / skip / abort semantics as HTTP server.
+- **Skip LLM when no work** — same `hasWork` check as CLI; orchestrator agents skip the LLM call when no instructions or steps defined.
+- **READMEs** — updated with new tool names, `approve_chain` parameters table, and agent skill approval flow explanation.
+
+---
+
 ## [v1.8.8] — 2026-08-29
 
 ### Added

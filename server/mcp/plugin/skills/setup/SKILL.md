@@ -1,5 +1,5 @@
 ---
-name: oe-mcp:setup
+name: setup
 description: Set up OE MCP Server — create oe-mcp.json, configure connectors, and verify the connection. Use when the user wants to connect Claude Code to a database, file system, API, or other enterprise data source.
 ---
 

@@ -26,7 +26,7 @@ A standalone binary that implements the [Model Context Protocol (MCP)](https://m
 - **Two transport modes** — `--stdio` for Claude Code / Cursor / Windsurf; `--serve` for cloud or team deployments
 - **Persistent memory** — `memory_set / memory_get / memory_list / memory_delete` survive across sessions
 - **Action log** — every connector call logged automatically with timestamp, tool, input, and result
-- **Run AI agents** — `run_agent` executes any OE Runtime SKILL.md agent or YAML agent directly from Claude Code, Cursor, or any MCP client
+- **Run AI agents** — `run_agent` executes any OE Runtime SKILL.md agent directly from Claude Code, Cursor, or any MCP client. Manual skills pause for approval via `approve_chain`.
 - **Self-hosted** — runs on your own machine, no cloud dependency, no call-home
 
 ---
@@ -136,9 +136,9 @@ Execute OE Runtime SKILL.md agents or YAML agents directly from Claude Code, Cur
 
 | Tool | Description |
 |---|---|
-| `run_agent` | Run an agent by file path. Returns output + any pending chains. |
-| `list_pending_chains` | List manual chains waiting for approval |
-| `approve_chain` | Approve or reject a pending manual chain by `chain_id` |
+| `run_agent` | Run an agent by file path. Auto skills execute immediately; manual skills pause and return `pending_skill_chain`. |
+| `list_pending_skills` | List all manual skills currently paused and waiting for approval |
+| `approve_chain` | Approve, skip, or abort a paused manual skill by `chain_id` |
 
 **`run_agent` parameters:**
 
@@ -148,7 +148,26 @@ Execute OE Runtime SKILL.md agents or YAML agents directly from Claude Code, Cur
 | `params` | ❌ | Key-value pairs substituted via `{{key}}` in the agent |
 | `input` | ❌ | Optional initial message passed to the agent |
 
+**`approve_chain` parameters:**
+
+| Parameter | Required | Description |
+|---|---|---|
+| `chain_id` | ✅ | From `pending_skill_chain.chain_id` in a `run_agent` response |
+| `approved` | ❌ | `true` to run the skill (default), `false` to skip it and continue |
+| `abort` | ❌ | `true` to stop the entire pipeline immediately |
+
 OE MCP looks for `oe-config.json` in the agent's directory first, then falls back to `oe-mcp.json`.
+
+### Agent Skill Approval Flow
+
+When an agent's skill pipeline includes manual skills, Claude handles the approval loop automatically:
+
+1. Claude calls `run_agent` → response shows `⏸ Skill awaiting approval` with `chain_id` and `skill_name`
+2. Claude decides — based on your instructions — whether to approve, skip, or abort
+3. Claude calls `approve_chain` → next skill runs or the next manual skill pauses again
+4. Repeat until `Pipeline complete` or Claude aborts
+
+Example instruction to Claude Code: _"Run the OE Skills orchestrator and send a Slack message — skip anything you can't do, abort if it asks for credentials."_
 
 ---
 

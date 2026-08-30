@@ -88,9 +88,19 @@ Execute OE Runtime SKILL.md agents or YAML agents directly from Claude Code, Cur
 
 | Tool | Description |
 |---|---|
-| `run_agent` | Run an agent by file path — returns output + pending chains |
-| `list_pending_chains` | List manual chains waiting for approval |
-| `approve_chain` | Approve or reject a pending chain by `chain_id` |
+| `run_agent` | Run an agent by file path — auto skills execute immediately; manual skills pause with `pending_skill_chain` |
+| `list_pending_skills` | List all manual skills currently paused and waiting for approval |
+| `approve_chain` | Approve, skip, or abort a paused manual skill by `chain_id` |
+
+**`approve_chain` parameters:**
+
+| Parameter | Description |
+|---|---|
+| `chain_id` | From `pending_skill_chain.chain_id` in a `run_agent` response |
+| `approved` | `true` to run the skill (default), `false` to skip and continue |
+| `abort` | `true` to stop the entire pipeline immediately |
+
+**Example:** Tell Claude Code — _"Run the OE Skills orchestrator. Approve the hello-world skill, skip email, abort if anything asks for credentials."_ Claude handles the full approval loop using `run_agent` and `approve_chain`.
 
 ---
 
