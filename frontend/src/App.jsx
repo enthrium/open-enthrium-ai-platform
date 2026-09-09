@@ -59,9 +59,32 @@ import DashboardPage  from "./pages/Dashboard/DashboardPage";
 import WorkspacesPage from "./pages/Workspaces/WorkspacesPage";
 import SettingsPage   from "./pages/Settings/SettingsPage";
 import MaintenancePage from "./pages/Settings/MaintenancePage";
+import UsersPage       from "./pages/Settings/UsersPage";
+import McpServersPage  from "./pages/Settings/McpServersPage";
 import commercialRoutes from "@commercial/routes";
 
+// Fetch licenseType from the server once; returns null while loading
+function useIsEnterprise() {
+  const [isEnterprise, setIsEnterprise] = useState(null);
+  useEffect(() => {
+    fetch("/api/instance")
+      .then(r => r.json())
+      .then(d => setIsEnterprise(d.licenseType === "enterprise"))
+      .catch(() => setIsEnterprise(false));
+  }, []);
+  return isEnterprise;
+}
+
 function AppRoutes() {
+  const isEnterprise = useIsEnterprise();
+
+  // Hold rendering until we know the license type (avoids flash of enterprise routes)
+  if (isEnterprise === null) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
   return (
     <Routes>
       {/* Public routes */}
@@ -84,7 +107,10 @@ function AppRoutes() {
         <Route path="/workspaces"          element={<WorkspacesPage />} />
         <Route path="/settings"            element={<SettingsPage />} />
         <Route path="/settings/maintenance" element={<MaintenancePage />} />
-        {commercialRoutes.map(r => <Route key={r.path} path={r.path} element={r.element} />)}
+        <Route path="/users"               element={<UsersPage />} />
+        <Route path="/settings/mcp-servers" element={<McpServersPage />} />
+        {/* Commercial routes: only registered when server confirms enterprise license */}
+        {isEnterprise && commercialRoutes.map(r => <Route key={r.path} path={r.path} element={r.element} />)}
         <Route path="*"                    element={<HomeRedirect />} />
       </Route>
     </Routes>

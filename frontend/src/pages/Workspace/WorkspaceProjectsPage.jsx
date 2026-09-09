@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../utils/api";
 import { load as yamlLoad } from "js-yaml";
@@ -341,6 +341,15 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
   const [approval,     setApproval]     = useState(null); // {stepIndex, skillName} | null
   const [approvalText, setApprovalText] = useState("");
 
+  // ── follow-up / preferences (auto-saved per project) ─────────────────────────
+  const [followUpInput, setFollowUpInput] = useState(() => {
+    try { return localStorage.getItem(`oe_prefs_${project.id}`) || ""; } catch { return ""; }
+  });
+  function handleFollowUpChange(val) {
+    setFollowUpInput(val);
+    try { localStorage.setItem(`oe_prefs_${project.id}`, val); } catch {}
+  }
+
   const abortRef           = useRef(null);
   const bottomRef          = useRef(null);
   const approvalResolveRef = useRef(null);
@@ -378,16 +387,19 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [steps, output, chainSteps, liveOutput]);
 
   // ── stream one skill, return final output ─────────────────────────────────────
-  async function streamSkill(agentId, skillInput, skillTriggerType = "manual") {
+  async function streamSkill(agentId, skillInput, skillTriggerType = "manual", skillIndex = undefined) {
     const token = localStorage.getItem("oe_token");
     const ctrl  = new AbortController();
     abortRef.current = ctrl;
     setLiveOutput("");
 
+    const body = { input: skillInput, triggerType: skillTriggerType };
+    if (typeof skillIndex === "number") body.skillIndex = skillIndex;
+
     const res = await fetch(
       `/api/workspaces/${slug}/projects/${project.id}/agents/${agentId}/run`,
       { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ input: skillInput, triggerType: skillTriggerType }), signal: ctrl.signal }
+        body: JSON.stringify(body), signal: ctrl.signal }
     );
 
     const reader  = res.body.getReader();
@@ -426,27 +438,49 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
 
   // ── run full chain ────────────────────────────────────────────────────────────
   async function runChain() {
-    const types  = allTriggerTypes(agents);
-    const initSteps = agents.map((a, i) => ({ agent: a, triggerType: types[i], status: "pending", output: "", toolCalls: [], duration: null }));
-    setChainMode(true); setChainRunning(true); setChainDone(false); setChainSteps(initSteps);
+    // Build steps list.
+    // If the root agent's YAML has a `skills:` pipeline, expand into virtual steps
+    // (one per sub-skill), each with its own skillIndex for the backend to resolve
+    // the correct SKILL.md.  Otherwise fall back to the agent list as-is.
+    let virtualSteps = [];
+    if (agents.length === 1) {
+      try {
+        const doc = yamlLoad(agents[0].yamlContent) || {};
+        if (Array.isArray(doc.skills) && doc.skills.length > 0) {
+          virtualSteps = doc.skills.map((s, i) => ({
+            agent:       agents[0],
+            skillIndex:  i,
+            name:        s.path?.split("/").pop() || `Step ${i + 1}`,
+            triggerType: (s.trigger_type || s.triggerType || "manual").toLowerCase(),
+            status:      "pending", output: "", toolCalls: [], duration: null,
+          }));
+        }
+      } catch {}
+    }
+    if (!virtualSteps.length) {
+      const types = allTriggerTypes(agents);
+      virtualSteps = agents.map((a, i) => ({ agent: a, skillIndex: undefined, name: a.name, triggerType: types[i], status: "pending", output: "", toolCalls: [], duration: null }));
+    }
+
+    setChainMode(true); setChainRunning(true); setChainDone(false); setChainSteps(virtualSteps);
     onRunStart(project.id);
 
     let currentInput = input.trim() || "Run";
 
-    for (let i = 0; i < initSteps.length; i++) {
+    for (let i = 0; i < virtualSteps.length; i++) {
       currentStepRef.current = i;
-      const step = initSteps[i];
+      const step = virtualSteps[i];
 
       // Manual: pause for human review (skip first step — needs no prior output to review)
       if (step.triggerType === "manual" && i > 0) {
         setChainSteps(s => s.map((st, idx) => idx === i ? { ...st, status: "awaiting" } : st));
-        currentInput = await waitForApproval(step.agent.name, currentInput);
+        currentInput = await waitForApproval(step.name, currentInput);
       }
 
       setChainSteps(s => s.map((st, idx) => idx === i ? { ...st, status: "running" } : st));
       const t0 = Date.now();
       try {
-        const out      = await streamSkill(step.agent.id, currentInput, step.triggerType);
+        const out      = await streamSkill(step.agent.id, currentInput, step.triggerType, step.skillIndex);
         const duration = ((Date.now() - t0) / 1000).toFixed(1) + "s";
         setChainSteps(s => s.map((st, idx) => idx === i ? { ...st, status: "done", output: out, duration } : st));
         currentInput = out;
@@ -462,17 +496,18 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
   }
 
   // ── single skill run (existing) ───────────────────────────────────────────────
-  async function startRun() {
+  async function startRun(inputOverride) {
     if (!selectedId || running) return;
     setRunning(true); setSteps([]); setOutput(""); setRunId(null); setFinished(false);
     onRunStart(project.id);
     const token = localStorage.getItem("oe_token");
     const ctrl  = new AbortController(); abortRef.current = ctrl;
+    const runInput = (typeof inputOverride === "string") ? inputOverride : (input.trim() || "Run");
     try {
       const res = await fetch(
         `/api/workspaces/${slug}/projects/${project.id}/agents/${selectedId}/run`,
         { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ input: input.trim() || "Run", triggerType }), signal: ctrl.signal }
+          body: JSON.stringify({ input: runInput, triggerType }), signal: ctrl.signal }
       );
       const reader = res.body.getReader(); const decoder = new TextDecoder(); let buf = "";
       while (true) {
@@ -500,7 +535,13 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
     if (runId) api.post(`/workspaces/${slug}/projects/${project.id}/runs/${runId}/cancel`).catch(()=>{});
   }
 
-  const isMulti   = agents.length > 1;
+  // A single-agent project whose YAML has a skills: pipeline is a chain too
+  const isChain = (() => {
+    if (agents.length !== 1) return false;
+    try { const doc = yamlLoad(agents[0]?.yamlContent) || {}; return Array.isArray(doc.skills) && doc.skills.length > 1; }
+    catch { return false; }
+  })();
+  const isMulti   = agents.length > 1 || isChain;
   const toolSteps = steps.filter(s => s.type === "tool");
   const hasError  = steps.some(s => s.type === "error");
   const errorMsg  = steps.find(s => s.type === "error")?.text;
@@ -556,6 +597,28 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
               <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                 No skills in this project. Open it to add one.
               </p>
+            ) : isChain ? (
+              /* Single-agent chain: show skill pills from the skills: array */
+              (() => {
+                let skillPills = [];
+                try {
+                  const doc = yamlLoad(agents[0]?.yamlContent) || {};
+                  skillPills = (doc.skills || []).map((s, i) => ({
+                    name: s.path?.split("/").pop() || `Step ${i+1}`,
+                    triggerType: (s.trigger_type || s.triggerType || "manual").toLowerCase(),
+                  }));
+                } catch {}
+                return (
+                  <div className="flex flex-wrap gap-1 items-center">
+                    {skillPills.map((sk, i) => (
+                      <React.Fragment key={i}>
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${sk.triggerType==="auto"?"bg-emerald-100 text-emerald-700":"bg-amber-100 text-amber-700"}`}>{sk.name}</span>
+                        {i < skillPills.length-1 && <span className="text-gray-300 text-xs">→</span>}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                );
+              })()
             ) : isMulti ? (
               <>
                 <div>
@@ -592,8 +655,17 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
               </div>
             )}
 
-            {/* Input — only for single skill manual or single-skill run in multi */}
-            {!isMulti && (triggerType === "auto" ? (
+            {/* Input — for chain agents show it (first skill is manual), for single skill show conditionally */}
+            {isChain ? (
+              <div>
+                <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Input <span className="normal-case font-normal text-gray-400">(optional)</span>
+                </label>
+                <textarea value={input} onChange={e => setInput(e.target.value)} disabled={running} rows={2}
+                  placeholder="What should the chain do?"
+                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-200 resize-none disabled:opacity-50 placeholder-gray-300" />
+              </div>
+            ) : !isMulti && (triggerType === "auto" ? (
               <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-emerald-50 border border-emerald-100">
                 <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -629,11 +701,13 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
                       Run Chain
                     </button>
                   )}
-                  <button onClick={startRun} disabled={!selectedId || loadingAgents || agents.length === 0}
-                    className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors disabled:opacity-40 shadow-sm shadow-emerald-200">
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                    {triggerType === "auto" ? "Run Auto" : "Run Skill"}
-                  </button>
+                  {!isChain && (
+                    <button onClick={startRun} disabled={!selectedId || loadingAgents || agents.length === 0}
+                      className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors disabled:opacity-40 shadow-sm shadow-emerald-200">
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                      {triggerType === "auto" ? "Run Auto" : "Run Skill"}
+                    </button>
+                  )}
                 </>
               )}
             </div>
@@ -646,12 +720,12 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
             {/* Chain steps list */}
             <div className="shrink-0 px-5 py-4 border-b border-gray-100 space-y-2">
               {chainSteps.map((st, i) => (
-                <div key={st.agent.id} className="flex items-center gap-3">
+                <div key={i} className="flex items-center gap-3">
                   <StepIcon status={st.status} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className={`text-sm font-semibold truncate ${st.status==="running"?"text-emerald-700":st.status==="error"?"text-red-600":st.status==="awaiting"?"text-amber-600":"text-gray-700"}`}>
-                        {st.agent.name}
+                        {st.name}
                       </span>
                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase ${st.triggerType==="auto"?"bg-emerald-100 text-emerald-600":"bg-amber-100 text-amber-600"}`}>
                         {st.triggerType}
@@ -700,7 +774,7 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
               {liveOutput && (
                 <>
                   <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-                    {chainSteps[currentStepRef.current]?.agent?.name} — Output
+                    {chainSteps[currentStepRef.current]?.name} — Output
                   </p>
                   <pre className="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed font-sans bg-gray-50 border border-gray-100 rounded-xl px-4 py-3">
                     {liveOutput}
@@ -764,6 +838,39 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
                 <pre className="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed font-sans bg-gray-50 border border-gray-100 rounded-xl px-4 py-3">{output}</pre>
               </div>
             )}
+            {/* ── Follow-up / preferences input shown after any finished run ── */}
+            {finished && (
+              <div className="border-t border-gray-100 pt-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+                    Your Input
+                  </p>
+                  {followUpInput && (
+                    <span className="text-[9px] text-emerald-500 font-medium flex items-center gap-1">
+                      <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      Auto-saved
+                    </span>
+                  )}
+                </div>
+                <textarea
+                  value={followUpInput}
+                  onChange={e => handleFollowUpChange(e.target.value)}
+                  rows={5}
+                  placeholder="Type your details or preferences here, then click Run Again…"
+                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-200 resize-y font-sans placeholder-gray-300"
+                />
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => startRun(followUpInput)}
+                    disabled={!followUpInput.trim() || running}
+                    className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors disabled:opacity-40 shadow-sm shadow-emerald-200"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                    Run Again
+                  </button>
+                </div>
+              </div>
+            )}
             <div ref={bottomRef} />
           </div>
         )}
@@ -774,8 +881,9 @@ function RunModal({ project, slug, onClose, onRunStart, onRunEnd }) {
 
 // ─── Main page ─────────────────────────────────────────────────────────────────
 export default function WorkspaceProjectsPage() {
-  const { slug }   = useParams();
-  const navigate   = useNavigate();
+  const { slug }        = useParams();
+  const navigate        = useNavigate();
+  const { pathname }    = useLocation();
   const { user }   = useAuth();
   const canManage  = user?.role === "admin" || user?.role === "manager";
 
@@ -815,6 +923,13 @@ export default function WorkspaceProjectsPage() {
 
   const fileInputRef = useRef(); // multi-file
   const zipInputRef  = useRef(); // zip
+
+  // GitHub URL import dialog
+  const [showGithubImport, setShowGithubImport] = useState(false);
+  const [githubUrl,        setGithubUrl]        = useState("");
+  const [githubLoading,    setGithubLoading]    = useState(false);
+  const [githubError,      setGithubError]      = useState("");
+  const [githubStatus,     setGithubStatus]     = useState("");
 
   // close import menu on outside click
   const importMenuRef = useRef();
@@ -856,6 +971,15 @@ export default function WorkspaceProjectsPage() {
   }
 
   async function processImport(fileMap) {
+    // ── All imports go through import-skill → written to app/agents/ on disk ──
+    const { data } = await api.post(`/admin/workspaces/${workspace.id}/projects/import-skill`, {
+      source: "files",
+      files: fileMap,
+    });
+    setProjects(ps => [data.project, ...ps]);
+    return;
+
+    // eslint-disable-next-line no-unreachable
     // Parse oe-config.json (optional)
     let oeConfig = null;
     if (fileMap["oe-config.json"]) {
@@ -902,6 +1026,22 @@ export default function WorkspaceProjectsPage() {
       return fileMap[key] || fileMap[key.toLowerCase()] || "";
     }
 
+    // Helper: collect scripts/references/assets files for a given skill path → JSON string
+    function findSkillFiles(skillPath) {
+      const norm   = (skillPath || "./").replace(/^\.\//, "").replace(/\/$/, "");
+      const prefix = norm === "" ? "" : `${norm}/`;
+      const SKIP   = new Set(["skill.md", "agent.yaml", "agent.yml", "oe-config.json", "oe-project.json"]);
+      const result = {};
+      for (const [key, content] of Object.entries(fileMap)) {
+        if (!key.startsWith(prefix)) continue;
+        const rel = key.slice(prefix.length);
+        if (SKIP.has(rel.toLowerCase())) continue;
+        if (!rel.includes("/")) continue; // only files inside subdirectories (scripts/, references/, assets/, …)
+        result[rel] = content;
+      }
+      return Object.keys(result).length > 0 ? JSON.stringify(result) : "{}";
+    }
+
     // ── explicit oe-project.json manifest ───────────────────────────────────────
     if (fileMap["oe-project.json"]) {
       let manifest = {};
@@ -912,7 +1052,7 @@ export default function WorkspaceProjectsPage() {
         const content  = fileMap[baseName] || "";
         let agentName  = entry.name || baseName.replace(/\.ya?ml$/, "");
         try { const d = yamlLoad(content); if (d?.name) agentName = d.name; } catch {}
-        agents.push({ name: agentName, description: entry.description || null, fileName: baseName, yamlContent: content, skillContent: findSkillMd(baseName), isDefault: entry.default || idx === 0 });
+        agents.push({ name: agentName, description: entry.description || null, fileName: baseName, yamlContent: content, filesJson: findSkillFiles(baseName.replace(/\/agent\.ya?ml$/, "") || "./"), isDefault: entry.default || idx === 0 });
       }
       const projectName = manifest.name || agents[0]?.name || `Project ${projects.length + 1}`;
       const { data } = await api.post(`/admin/workspaces/${workspace.id}/projects`, { name: projectName, description: manifest.description || null, manifest, oeConfig, agents });
@@ -936,16 +1076,16 @@ export default function WorkspaceProjectsPage() {
 
       if (skillPaths.length === 0 || (skillPaths.length === 1 && (skillPaths[0] === "./" || skillPaths[0] === "."))) {
         // ── Single-agent: skill lives alongside agent.yaml ───────────────────
-        const skillContent = findSkillMd("./");
-        const name = parseSkillMdName(skillContent, rootDoc.name || rootFname.replace(/\.ya?ml$/, ""));
-        agents.push({ name, description: rootDoc.description || null, fileName: rootFname, yamlContent: rootYamlContent, skillContent, isDefault: true });
+        const skillMd = findSkillMd("./");
+        const name = parseSkillMdName(skillMd, rootDoc.name || rootFname.replace(/\.ya?ml$/, ""));
+        agents.push({ name, description: rootDoc.description || null, fileName: rootFname, yamlContent: rootYamlContent, filesJson: findSkillFiles("./"), isDefault: true });
       } else {
         // ── Multi-agent: one agent per skills[].path ─────────────────────────
         for (const [idx, sp] of skillPaths.entries()) {
-          const norm         = sp.replace(/^\.\//, "").replace(/\/$/, "");
-          const skillContent = findSkillMd(sp);
-          const name         = parseSkillMdName(skillContent, norm || `Agent ${idx + 1}`);
-          agents.push({ name, description: null, fileName: rootFname, yamlContent: rootYamlContent, skillContent, isDefault: idx === 0 });
+          const norm   = sp.replace(/^\.\//, "").replace(/\/$/, "");
+          const skillMd = findSkillMd(sp);
+          const name   = parseSkillMdName(skillMd, norm || `Agent ${idx + 1}`);
+          agents.push({ name, description: null, fileName: rootFname, yamlContent: rootYamlContent, filesJson: findSkillFiles(sp), isDefault: idx === 0 });
         }
       }
 
@@ -961,12 +1101,107 @@ export default function WorkspaceProjectsPage() {
     if (mdFiles.length > 0) {
       const agents = mdFiles.map(([fname, content], idx) => ({
         name: parseSkillMdName(content, fname.replace(/\.md$/i, "")),
-        description: null, fileName: fname, yamlContent: "", skillContent: content, isDefault: idx === 0,
+        description: null, fileName: fname, yamlContent: "",
+        filesJson: findSkillFiles(fname.includes("/") ? fname.replace(/\/[^/]+$/, "") : "./"),
+        isDefault: idx === 0,
       }));
       const projectName = agents[0]?.name || `Project ${projects.length + 1}`;
       const manifest    = { version: "1.0.0", description: "", author: "", tags: [], agents: agents.map((a, i) => ({ name: a.name, file: `./${a.fileName}`, default: i === 0 })) };
       const { data } = await api.post(`/admin/workspaces/${workspace.id}/projects`, { name: projectName, description: null, manifest, oeConfig, agents });
       setProjects(ps => [data.project, ...ps]);
+    }
+  }
+
+  // ── Import: GitHub URL ────────────────────────────────────────────────────────
+  // Text extensions worth downloading
+  const GH_TEXT_EXTS = new Set([".md",".txt",".yaml",".yml",".json",".py",".js",".ts",".sh",".html",".css",".xml",".csv",".toml",".ini",".env",".rb",".go",".rs"]);
+  function ghIsText(name) { const d = name.lastIndexOf("."); return d >= 0 && GH_TEXT_EXTS.has(name.slice(d).toLowerCase()); }
+  // Only recurse into these asset subdirs
+  const GH_ASSET_DIRS = new Set(["scripts","references","assets"]);
+
+  async function fetchGithubFileMap(url, onStatus) {
+    // https://github.com/owner/repo/tree/branch/path/to/skill
+    const m = url.trim().match(/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.*)/);
+    if (!m) throw new Error(
+      "Paste a GitHub folder URL — e.g. https://github.com/anthropics/skills/tree/main/skills/docx"
+    );
+    const [, owner, repo, branch, basePath] = m;
+    const fileMap = {};
+
+    // Sequential (not parallel) to stay under GitHub's unauthenticated rate limit.
+    // relDir = path inside the skill folder, e.g. "" for root, "scripts" for scripts/
+    async function fetchDir(apiUrl, relDir) {
+      onStatus?.(`Fetching ${relDir || "root"}…`);
+      const res = await fetch(apiUrl, {
+        headers: { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
+      });
+      if (!res.ok) {
+        if (res.status === 403) throw new Error("GitHub API rate limit — wait a minute and try again.");
+        if (res.status === 404) throw new Error("Repo or path not found. Is the URL pointing to a public folder?");
+        throw new Error(`GitHub API returned ${res.status}`);
+      }
+      const items = await res.json();
+      if (!Array.isArray(items)) throw new Error("Expected a folder URL — try pointing to a directory that contains SKILL.md.");
+
+      for (const item of items) {
+        const rel = relDir ? `${relDir}/${item.name}` : item.name;
+        if (item.type === "file") {
+          // Root level: collect all text files; asset subdirs: collect text files inside them
+          const isRoot   = !relDir;
+          const topDir   = relDir.split("/")[0];
+          const inAssets = !!relDir && GH_ASSET_DIRS.has(topDir.toLowerCase());
+          if ((isRoot || inAssets) && ghIsText(item.name)) {
+            onStatus?.(`Downloading ${rel}…`);
+            try {
+              const r = await fetch(item.download_url);
+              if (r.ok) fileMap[rel] = await r.text();
+            } catch { /* skip undownloadable file */ }
+          }
+        } else if (item.type === "dir") {
+          // At root: recurse only into known asset dirs; inside asset dirs: recurse freely
+          const topDir   = relDir ? relDir.split("/")[0] : item.name;
+          const inAssets = !!relDir && GH_ASSET_DIRS.has(topDir.toLowerCase());
+          const isAsset  = !relDir && GH_ASSET_DIRS.has(item.name.toLowerCase());
+          if (isAsset || inAssets) {
+            await fetchDir(item.url, rel);
+          }
+        }
+      }
+    }
+
+    await fetchDir(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${basePath}?ref=${branch}`,
+      ""
+    );
+    if (Object.keys(fileMap).length === 0) throw new Error("No importable files found at that URL.");
+    return fileMap;
+  }
+
+  async function handleImportGithub() {
+    const url = githubUrl.trim();
+    if (!url) return;
+    setGithubLoading(true);
+    setGithubError("");
+    setGithubStatus("Fetching from GitHub…");
+    setImporting(true);
+    try {
+      // Backend handles the GitHub fetch + writes files to cli/skills/ + creates DB entry
+      setGithubStatus("Downloading files & registering skill…");
+      const { data } = await api.post(`/admin/workspaces/${workspace.id}/projects/import-skill`, {
+        source: "github",
+        url,
+      });
+      setProjects(ps => [data.project, ...ps]);
+      setShowGithubImport(false);
+      setGithubUrl("");
+    } catch (err) {
+      setGithubError(
+        err.response?.data?.error || err.message || "GitHub import failed"
+      );
+    } finally {
+      setGithubLoading(false);
+      setGithubStatus("");
+      setImporting(false);
     }
   }
 
@@ -994,14 +1229,20 @@ export default function WorkspaceProjectsPage() {
     try {
       const dirHandle = await window.showDirectoryPicker({ mode: "read" });
       const fileMap = {};
-      // Recursively collect files: root level = all; subdirs = SKILL.md only
+      const ASSET_DIRS = new Set(["scripts", "references", "assets"]);
+      // Recursively collect files: root level = all; subdirs = SKILL.md + scripts/references/assets/**
       async function collectDir(handle, base) {
         try {
           for await (const [name, h] of handle.entries()) {
             if (name.startsWith(".")) continue;
             const key = base ? `${base}/${name}` : name;
             if (h.kind === "file") {
-              if (!base || name.toLowerCase() === "skill.md") {
+              const parts    = key.split("/");
+              const isRoot   = parts.length === 1;
+              const isSkillMd= name.toLowerCase() === "skill.md";
+              // Check if any ancestor directory is a known asset dir (scripts/references/assets)
+              const inAssets = parts.slice(0, -1).some(p => ASSET_DIRS.has(p.toLowerCase()));
+              if (isRoot || isSkillMd || inAssets) {
                 fileMap[key] = await (await h.getFile()).text();
               }
             } else if (h.kind === "directory") {
@@ -1081,7 +1322,7 @@ Provide a clear, accurate, and helpful response.
 `;
 
       const oeConfig = { llm: llmCfg, connectors: [] };
-      const agents   = [{ name: projectName, description: null, fileName: "agent.yaml", yamlContent: defaultYaml, skillContent: defaultSkill, isDefault: true }];
+      const agents   = [{ name: projectName, description: null, fileName: "agent.yaml", yamlContent: defaultYaml, isDefault: true }];
       const manifest = { version: "1.0.0", description: "Describe what this project does", author: "", tags: [], agents: [{ name: projectName, file: "./agent.yaml", default: true }] };
 
       const { data } = await api.post(`/admin/workspaces/${workspace.id}/projects`, {
@@ -1105,7 +1346,7 @@ Provide a clear, accurate, and helpful response.
       const agents = (src.agents || []).map(a => ({
         name: a.name, description: a.description || null,
         fileName: a.fileName, yamlContent: a.yamlContent || "",
-        skillContent: a.skillContent || "", isDefault: a.isDefault,
+        isDefault: a.isDefault,
       }));
       let manifest = null;
       try { manifest = JSON.parse(src.manifest || "null"); } catch {}
@@ -1167,10 +1408,16 @@ Provide a clear, accurate, and helpful response.
       const skills = proj.agents || [];
       const files  = [];
 
-      // ── oe-config.json — mask sensitive keys before export ────────────────────
+      // ── oe-config.json — mask sensitive keys, provider-specific apiKey placeholder ──
       if (proj.oeConfig) {
         try {
-          const masked = maskForExport(JSON.parse(proj.oeConfig));
+          const cfg    = JSON.parse(proj.oeConfig);
+          const masked = maskForExport(cfg);
+          // Always use a provider-specific placeholder so the template is self-documenting
+          if (masked.llm) {
+            const provider = (masked.llm.provider || "openai").toUpperCase();
+            masked.llm.apiKey = `YOUR_${provider}_API_KEY`;
+          }
           files.push({ name: "oe-config.json", content: JSON.stringify(masked, null, 2) });
         } catch {}
       }
@@ -1178,10 +1425,15 @@ Provide a clear, accurate, and helpful response.
       const isSingle = skills.length <= 1;
 
       if (isSingle) {
-        // Single-skill: agent.yaml + SKILL.md at root
+        // Single-skill: agent.yaml + SKILL.md at root + any filesJson assets
         const skill = skills[0];
-        if (skill?.yamlContent) files.push({ name: "agent.yaml", content: skill.yamlContent });
-        if (skill?.skillContent) files.push({ name: "SKILL.md",  content: skill.skillContent });
+        if (skill?.yamlContent)  files.push({ name: "agent.yaml", content: skill.yamlContent });
+        if (skill?.skillContent) files.push({ name: "SKILL.md",   content: skill.skillContent });
+        // Include scripts/references/assets files
+        const extraRoot = (() => { try { return JSON.parse(skill?.filesJson || "{}"); } catch { return {}; } })();
+        for (const [rel, content] of Object.entries(extraRoot)) {
+          files.push({ name: rel, content });
+        }
       } else {
         // Multi-skill: shared agent.yaml at root, each skill in its own subfolder
         // All skills share the same agent.yaml — write it once from the first skill
@@ -1200,6 +1452,11 @@ Provide a clear, accurate, and helpful response.
           const folder = yamlPaths[idx]
             || skill.name.toLowerCase().replace(/[^a-z0-9/]+/g, "-").replace(/^-|-$/g, "");
           files.push({ name: `${folder}/SKILL.md`, content: skill.skillContent });
+          // Include scripts/references/assets files under the skill folder
+          const extra = (() => { try { return JSON.parse(skill?.filesJson || "{}"); } catch { return {}; } })();
+          for (const [rel, content] of Object.entries(extra)) {
+            files.push({ name: `${folder}/${rel}`, content });
+          }
         }
       }
 
@@ -1252,7 +1509,7 @@ Provide a clear, accurate, and helpful response.
               <input
                 autoFocus
                 className="px-3 py-1.5 text-sm rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 outline-none focus:border-white/50 w-48"
-                placeholder="Project name…"
+                placeholder="Agent name…"
                 value={newName}
                 onChange={e => setNewName(e.target.value)}
               />
@@ -1269,7 +1526,7 @@ Provide a clear, accurate, and helpful response.
             <>
               {/* Logs button — visible to all users */}
               <button
-                onClick={() => navigate(`/workspace/${slug}/run-logs`)}
+                onClick={() => navigate(`/workspace/${slug}/run-logs`, { state: { from: pathname } })}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 text-white hover:bg-white/20 transition-colors"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1339,6 +1596,20 @@ Provide a clear, accurate, and helpful response.
 
                         <div className="my-1 border-t border-gray-100" />
 
+                        {/* Import from GitHub URL */}
+                        <button
+                          onClick={() => { setShowImportMenu(false); setGithubError(""); setShowGithubImport(true); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                          <div className="text-left">
+                            <div>Import from GitHub</div>
+                            <div className="text-[10px] text-gray-400">agentskills.io · any public repo</div>
+                          </div>
+                        </button>
+
                         {/* Import Templates */}
                         <button
                           onClick={() => { setShowImportMenu(false); setShowTemplates(true); }}
@@ -1349,6 +1620,7 @@ Provide a clear, accurate, and helpful response.
                           </svg>
                           <span className="text-indigo font-medium">Templates</span>
                         </button>
+
                       </div>
                     )}
                   </div>
@@ -1364,7 +1636,7 @@ Provide a clear, accurate, and helpful response.
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    New Project
+                    New Agent
                   </button>
                 </>
               )}
@@ -1388,11 +1660,13 @@ Provide a clear, accurate, and helpful response.
             {projects.map(project => (
               <div
                 key={project.id}
-                onClick={() => editingId !== project.id && navigate(`/workspace/${slug}/projects/${project.id}`)}
-                className={`group bg-white border rounded-xl p-5 cursor-pointer transition-all flex flex-col ${
+                onClick={() => canManage && editingId !== project.id && navigate(`/workspace/${slug}/projects/${project.id}`)}
+                className={`group bg-white border rounded-xl p-5 transition-all flex flex-col ${
+                  canManage ? "cursor-pointer" : "cursor-default"
+                } ${
                   runningProjectIds.has(project.id)
                     ? "border-emerald-400 shadow-lg shadow-emerald-100 ring-2 ring-emerald-300 ring-offset-1"
-                    : "border-gray-200 hover:border-indigo/40 hover:shadow-md"
+                    : canManage ? "border-gray-200 hover:border-indigo/40 hover:shadow-md" : "border-gray-200"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2 flex-1">
@@ -1416,10 +1690,7 @@ Provide a clear, accurate, and helpful response.
                           {project.name}
                         </h3>
                         {(() => {
-                          try {
-                            const v = JSON.parse(project.manifest || "{}").version;
-                            return v ? <span className="text-[10px] text-gray-400">v{v}</span> : null;
-                          } catch { return null; }
+                          return null;
                         })()}
                       </>
                     )}
@@ -1544,6 +1815,80 @@ Provide a clear, accurate, and helpful response.
           }}
           onClose={() => setEditManifest(null)}
         />
+      )}
+
+      {/* GitHub URL import dialog */}
+      {showGithubImport && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.55)" }}>
+          <div className="bg-white rounded-2xl shadow-2xl flex flex-col w-full max-w-lg">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <div>
+                <h2 className="font-bold text-gray-900 text-sm">Import from GitHub</h2>
+                <p className="text-[10px] text-gray-400 mt-0.5">agentskills.io format · any public repository</p>
+              </div>
+              <button onClick={() => { setShowGithubImport(false); setGithubUrl(""); setGithubError(""); }}
+                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="px-5 py-4 flex flex-col gap-3">
+              <label className="text-[11px] font-medium text-gray-600">GitHub folder URL</label>
+              <input
+                autoFocus
+                value={githubUrl}
+                onChange={e => { setGithubUrl(e.target.value); setGithubError(""); }}
+                onKeyDown={e => { if (e.key === "Enter" && !githubLoading) handleImportGithub(); }}
+                placeholder="https://github.com/anthropics/skills/tree/main/skills/docx"
+                className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo/30 font-mono"
+              />
+              {githubError && (
+                <div className="text-[11px] text-red-600 bg-red-50 border border-red-100 rounded px-3 py-2">
+                  {githubError}
+                </div>
+              )}
+              {githubStatus && !githubError && (
+                <div className="text-[11px] text-indigo/80 bg-indigo/5 border border-indigo/10 rounded px-3 py-2 flex items-center gap-2">
+                  <div className="w-3 h-3 border-2 border-indigo/30 border-t-indigo rounded-full animate-spin shrink-0" />
+                  {githubStatus}
+                </div>
+              )}
+              <p className="text-[10px] text-gray-400 leading-relaxed">
+                Paste the URL of any public GitHub folder that contains a <code className="bg-gray-100 px-1 rounded">SKILL.md</code>.
+                Subfolders like <code className="bg-gray-100 px-1 rounded">scripts/</code>, <code className="bg-gray-100 px-1 rounded">references/</code>,
+                and <code className="bg-gray-100 px-1 rounded">assets/</code> are imported automatically.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-100">
+              <button onClick={() => { setShowGithubImport(false); setGithubUrl(""); setGithubError(""); }}
+                className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleImportGithub}
+                disabled={!githubUrl.trim() || githubLoading}
+                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-lg bg-indigo text-white hover:bg-indigo/90 disabled:opacity-50 transition-colors"
+              >
+                {githubLoading ? (
+                  <><div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Fetching…</>
+                ) : (
+                  <>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Import
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Templates dialog */}

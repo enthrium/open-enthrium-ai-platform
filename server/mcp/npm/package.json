@@ -1,44 +1,41 @@
 {
     "name": "@openenthrium/oe-mcp",
-    "version": "1.8.9",
-    "description":  "OE MCP Server - connect Claude Code, Cursor \u0026 Windsurf to enterprise data sources. One binary, one JSON config.",
-    "homepage":  "https://www.openenthrium.com/mcp.html",
-    "repository":  {
-                       "type":  "git",
-                       "url":  "git+https://github.com/enthrium/open-enthrium-ai-mcp-server.git"
-                   },
-    "license":  "Apache-2.0",
-    "mcpName":  "io.github.enthrium/oe-mcp",
-    "bin":  {
-                "oe-mcp":  "bin.js"
-            },
-    "scripts":  {
-                    "postinstall":  "node postinstall.js"
-                },
-    "files":  [
-                  "bin.js",
-                  "postinstall.js",
-                  "README.md"
-              ],
-    "engines":  {
-                    "node":  "\u003e=18"
-                },
-    "keywords":  [
-                     "mcp",
-                     "model-context-protocol",
-                     "claude",
-                     "cursor",
-                     "windsurf",
-                     "ai",
-                     "enterprise",
-                     "database",
-                     "postgresql",
-                     "mysql",
-                     "mongodb",
-                     "s3",
-                     "slack",
-                     "github",
-                     "ssh",
-                     "rest-api"
-                 ]
+    "version": "1.9.3",
+    "description": "OE MCP Server - connect Claude Code, Cursor & Windsurf to enterprise data sources. One JSON config.",
+    "homepage": "https://www.openenthrium.com/mcp.html",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/enthrium/open-enthrium-ai-mcp-server.git"
+    },
+    "license": "Apache-2.0",
+    "mcpName": "io.github.enthrium/oe-mcp",
+    "bin": {
+        "oe-mcp": "bin.js"
+    },
+    "files": [
+        "bin.js",
+        "bundle.js",
+        "README.md"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
+    "keywords": [
+        "mcp",
+        "model-context-protocol",
+        "claude",
+        "cursor",
+        "windsurf",
+        "ai",
+        "enterprise",
+        "database",
+        "postgresql",
+        "mysql",
+        "mongodb",
+        "s3",
+        "slack",
+        "github",
+        "ssh",
+        "rest-api"
+    ]
 }

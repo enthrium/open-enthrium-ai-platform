@@ -36,6 +36,7 @@ frontend/build/
 # ── Logs ──────────────────────────────────────────────────────────────────────
 *.log
 logs/
+server/oe-mcp-log.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

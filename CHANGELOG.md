@@ -5,6 +5,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.9.3] — 2026-09-03
+
+### Fixed
+- **OE MCP — `npx` now works** — `@openenthrium/oe-mcp` switched to ncc-bundled Node.js source; Claude Code MCP connection no longer times out on first use via `npx`
+
+---
+
+## [v1.9.2] — 2026-09-03
+
+### Fixed
+- **OE Runtime — `npx` now works** — npm package replaced binary-download-via-postinstall with a bundled Node.js source (ncc); `npx -y @openenthrium/oe-runtime` no longer requires postinstall to run or a cached binary
+
+---
+
+## [v1.9.1] — 2026-09-02
+
+### Fixed
+- **OE Runtime — skills-only agents via API server** — agents with only `skills:` (no `systemPrompt` or `steps`) now auto-trigger correctly; was returning confused LLM responses instead of executing SKILL.md steps
+- **OE Runtime — `input` field removed** — API endpoints, SDK, CLI, and all documentation no longer accept or reference an `input` field; agent.yaml is self-contained
+
+---
+
 ## [v1.9.0] — 2026-08-30
 
 ### Added

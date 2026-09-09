@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import api from "../../utils/api";
 import { Spinner } from "../../components/ui";
 import ConfirmDialog from "../../components/ConfirmDialog";
@@ -31,6 +31,9 @@ function statusBadge(status) {
 export default function WorkspaceRunLogsPage() {
   const { slug }   = useParams();
   const navigate   = useNavigate();
+  const location   = useLocation();
+  // Determine back destination: use router state if set, else fall back to browser history
+  const backPath   = location.state?.from || null;
   const [workspace, setWorkspace] = useState(null);
   const [runs, setRuns]           = useState([]);
   const [loading, setLoading]     = useState(true);
@@ -83,12 +86,29 @@ export default function WorkspaceRunLogsPage() {
     const ms = new Date(r.completedAt) - new Date(r.startedAt);
     return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
   };
+  function triggeredFromBadge(r) {
+    const src = (r.triggeredFrom || "project").toLowerCase();
+    if (src === "chat") return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-violet-100 text-violet-700">
+        <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 16c0 1.1-.9 2-2 2H5l-4 4V5c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v11z"/></svg>
+        Chat
+      </span>
+    );
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-700">
+        <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Agent
+      </span>
+    );
+  }
+
   const triggeredByLabel = (r) => {
     const who  = r.triggeredBy ? (r.triggeredBy.name || r.triggeredBy.email) : null;
     const type = (r.triggerType || "manual").toLowerCase();
     if (type === "auto")      return who ? `Auto (${who})` : "Auto";
     if (type === "scheduled") return "Scheduler";
     if (type === "chained")   return "Chained";
+    if (type === "chat")      return who ? `${who} (Chat)` : "Chat";
     return who ? who : "Manual";
   };
 
@@ -97,7 +117,7 @@ export default function WorkspaceRunLogsPage() {
       {/* Header — same gradient as WorkspaceProjectsPage */}
       <header className="shrink-0 flex items-center justify-between px-6 py-4" style={HEADER_STYLE}>
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(`/workspace/${slug}/projects`)}
+          <button onClick={() => backPath ? navigate(backPath) : navigate(-1)}
             className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -139,10 +159,10 @@ export default function WorkspaceRunLogsPage() {
             {runs.length > 0 && (
               <div className="flex gap-0 border border-white/20 rounded-lg overflow-hidden bg-white/10">
                 <button onClick={() => {
-                  const headers = ["Project", "Skill", "Status", "Triggered By", "Started", "Duration", "Output", "Error"];
+                  const headers = ["Project", "Skill", "Status", "Triggered From", "Triggered By", "Started", "Duration", "Output", "Error"];
                   const rows = runs.map(r => [
-                    r.project?.name || "", r.agent?.name || "", r.status,
-                    triggeredByLabel(r), fmt(r.startedAt), duration(r),
+                    r.project?.name || "", r.skillName || r.agent?.name || "", r.status,
+                    r.triggeredFrom || "project", triggeredByLabel(r), fmt(r.startedAt), duration(r),
                     r.output || "", r.error || "",
                   ]);
                   const csv = [headers, ...rows].map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
@@ -155,8 +175,8 @@ export default function WorkspaceRunLogsPage() {
                 <button onClick={() => {
                   const lines = [`# Run Logs`, `*Generated: ${new Date().toLocaleString()} — ${runs.length} runs*`, ""];
                   runs.forEach((r, i) => {
-                    lines.push(`## ${i+1}. ${r.project?.name || "—"} › ${r.agent?.name || "—"}`);
-                    lines.push(`- **Status:** ${r.status} · **By:** ${triggeredByLabel(r)} · **Started:** ${fmt(r.startedAt)} · **Duration:** ${duration(r)}`);
+                    lines.push(`## ${i+1}. ${r.project?.name || "—"} › ${r.skillName || r.agent?.name || "—"}`);
+                    lines.push(`- **Status:** ${r.status} · **From:** ${r.triggeredFrom || "project"} · **By:** ${triggeredByLabel(r)} · **Started:** ${fmt(r.startedAt)} · **Duration:** ${duration(r)}`);
                     if (r.output) lines.push("", "```", r.output, "```");
                     if (r.error)  lines.push("", "**Error:**", "```", r.error, "```");
                     lines.push("", "---", "");
@@ -171,7 +191,7 @@ export default function WorkspaceRunLogsPage() {
                   const escape = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
                   const blocks = runs.map((r,i) =>
                     `<div class="run"><h2>${i+1}. ${escape(r.project?.name)} › ${escape(r.agent?.name)}</h2>` +
-                    `<div class="meta"><span class="status ${r.status}">${escape(r.status)}</span> · ${escape(triggeredByLabel(r))} · ${escape(fmt(r.startedAt))} · ${escape(duration(r))}</div>` +
+                    `<div class="meta"><span class="status ${r.status}">${escape(r.status)}</span> · <span class="from">${escape(r.triggeredFrom || "project")}</span> · ${escape(triggeredByLabel(r))} · ${escape(fmt(r.startedAt))} · ${escape(duration(r))}</div>` +
                     `${r.output ? `<pre>${escape(r.output)}</pre>` : ""}${r.error ? `<pre class="error">${escape(r.error)}</pre>` : ""}</div>`
                   ).join("");
                   const w = window.open("","_blank");
@@ -195,14 +215,14 @@ export default function WorkspaceRunLogsPage() {
               </svg>
             </div>
             <p className="text-sm font-medium text-gray-600 mb-1">No runs yet</p>
-            <p className="text-xs text-gray-400">Project runs for this workspace will appear here</p>
+            <p className="text-xs text-gray-400">Agent runs for this workspace will appear here</p>
           </div>
         ) : (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  {["Project", "Skill", "Status", "Triggered By", "Started", "Duration", "Logs"].map(h => (
+                  {["Agent", "Skill", "Status", "Triggered From", "Triggered By", "Started", "Duration", "Logs"].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -212,8 +232,16 @@ export default function WorkspaceRunLogsPage() {
                   <React.Fragment key={r.id}>
                     <tr className="hover:bg-gray-50">
                       <td className="px-4 py-3 font-medium text-gray-900 max-w-[140px] truncate">{r.project?.name || "—"}</td>
-                      <td className="px-4 py-3 text-gray-700">{r.agent?.name || "—"}</td>
+                      <td className="px-4 py-3 text-gray-700">
+                        {r.skillName
+                          ? <span className="text-gray-900 font-medium">{r.skillName}</span>
+                          : r.agent?.name || "—"}
+                        {r.skillName && r.agent?.name && r.agent.name !== r.project?.name && (
+                          <span className="text-gray-400 text-xs ml-1">({r.agent.name})</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3">{statusBadge(r.status)}</td>
+                      <td className="px-4 py-3">{triggeredFromBadge(r)}</td>
                       <td className="px-4 py-3 text-gray-500">{triggeredByLabel(r)}</td>
                       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{fmt(r.startedAt)}</td>
                       <td className="px-4 py-3 text-gray-500">{duration(r)}</td>
@@ -226,13 +254,13 @@ export default function WorkspaceRunLogsPage() {
                     </tr>
                     {expanded === r.id && (
                       <tr className="bg-gray-50">
-                        <td colSpan={7} className="px-6 py-4">
+                        <td colSpan={8} className="px-6 py-4">
                           <div className="flex items-center justify-between mb-3">
                             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Output</span>
                             <div className="flex gap-0 border border-gray-200 rounded-lg overflow-hidden bg-white">
                               <button onClick={() => {
-                                const headers = ["Project", "Skill", "Status", "Triggered By", "Started", "Duration", "Output", "Error"];
-                                const row = [r.project?.name || "", r.agent?.name || "", r.status, triggeredByLabel(r), fmt(r.startedAt), duration(r), r.output || "", r.error || ""];
+                                const headers = ["Project", "Skill", "Status", "Triggered From", "Triggered By", "Started", "Duration", "Output", "Error"];
+                                const row = [r.project?.name || "", r.agent?.name || "", r.status, r.triggeredFrom || "project", triggeredByLabel(r), fmt(r.startedAt), duration(r), r.output || "", r.error || ""];
                                 const csv = [headers, row].map(cols => cols.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
                                 const a = document.createElement("a");
                                 a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" }));
@@ -243,7 +271,7 @@ export default function WorkspaceRunLogsPage() {
                               <button onClick={() => {
                                 const lines = [
                                   `# ${r.project?.name || "Project"} › ${r.agent?.name || "Skill"} — Run Log`,
-                                  `- **Status:** ${r.status}  **By:** ${triggeredByLabel(r)}  **Started:** ${fmt(r.startedAt)}  **Duration:** ${duration(r)}`,
+                                  `- **Status:** ${r.status}  **From:** ${r.triggeredFrom || "project"}  **By:** ${triggeredByLabel(r)}  **Started:** ${fmt(r.startedAt)}  **Duration:** ${duration(r)}`,
                                   "",
                                 ];
                                 if (r.output) { lines.push("## Output", "```", r.output, "```", ""); }
@@ -257,7 +285,7 @@ export default function WorkspaceRunLogsPage() {
                               <button onClick={() => {
                                 const escape = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
                                 const w = window.open("","_blank");
-                                w.document.write(`<html><head><title>${escape(r.project?.name)} › ${escape(r.agent?.name)}</title><style>body{font-family:system-ui,sans-serif;font-size:13px;padding:32px;max-width:900px;margin:auto}h1{font-size:18px;font-weight:700;margin-bottom:4px}h2{font-size:13px;font-weight:600;color:#4b5563;margin:16px 0 6px}.meta{font-size:12px;color:#6b7280;margin-bottom:20px}pre{background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:12px;font-size:11px;white-space:pre-wrap;word-break:break-word;font-family:monospace}pre.error{background:#fef2f2;border-color:#fecaca;color:#dc2626}@media print{pre{page-break-inside:avoid}}</style></head><body><h1>${escape(r.project?.name||"Project")} › ${escape(r.agent?.name||"Agent")}</h1><div class="meta">Status: <strong>${escape(r.status)}</strong> · By: ${escape(triggeredByLabel(r))} · ${escape(fmt(r.startedAt))} · ${escape(duration(r))}</div>${r.output?`<h2>Output</h2><pre>${escape(r.output)}</pre>`:""}${r.error?`<h2>Error</h2><pre class="error">${escape(r.error)}</pre>`:""}</body></html>`);
+                                w.document.write(`<html><head><title>${escape(r.project?.name)} › ${escape(r.agent?.name)}</title><style>body{font-family:system-ui,sans-serif;font-size:13px;padding:32px;max-width:900px;margin:auto}h1{font-size:18px;font-weight:700;margin-bottom:4px}h2{font-size:13px;font-weight:600;color:#4b5563;margin:16px 0 6px}.meta{font-size:12px;color:#6b7280;margin-bottom:20px}pre{background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:12px;font-size:11px;white-space:pre-wrap;word-break:break-word;font-family:monospace}pre.error{background:#fef2f2;border-color:#fecaca;color:#dc2626}@media print{pre{page-break-inside:avoid}}</style></head><body><h1>${escape(r.project?.name||"Project")} › ${escape(r.agent?.name||"Agent")}</h1><div class="meta">Status: <strong>${escape(r.status)}</strong> · From: ${escape(r.triggeredFrom || "project")} · By: ${escape(triggeredByLabel(r))} · ${escape(fmt(r.startedAt))} · ${escape(duration(r))}</div>${r.output?`<h2>Output</h2><pre>${escape(r.output)}</pre>`:""}${r.error?`<h2>Error</h2><pre class="error">${escape(r.error)}</pre>`:""}</body></html>`);
                                 w.document.close(); w.print();
                               }} className="px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 border-l border-gray-200 transition-colors">.pdf</button>
                             </div>
@@ -285,8 +313,8 @@ export default function WorkspaceRunLogsPage() {
       {confirmClear && (
         <ConfirmDialog
           title="Clear Run Logs"
-          message="All project run logs for this workspace will be permanently deleted."
-          confirmLabel="Clear All"
+          message="The displayed run logs will be permanently deleted and cannot be recovered."
+          confirmLabel="Clear"
           loading={clearing}
           onConfirm={clearRuns}
           onCancel={() => setConfirmClear(false)}

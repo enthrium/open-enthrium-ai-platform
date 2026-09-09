@@ -94,10 +94,20 @@ router.post("/:slug/projects/:projectId/agents/:agentId/run", authenticate, asyn
     const ws = await wsMember(req, req.params.slug);
     if (!ws) return res.status(403).json({ error: "Access denied" });
 
-    const { input = "", triggerType = "manual" } = req.body;
+    const { input = "", triggerType = "manual", skillIndex } = req.body;
     const { getLLMConfig } = require("../providers/llm");
     const yaml    = require("js-yaml");
     const engine  = require("../engine");
+    const fs      = require("fs");
+    const path    = require("path");
+
+    const SKILLS_DIR = path.resolve(__dirname, "../../cli/skills");
+
+    function resolveSkillPath(folderPath) {
+      if (!folderPath) return null;
+      if (path.isAbsolute(folderPath)) return folderPath;
+      return path.resolve(__dirname, "../../../", folderPath);
+    }
 
     const [project, agent] = await Promise.all([
       req.db.project.findUnique({ where: { id: parseInt(req.params.projectId) } }),
@@ -105,12 +115,60 @@ router.post("/:slug/projects/:projectId/agents/:agentId/run", authenticate, asyn
     ]);
     if (!project || !agent) return res.status(404).json({ error: "Not found" });
 
-    const llmConfig  = await getLLMConfig();
-    const oeConfig   = (() => { try { return JSON.parse(project.oeConfig || "{}"); } catch { return {}; } })();
-    // Mirror CLI prepareConnectors: extract creds and wrap in authConfig/config JSON strings
-    // so every adapter can read them via JSON.parse(connector.config / connector.authConfig)
-    const connectors = (oeConfig.connectors || []).map((c, i) => {
+    // ── DB is the source of truth for agent.yaml (yamlContent) and oe-config ────
+    // SKILL.md is a raw source file stored on disk — read it from there.
+    // agent.yaml and oe-config.json live only in DB; never read them from disk.
+    let llmConfig    = await getLLMConfig();
+    let yamlContent  = agent.yamlContent;
+    let skillContent = "";  // SKILL.md is disk-only raw source file
+    let oeConfigObj  = (() => { try { return JSON.parse(project.oeConfig || "{}"); } catch { return {}; } })();
+
+    const absPath = agent.folderPath ? resolveSkillPath(agent.folderPath) : null;
+
+    // Resolve sub-skill folder for chain agents (skills: array in YAML)
+    // yamlContent comes from DB — no disk override
+    let skillDir  = absPath; // default: root agent folder
+    let skillName = null;    // individual skill name for chain runs
+    if (absPath && fs.existsSync(absPath)) {
+      if (typeof skillIndex === "number") {
+        try {
+          const rootDoc = yaml.load(yamlContent) || {};
+          const skillEntry = (rootDoc.skills || [])[skillIndex];
+          if (skillEntry?.path) {
+            skillName = skillEntry.path.split(/[/\\]/).pop() || null;
+            const sub = path.isAbsolute(skillEntry.path)
+              ? skillEntry.path
+              : path.resolve(absPath, skillEntry.path);
+            if (fs.existsSync(sub)) skillDir = sub;
+          }
+        } catch {}
+      } else {
+        // Auto-detect: if this is a chain YAML (has skills:) and no SKILL.md at root, use skills[0]
+        try {
+          const rootDoc = yaml.load(yamlContent) || {};
+          if (Array.isArray(rootDoc.skills) && rootDoc.skills.length > 0 && !fs.existsSync(path.join(absPath, "SKILL.md"))) {
+            const firstSkill = rootDoc.skills[0];
+            if (firstSkill?.path) {
+              const sub = path.isAbsolute(firstSkill.path)
+                ? firstSkill.path
+                : path.resolve(absPath, firstSkill.path);
+              if (fs.existsSync(sub)) skillDir = sub;
+            }
+          }
+        } catch {}
+      }
+
+      if (skillDir) {
+        try { skillContent = fs.readFileSync(path.join(skillDir, "SKILL.md"), "utf8"); } catch {}
+      }
+    }
+
+    // Build connectors; auto-set shell cwd to skill folder
+    const connectors = (oeConfigObj.connectors || []).map((c, i) => {
       const { connection_name, connection_type, ...creds } = c;
+      if (connection_type === "shell" && absPath && (!creds.cwd || creds.cwd === ".")) {
+        creds.cwd = absPath;
+      }
       return {
         id:         i + 1,
         name:       connection_name,
@@ -118,9 +176,11 @@ router.post("/:slug/projects/:projectId/agents/:agentId/run", authenticate, asyn
         status:     "active",
         authConfig: JSON.stringify(creds),
         config:     JSON.stringify(creds),
+        ...creds,
       };
     });
-    const doc        = (() => { try { return yaml.load(agent.yamlContent) || {}; } catch { return {}; } })();
+
+    const doc        = (() => { try { return yaml.load(yamlContent) || {}; } catch { return {}; } })();
 
     // Extract SKILL.md body (strip YAML frontmatter)
     function skillMdBody(content) {
@@ -130,7 +190,7 @@ router.post("/:slug/projects/:projectId/agents/:agentId/run", authenticate, asyn
       const end = s.indexOf("---", 3);
       return end === -1 ? s : s.slice(end + 3).trim();
     }
-    const skillPrompt = skillMdBody(agent.skillContent);
+    const skillPrompt = skillMdBody(skillContent);
 
     const agentSpec  = {
       systemPrompt: skillPrompt || doc.instructions || doc.system_prompt || doc.systemPrompt || "",
@@ -145,7 +205,7 @@ router.post("/:slug/projects/:projectId/agents/:agentId/run", authenticate, asyn
     res.setHeader("Connection",    "keep-alive");
 
     const run = await req.db.projectRun.create({
-      data: { projectId: project.id, agentId: agent.id, triggeredByUserId: req.user?.id || null, status: "running", input: input || null, triggerType: triggerType || "manual" },
+      data: { projectId: project.id, agentId: agent.id, triggeredByUserId: req.user?.id || null, status: "running", input: input || null, triggerType: triggerType || "manual", triggeredFrom: "project", skillName: skillName || null },
     });
 
     const { executeTool } = require("../utils/tools/registry");
@@ -192,9 +252,12 @@ router.get("/:slug/project-runs", authenticate, async (req, res) => {
     const { period = "all" } = req.query;
     const days = { "7d": 7, "30d": 30 }[period];
     const startFilter = days ? { gte: new Date(Date.now() - days * 86400000) } : undefined;
+    const isAdmin = req.user.role === "admin" || req.user.role === "manager";
     const runs = await req.db.projectRun.findMany({
       where: {
         project: { workspaceId: ws.id },
+        // Regular users see only their own runs; admins/managers see all
+        ...(!isAdmin ? { triggeredByUserId: req.user.id } : {}),
         ...(startFilter ? { startedAt: startFilter } : {}),
       },
       orderBy: { startedAt: "desc" },
@@ -209,12 +272,18 @@ router.get("/:slug/project-runs", authenticate, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Clear all project runs (manager/admin only — destructive)
-router.delete("/:slug/project-runs", authenticate, requireManagerOrAdmin, async (req, res) => {
+// Clear project runs — admins/managers clear all; regular users clear only their own
+router.delete("/:slug/project-runs", authenticate, async (req, res) => {
   try {
     const workspace = await req.db.workspace.findUnique({ where: { slug: req.params.slug } });
     if (!workspace) return res.status(404).json({ error: "Workspace not found" });
-    await req.db.projectRun.deleteMany({ where: { project: { workspaceId: workspace.id } } });
+    const isAdmin = req.user.role === "admin" || req.user.role === "manager";
+    await req.db.projectRun.deleteMany({
+      where: {
+        project: { workspaceId: workspace.id },
+        ...(!isAdmin ? { triggeredByUserId: req.user.id } : {}),
+      },
+    });
     res.json({ ok: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

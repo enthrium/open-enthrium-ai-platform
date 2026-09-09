@@ -12,7 +12,6 @@
 [![macOS](https://img.shields.io/badge/macOS-Download-000000?logo=apple&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-agent-runtime/releases/latest/download/oe-runtime-macos)
 [![npm](https://img.shields.io/npm/v/@openenthrium/oe-runtime?color=4f46e5&label=npm)](https://www.npmjs.com/package/@openenthrium/oe-runtime)
 [![Website](https://img.shields.io/badge/Website-openenthrium.com-4f46e5)](https://www.openenthrium.com)
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 
 </div>
 
@@ -32,7 +31,7 @@ Supports two agent formats:
 ## Quick Start
 
 ```bash
-npx -y @openenthrium/oe-runtime ./skills/hello-world
+npx -y @openenthrium/oe-runtime@latest ./skills/hello-world
 ```
 
 Or download a binary from the [releases page](https://github.com/enthrium/open-enthrium-ai-agent-runtime/releases/latest) and run:
@@ -121,7 +120,7 @@ Summarise the findings in plain English with key numbers highlighted.
 **Run it:**
 
 ```bash
-npx -y @openenthrium/oe-runtime ./my-skill
+npx -y @openenthrium/oe-runtime@latest ./my-skill
 ```
 
 Pass the folder — OE Runtime resolves `agent.yaml` inside it automatically.
@@ -182,7 +181,7 @@ Enable server mode in `oe-config.json`:
 Start:
 
 ```bash
-npx -y @openenthrium/oe-runtime --serve --config oe-config.json
+npx -y @openenthrium/oe-runtime@latest --serve --config oe-config.json
 ```
 
 **Endpoints:**
@@ -204,7 +203,7 @@ When an agent has `trigger_type: manual` skills, the HTTP server pauses at each 
 curl -X POST http://localhost:3333/run-file \
   -H "x-api-key: your-secret" \
   -H "Content-Type: application/json" \
-  -d '{"file": "/path/to/agent.yaml", "input": "run"}'
+  -d '{"file": "/path/to/agent.yaml"}'
 ```
 
 ```json

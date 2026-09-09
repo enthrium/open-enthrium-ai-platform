@@ -1,13 +1,132 @@
 import React, { useState, useEffect, useRef } from "react";
 import VisualizationCard from "../../components/VisualizationCard";
 import { exportMD, exportFilename } from "../../utils/exportOutput";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../utils/api";
 import WorkspaceDrawer from "../../components/WorkspaceDrawer";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+// ── MCP Status Badge ──────────────────────────────────────────────────────────
+
+const TYPE_ICONS = {
+  mysql:      "🗄️",
+  postgresql: "🐘",
+  filesystem: "📁",
+  github:     "🐙",
+  rest:       "🌐",
+  graphql:    "⬡",
+};
+
+function McpStatusBadge() {
+  const [status,  setStatus]  = useState(null);  // null = loading
+  const [open,    setOpen]    = useState(false);
+  const ref = useRef();
+
+  useEffect(() => {
+    let cancelled = false;
+    api.get("/mcp-status").then(r => {
+      if (!cancelled) setStatus(r.data);
+    }).catch(() => {
+      if (!cancelled) setStatus({ online: false, tools: 0, connectors: [], externalServers: [] });
+    });
+    // Refresh every 30s
+    const id = setInterval(() => {
+      api.get("/mcp-status").then(r => {
+        if (!cancelled) setStatus(r.data);
+      }).catch(() => {});
+    }, 30000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
+
+  // Close popover on outside click
+  useEffect(() => {
+    if (!open) return;
+    function handler(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  if (status === null) return null; // still loading — show nothing
+
+  const connected = status.online;
+  const connCount = status.connectors?.length || 0;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        title={connected ? `MCP Connected · ${status.tools} tools` : "MCP Offline"}
+        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium transition-colors ${
+          connected
+            ? "bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+            : "bg-gray-50 border-gray-200 text-gray-400 hover:bg-gray-100"
+        }`}
+      >
+        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${connected ? "bg-green-500" : "bg-gray-300"}`} />
+        <span>MCP</span>
+        {connected && connCount > 0 && (
+          <span className="bg-green-200 text-green-800 rounded-full px-1.5 py-px text-[10px] font-bold leading-none">
+            {connCount}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+          {/* Header */}
+          <div className={`px-4 py-3 flex items-center gap-2 border-b border-gray-100 ${connected ? "bg-green-50" : "bg-gray-50"}`}>
+            <span className={`w-2 h-2 rounded-full shrink-0 ${connected ? "bg-green-500" : "bg-gray-300"}`} />
+            <span className="text-sm font-semibold text-gray-800">
+              {connected ? "MCP Connected" : "MCP Offline"}
+            </span>
+            {connected && (
+              <span className="ml-auto text-xs text-gray-500">{status.tools} tools loaded</span>
+            )}
+          </div>
+
+          {/* Connectors */}
+          {connected && connCount > 0 ? (
+            <div className="py-2">
+              <p className="px-4 pt-1 pb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Data Connectors</p>
+              {status.connectors.map((c, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors">
+                  <span className="text-base leading-none">{TYPE_ICONS[c.type] || "🔌"}</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">{c.name}</p>
+                    <p className="text-[11px] text-gray-400">{c.type} · {c.toolPrefix}*</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : connected ? (
+            <p className="px-4 py-4 text-sm text-gray-500">No data connectors configured.</p>
+          ) : (
+            <p className="px-4 py-4 text-sm text-gray-500">The MCP server is not reachable. Check Settings → MCP Servers.</p>
+          )}
+
+          {/* External servers */}
+          {connected && status.externalServers?.length > 0 && (
+            <div className="border-t border-gray-100 py-2">
+              <p className="px-4 pt-1 pb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">External MCP Servers</p>
+              {status.externalServers.map((s, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors">
+                  <span className="text-base leading-none">🌐</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">{s.name}</p>
+                    <p className="text-[11px] text-gray-400 truncate">{s.url}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Thread sidebar item ────────────────────────────────────────────────────────
 
@@ -132,6 +251,55 @@ function stripMarkdown(text = "") {
     .replace(/\s+/g, " ").trim();
 }
 
+// ── Chart renderer — uses Recharts (already installed) ───────────────────────
+// LLM outputs JSON in a ```chart block: { type, labels, datasets: [{ label, data, color }] }
+
+import {
+  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+} from "recharts";
+
+const CHART_COLORS = ["#6366f1","#22c55e","#f59e0b","#ef4444","#3b82f6","#a855f7","#14b8a6","#f97316"];
+
+function ChatChart({ raw }) {
+  let spec;
+  try { spec = JSON.parse(raw); } catch { return null; } // incomplete during streaming — show nothing
+
+  const { type = "bar", labels = [], datasets = [] } = spec;
+  // Build recharts-friendly data: [{ name: label, Series1: val, ... }]
+  const data = labels.map((label, i) => {
+    const row = { name: label };
+    datasets.forEach(ds => { row[ds.label || "Value"] = ds.data?.[i] ?? 0; });
+    return row;
+  });
+  const keys = datasets.map(ds => ds.label || "Value");
+
+  return (
+    <div className="my-3">
+      <ResponsiveContainer width="100%" height={300}>
+        {type === "pie" || type === "doughnut" ? (
+          <PieChart>
+            <Pie data={data} dataKey={keys[0]} nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+              {data.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+            </Pie>
+            <Tooltip /><Legend />
+          </PieChart>
+        ) : type === "line" ? (
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis /><Tooltip /><Legend />
+            {keys.map((k, i) => <Line key={k} type="monotone" dataKey={k} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2} dot={false} />)}
+          </LineChart>
+        ) : (
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis /><Tooltip /><Legend />
+            {keys.map((k, i) => <Bar key={k} dataKey={k} fill={CHART_COLORS[i % CHART_COLORS.length]} radius={[4,4,0,0]} />)}
+          </BarChart>
+        )}
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 // ── Markdown renderer ─────────────────────────────────────────────────────────
 
 function CodeBlock({ children }) {
@@ -161,6 +329,65 @@ function CodeBlock({ children }) {
   );
 }
 
+// ── Table with "View as Chart" toggle ────────────────────────────────────────
+// Parses the markdown table AST to extract headers + rows, then lets the user
+// toggle between the table view and a Recharts bar chart with one click.
+
+function extractTableData(node) {
+  try {
+    const thead = node?.children?.find(c => c.tagName === "thead");
+    const tbody = node?.children?.find(c => c.tagName === "tbody");
+    if (!thead || !tbody) return null;
+
+    const headers = thead.children?.[0]?.children?.map(th =>
+      th.children?.map(c => c.value || "").join("") || ""
+    ) || [];
+
+    const rows = (tbody.children || []).map(tr =>
+      (tr.children || []).map(td =>
+        td.children?.map(c => c.value || c.children?.map(x => x.value || "").join("") || "").join("") || ""
+      )
+    );
+
+    if (headers.length < 2 || rows.length === 0) return null;
+
+    // First column = labels, remaining = numeric series
+    const labels = rows.map(r => r[0]);
+    const datasets = headers.slice(1).map((h, hi) => ({
+      label: h,
+      data:  rows.map(r => parseFloat(r[hi + 1]) || 0),
+    }));
+    return { labels, datasets };
+  } catch { return null; }
+}
+
+function TableWithChart({ children, node }) {
+  const [showChart, setShowChart] = useState(false);
+  const chartData = extractTableData(node);
+
+  return (
+    <div className="my-3">
+      {chartData && (
+        <div className="flex justify-end mb-1">
+          <button
+            onClick={() => setShowChart(v => !v)}
+            className="text-[11px] font-medium px-2.5 py-1 rounded-lg border border-gray-200 text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors flex items-center gap-1"
+          >
+            {showChart ? "📋 Table" : "📊 Chart"}
+          </button>
+        </div>
+      )}
+      {showChart && chartData ? (
+        <ChatChart raw={JSON.stringify({ type: "bar", labels: chartData.labels, datasets: chartData.datasets })} />
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="text-sm border-collapse w-full">{children}</table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const MD_COMPONENTS = {
   p:          ({ children }) => <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>,
   h1:         ({ children }) => <h1 className="text-xl font-bold mb-3 mt-4 first:mt-0">{children}</h1>,
@@ -174,32 +401,69 @@ const MD_COMPONENTS = {
   blockquote: ({ children }) => <blockquote className="border-l-4 border-gray-300 pl-4 py-1 my-3 text-gray-600 italic">{children}</blockquote>,
   hr:         () => <hr className="my-4 border-gray-200" />,
   a:          ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-indigo underline hover:opacity-80">{children}</a>,
-  code:       ({ inline, children }) => inline
-    ? <code className="bg-gray-100 text-gray-800 text-[13px] px-1.5 py-0.5 rounded font-mono">{children}</code>
-    : <code className="block">{children}</code>,
-  pre:        ({ children }) => <CodeBlock>{children}</CodeBlock>,
-  table:      ({ children }) => <div className="overflow-x-auto my-3"><table className="text-sm border-collapse w-full">{children}</table></div>,
+  code:       ({ inline, className, children }) => {
+    const lang = /language-(\w+)/.exec(className || "")?.[1];
+    if (!inline && lang === "chart") {
+      return <ChatChart raw={String(children).replace(/\n$/, "")} />;
+    }
+    return inline
+      ? <code className="bg-gray-100 text-gray-800 text-[13px] px-1.5 py-0.5 rounded font-mono">{children}</code>
+      : <code className={`block${className ? ` ${className}` : ""}`}>{children}</code>;
+  },
+  pre:        ({ children }) => {
+    // Skip dark code-block wrapper for chart blocks — ChatChart handles its own styling
+    const child = React.Children.toArray(children)[0];
+    if (child?.props?.className?.includes("language-chart")) return <>{children}</>;
+    return <CodeBlock>{children}</CodeBlock>;
+  },
+  table:      ({ children, node }) => <TableWithChart node={node}>{children}</TableWithChart>,
   th:         ({ children }) => <th className="border border-gray-200 px-3 py-1.5 bg-gray-50 font-semibold text-left">{children}</th>,
   td:         ({ children }) => <td className="border border-gray-200 px-3 py-1.5">{children}</td>,
 };
 
+// Split content at ```chart blocks regardless of surrounding text,
+// then render each part as markdown or a native Recharts chart.
+const CHART_RE = /```chart\s*([\s\S]*?)```/g;
+
 function MarkdownContent({ content }) {
+  const parts = [];
+  let last = 0;
+  let m;
+  CHART_RE.lastIndex = 0;
+  while ((m = CHART_RE.exec(content)) !== null) {
+    if (m.index > last) parts.push({ type: "md",    text: content.slice(last, m.index) });
+    parts.push({ type: "chart", text: m[1].trim() });
+    last = m.index + m[0].length;
+  }
+  if (last < content.length) parts.push({ type: "md", text: content.slice(last) });
+
   return (
     <div className="text-[15px] text-gray-900">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
-        {content}
-      </ReactMarkdown>
+      {(parts.length ? parts : [{ type: "md", text: content }]).map((p, i) =>
+        p.type === "chart"
+          ? <ChatChart key={i} raw={p.text} />
+          : p.text.trim() && (
+              <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
+                {p.text}
+              </ReactMarkdown>
+            )
+      )}
     </div>
   );
 }
 
 // ── Chat message ──────────────────────────────────────────────────────────────
 
-function ChatMessage({ msg, ttsSettings, onShowSources }) {
+const CHAIN_ID_RE = /chain_id:\s*`([^`]+)`/;
+
+function ChatMessage({ msg, ttsSettings, onShowSources, onAction }) {
   const isUser = msg.role === "user";
   const [speaking, setSpeaking] = React.useState(false);
   const [copied, setCopied]     = React.useState(false);
   const audioRef = React.useRef(null);
+
+  // Detect pending manual chain approval in this message
+  const pendingChainId = !isUser ? (CHAIN_ID_RE.exec(msg.content)?.[1] || null) : null;
 
   function stopSpeech() {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
@@ -271,6 +535,45 @@ function ChatMessage({ msg, ttsSettings, onShowSources }) {
 
         {/* Visualization card */}
         {msg.visualization && <VisualizationCard visualization={msg.visualization} />}
+
+        {/* Chain approval buttons */}
+        {pendingChainId && onAction && (
+          <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+            <div className="flex items-center gap-2 mb-2.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+              <span className="text-xs font-semibold text-amber-800">Manual approval required — what would you like to do?</span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => onAction(`approve chain_id:\`${pendingChainId}\``)}
+                className="flex items-center justify-center gap-1.5 flex-1 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-semibold transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+                Approve
+              </button>
+              <button
+                onClick={() => onAction(`skip chain_id:\`${pendingChainId}\``)}
+                className="flex items-center justify-center gap-1.5 flex-1 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                </svg>
+                Skip
+              </button>
+              <button
+                onClick={() => onAction(`abort chain_id:\`${pendingChainId}\``)}
+                className="flex items-center justify-center gap-1.5 flex-1 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold border border-red-200 transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Abort
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Action bar */}
         <div className="flex items-center gap-0.5 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -359,7 +662,8 @@ function SourcesPanel({ sources, onClose }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function WorkspaceChat() {
-  const { slug } = useParams();
+  const { slug }   = useParams();
+  const { pathname } = useLocation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -682,6 +986,7 @@ export default function WorkspaceChat() {
               setMessages(m => [...m, { id: Date.now() + 1, role: "assistant", content: evt.dlp.message }]);
               setDlpPrompt({ type: "warn", policyNames: evt.dlp.policyNames, originalText: text });
             }
+            if (evt.tool_call) { setStreamingText(t => (t ? t + "\n" : "") + `🔧 Calling \`${evt.tool_call}\`...`); }
             if (evt.chunk) { accumulated += evt.chunk; setStreamingText(accumulated); }
             if (evt.done)  { finalSources = evt.sources || []; finalVisualization = evt.visualization || null; if (evt.content) accumulated = evt.content; }
             if (evt.error) { accumulated = `*Error: ${evt.error}*`; }
@@ -802,24 +1107,6 @@ export default function WorkspaceChat() {
           ))}
         </div>
 
-        {/* Bottom nav */}
-        <div className="shrink-0 border-t border-gray-200 px-3 py-3 space-y-0.5">
-          {[
-            { id: "projects", label: "Agents", path: `/workspace/${slug}/projects`, icon: "M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" },
-            { id: "embed",    label: "Embed",    path: `/workspace/${slug}/embed`,    icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" },
-          ].map(item => (
-            <button
-              key={item.id}
-              onClick={() => navigate(item.path)}
-              className="flex items-center gap-2.5 w-full px-2 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
-            >
-              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} />
-              </svg>
-              {item.label}
-            </button>
-          ))}
-        </div>
 
       </div>
 
@@ -837,7 +1124,25 @@ export default function WorkspaceChat() {
           </div>
 
           {/* Right actions */}
-          <div className="flex items-center gap-1 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Quick nav — Agents · Embed (admin/manager only) · Logs */}
+            {[
+              { id: "projects", label: "Agents",   path: `/workspace/${slug}/projects`, icon: "M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z", adminOnly: true },
+              { id: "embed",    label: "Embed",    path: `/workspace/${slug}/embed`,    icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",                                adminOnly: true },
+              { id: "run-logs", label: "Logs",     path: `/workspace/${slug}/run-logs`, icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" },
+            ].filter(item => !item.adminOnly || canManageDocs).map(item => (
+              <button key={item.id} onClick={() => navigate(item.path, { state: { from: pathname } })} title={item.label}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} />
+                </svg>
+                {item.label}
+              </button>
+            ))}
+            <div className="w-px h-4 bg-gray-200 mx-1" />
+            {/* MCP status badge */}
+            <McpStatusBadge />
+
             {/* History breadcrumbs button */}
             {messages.filter(m => m.role === "user").length > 0 && (
               <button
@@ -968,7 +1273,7 @@ export default function WorkspaceChat() {
               </div>
             )}
 
-            {messages.map(msg => (
+            {messages.map((msg, idx) => (
               <div
                 key={msg.id}
                 ref={el => { if (el) messageRefs.current.set(msg.id, el); else messageRefs.current.delete(msg.id); }}
@@ -977,6 +1282,11 @@ export default function WorkspaceChat() {
                   msg={msg}
                   ttsSettings={ttsSettings}
                   onShowSources={setActiveSources}
+                  onAction={
+                    idx === messages.length - 1 && !streaming && msg.role === "assistant"
+                      ? text => sendMessage(null, text)
+                      : null
+                  }
                 />
               </div>
             ))}

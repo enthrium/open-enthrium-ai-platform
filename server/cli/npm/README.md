@@ -8,7 +8,6 @@ Run SKILL.md agents and YAML workflows against any enterprise data source — no
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-4f46e5.svg)](https://github.com/enthrium/open-enthrium-ai-agent-runtime/blob/main/LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/enthrium/open-enthrium-ai-agent-runtime?color=4f46e5&label=latest)](https://github.com/enthrium/open-enthrium-ai-agent-runtime/releases)
 [![Website](https://img.shields.io/badge/Website-openenthrium.com-4f46e5)](https://www.openenthrium.com)
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 
 ---
 
@@ -26,7 +25,7 @@ Supports two agent formats:
 ## Quick Start
 
 ```bash
-npx -y @openenthrium/oe-runtime ./skills/hello-world
+npx -y @openenthrium/oe-runtime@latest ./skills/hello-world
 ```
 
 > **`-y` is required** — without it npx blocks waiting for keyboard input and the agent never runs.
@@ -107,7 +106,7 @@ Summarise the findings in plain English with key numbers highlighted.
 **Run it:**
 
 ```bash
-npx -y @openenthrium/oe-runtime ./my-skill
+npx -y @openenthrium/oe-runtime@latest ./my-skill
 ```
 
 Pass the folder — OE Runtime resolves `agent.yaml` inside it automatically.
@@ -164,7 +163,7 @@ Enable server mode in `oe-config.json`:
 Start:
 
 ```bash
-npx -y @openenthrium/oe-runtime --serve --config oe-config.json
+npx -y @openenthrium/oe-runtime@latest --serve --config oe-config.json
 ```
 
 **Endpoints:**
@@ -184,7 +183,7 @@ When a pipeline has manual skills, the server pauses at each one and returns a `
 # 1. Start the agent
 curl -X POST http://localhost:3333/run-file \
   -H "x-api-key: your-secret" -H "Content-Type: application/json" \
-  -d '{"file": "/path/to/agent.yaml", "input": "run"}'
+  -d '{"file": "/path/to/agent.yaml"}'
 # → { "pending_skill_chain": { "chain_id": "abc123", "skill_name": "email" } }
 
 # 2. Approve

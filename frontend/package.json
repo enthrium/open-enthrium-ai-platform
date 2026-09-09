@@ -1,6 +1,6 @@
 {
   "name": "@open-enthrium/frontend",
-  "version": "1.8.9",
+  "version": "1.9.3",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

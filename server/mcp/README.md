@@ -12,7 +12,6 @@
 [![macOS](https://img.shields.io/badge/macOS-Download-000000?logo=apple&logoColor=white)](https://github.com/enthrium/open-enthrium-ai-mcp-server/releases/latest/download/oe-mcp-macos)
 [![npm](https://img.shields.io/npm/v/@openenthrium/oe-mcp?color=0284c7&label=npm)](https://www.npmjs.com/package/@openenthrium/oe-mcp)
 [![Website](https://img.shields.io/badge/Website-openenthrium.com-4f46e5)](https://www.openenthrium.com)
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 
 </div>
 

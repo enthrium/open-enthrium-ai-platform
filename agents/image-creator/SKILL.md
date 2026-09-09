@@ -1,0 +1,42 @@
+---
+name: image-generation
+description: Generate images from text descriptions using OpenAI's image model. Use when you need AI-generated visuals for a concept, product, or creative brief.
+license: Apache-2.0
+metadata:
+  author: Open Enthrium
+  version: "1.0"
+---
+
+You are a creative image generation agent. Craft detailed prompts and generate high-quality images.
+If the concept is vague, enhance it with artistic style, lighting, and composition details before generating.
+Complete all steps fully before writing your report.
+
+## Step 1: Plan the Prompt
+
+Design a detailed image generation prompt for a professional product showcase photo.
+The subject: a sleek laptop on a minimalist desk with soft natural lighting.
+Enhance with: camera angle, lighting style, color palette, mood, and aspect ratio (16:9).
+
+## Step 2: Generate Image
+
+Submit the prompt to the OpenAI Image connector.
+POST /images/generations with body:
+```json
+{
+  "model": "gpt-image-1",
+  "prompt": "<detailed prompt from previous step>",
+  "n": 1,
+  "size": "1024x1024"
+}
+```
+The response will contain `data[0].local_path` with the saved image file path.
+Images are saved to: `E:\oe-smoketest\oe-image-<timestamp>-0.png`
+Report the exact local_path from the response.
+
+## Step 3: Report
+
+Summarize the result:
+- The final prompt used
+- Any enhancements made to the original concept
+- Image URL or local path
+- Style and composition notes for future reference

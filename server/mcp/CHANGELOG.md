@@ -5,6 +5,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v1.9.3] — 2026-09-03
+
+### Fixed
+- **`npx` / Claude Code MCP connection timeout fixed** — npm package switched from binary-download-via-postinstall to a bundled Node.js source (ncc bundle); MCP server now starts immediately without downloading a binary, eliminating the 30s connection timeout
+- **Version always correct** — version reported by the server now always matches the published npm package version
+
+### Changed
+- **npm package architecture** — `bin.js` now runs `bundle.js` (ncc-compiled source + all deps) directly via Node.js; platform binaries on GitHub releases unchanged for standalone use
+- **No postinstall download** — `postinstall.js` removed; no binary download on install
+
+---
+
+## [v1.9.2] — 2026-09-03
+
+### Changed
+- **Version bump** — aligned with platform v1.9.2 release; no functional changes to MCP server in this release.
+
+---
+
+## [v1.9.1] — 2026-09-02
+
+### Changed
+- **Version bump** — aligned with platform v1.9.1 release; no functional changes to MCP server in this release.
+
+---
+
 ## [v1.9.0] — 2026-08-30
 
 ### Changed

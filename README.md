@@ -10,7 +10,6 @@ No code. No LangChain. No Python.
 [![Docker Pulls](https://img.shields.io/docker/pulls/jumbocoder/open-enthrium-ai-platform?color=2496ED&logo=docker&logoColor=white)](https://hub.docker.com/r/jumbocoder/open-enthrium-ai-platform)
 [![GitHub Release](https://img.shields.io/github/v/release/enthrium/open-enthrium-ai-platform?color=4f46e5&label=latest)](https://github.com/enthrium/open-enthrium-ai-platform/releases)
 [![Website](https://img.shields.io/badge/Website-Open_Enthrium-4f46e5)](https://www.openenthrium.com)
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/vWsZ24Msn)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-jumbocoder-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/jumbocoder/open-enthrium-ai-platform)
 
 </div>
@@ -34,15 +33,17 @@ A self-hosted, web-based open-source AI platform with three core capabilities:
 
 ```bash
 docker run -d \
+  -p 3000:3000 \
   -p 3001:3001 \
   -e JWT_SECRET=your-secret \
   -e SUPER_ADMIN_EMAIL=admin@yourdomain.com \
   -e SUPER_ADMIN_PASSWORD=your-password \
+  -e LICENSE_TYPE=community \
   -v open-enthrium-data:/app/server/storage \
   jumbocoder/open-enthrium-ai-platform:latest
 ```
 
-Open [http://localhost:3001](http://localhost:3001) and log in with your super admin credentials. Configure your LLM provider, embedding model, and vector database from the admin panel — no `.env` changes needed.
+Open [http://localhost:3000](http://localhost:3000) and log in with your super admin credentials. Configure your LLM provider, embedding model, and vector database from the admin panel — no `.env` changes needed.
 
 **Or run from source:**
 
@@ -58,7 +59,16 @@ yarn install
 
 # 3. Configure environment
 cp server/.env.example server/.env
-# Edit server/.env — set JWT_SECRET, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD
+# Edit server/.env — required variables:
+#   JWT_SECRET          — long random string (required)
+#   SUPER_ADMIN_EMAIL   — first admin account email
+#   SUPER_ADMIN_PASSWORD — first admin account password
+#   LICENSE_TYPE        — "community" (default) or "commercial"
+# Optional port overrides (defaults shown):
+#   FRONTEND_PORT=3000
+#   SERVER_PORT=3001
+#   PROCESSOR_PORT=3002
+#   MCP_PORT=3003
 
 # 4. Set up the database (Prisma)
 yarn workspace @open-enthrium/server db:push
@@ -106,7 +116,6 @@ Contributions are welcome. Before opening a PR:
 | ⚡ OE Runtime | [open-enthrium-ai-agent-runtime](https://github.com/enthrium/open-enthrium-ai-agent-runtime) |
 | 🔌 OE MCP | [open-enthrium-ai-mcp-server](https://github.com/enthrium/open-enthrium-ai-mcp-server) |
 | 🐛 Issues | [github.com/enthrium/open-enthrium-ai-platform/issues](https://github.com/enthrium/open-enthrium-ai-platform/issues) |
-| 💬 Discord | [discord.com/invite/vWsZ24Msn](https://discord.com/invite/vWsZ24Msn) |
 
 ---
 

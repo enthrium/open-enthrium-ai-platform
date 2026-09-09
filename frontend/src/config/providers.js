@@ -17,10 +17,10 @@ export const PROVIDERS = [
   },
   {
     id: "gemini", name: "Google Gemini", tag: "Cloud",
-    desc: "Gemini 2.0 Flash, Pro and more from Google.",
+    desc: "Gemini 3.6 Flash, 2.5 Pro and more from Google.",
     fields: [
       { key: "llm_api_key", label: "API Key",  type: "password", placeholder: "AIza..." },
-      { key: "llm_model",   label: "Model",    type: "model-select", defaultModel: "gemini-2.0-flash" }
+      { key: "llm_model",   label: "Model",    type: "model-select", defaultModel: "gemini-3.6-flash" }
     ]
   },
   {
@@ -189,8 +189,8 @@ export const EMBEDDING_PROVIDERS = [
     fields: [
       { key: "embedding_api_key", label: "API Key", type: "password", placeholder: "AIza..." },
       { key: "embedding_model", label: "Model", type: "select",
-        options: ["text-embedding-004", "embedding-001"],
-        defaultModel: "text-embedding-004" }
+        options: ["gemini-embedding-001", "gemini-embedding-2", "gemini-embedding-2-preview"],
+        defaultModel: "gemini-embedding-001" }
     ]
   },
   {
